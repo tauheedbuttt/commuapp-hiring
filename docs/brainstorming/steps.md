@@ -10,3 +10,5 @@ This doc covers the step i take to solve the assignment. Agents can add here ste
    3. saw how to view help in detail in detail page (bonus)
    4. verified output from claude in Postman by calling queries directly
 6. learn php laravel scaffold architecture
+7. setup base laravel+lighthouse project. with example geocoding call. to see how project is setup, what is where.
+8. delete unused files from backend
