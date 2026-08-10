@@ -1,0 +1,20 @@
+"Indicates what fields are available at the top level of a query operation."
+type Query {
+    "Resolve a town name to coordinates via the Nominatim geocoding API."
+    geocodeTown(
+        "The town name to geocode. Must be non-blank."
+        town: String! @rules(apply: ["required", "regex:/\\S/"])
+    ): TownLocation!
+}
+
+"A town resolved to a single geographic point."
+type TownLocation {
+    "The town name as provided in the request."
+    town: String!
+
+    "Latitude of the resolved location."
+    latitude: Float!
+
+    "Longitude of the resolved location."
+    longitude: Float!
+}
