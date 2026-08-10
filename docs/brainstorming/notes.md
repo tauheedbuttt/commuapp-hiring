@@ -1,0 +1,25 @@
+- avoid monorepo frameworks, just keep both codes in root directory. one repo contains all
+- product decision 1: customer is interviewer. so trying to make app, that looks similar to their existing one. so they feel easier to use it and can learn quickly.
+- screens: 
+  - Onboarding: Ask for location
+  - Home Page: Showing help posts in that location. Collapsable summary on top of page
+  - Settings Page: preferences for location filtering
+- Use same logo as commuapp
+- Simple AF geocoding api: https://nominatim.openstreetmap.org/search?q=Tampere&format=json
+  - no auth setup needed, no key management, one simple call, can swap easily
+  - response schema
+  - [{"place_id":166463799,"licence":"Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright","osm_type":"relation","osm_id":3579531,"lat":"61.4977988","lon":"23.7616335","class":"boundary","type":"administrative","place_rank":16,"importance":0.6858210048305723,"addresstype":"city","name":"Tampere","display_name":"Tampere, Tampere sub-region, Pirkanmaa, Mainland Finland, Finland","boundingbox":["61.4233923","61.8366140","23.5422878","24.1184947"]}]
+- api boundary: Laravel Backend
+- modular project, never spamming all functionality in one file.
+- envs instead of hardcoding urls, keys etc.
+- cache: geocoding results, generated summaries
+  - seperate keys for each
+  - avoid fetching nearby notice in cache. reason: want real-time feel. can implement with pull down to refresh UX and then cache gets invalidated at backend. but will decide later
+- after reconsidreation i notice these can only be implemented if user has given onboarding details since our task doesnt require this from use, we will not have an order by preference
+- "recent" = fixed `first: N` ordered CREATED_AT DESC, no local-storage/seen-tracking (device-local, unbounded growth, arbitrary daily-reset boundary, solves "what's new" not "how many recent") — same fetched batch feeds both list + Bedrock summary, single fetch, no separate summary-only query. seperate calls would indicate we need to feed data from list for bedrock summary for no reason.
+- use GraphQL as backend, because a lot of APIs in CommuApp are using graphql. makes sense to implement it and learn as well once real job i get.
+  - CommuAPI is graphql. My backend is graphql. less translation needed between both. same types fields can be used.
+  - easy to explore API due to schema by default.
+  - interfaces and types come with API, easier to generate TS types for mobile app.
+  - Natural merge of 2 sources, needed DTO merge in REST
+- own backend API: 2 queries — one returns posts + summary together (single fetch); the other kept separate for detail page so list query doesn't carry unnecessary fields.

@@ -1,0 +1,3669 @@
+"""
+Indicates that an Input Object is a OneOf Input Object (and thus requires exactly one of its fields be provided).
+"""
+directive @oneOf on INPUT_OBJECT
+
+type AccountVerification {
+  id: ID!
+  type: String!
+  completed_at: DateTime
+}
+
+type Asset {
+  id: ID
+  url: String
+  content_type: String
+  asset_original_name: String
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+type Badge {
+  name: String!
+  description: String
+  private_user_content: PrivateUserContent
+}
+
+type Block {
+  id: ID
+  blocker: User
+  blocked: User
+  created_at: DateTime
+}
+
+type Category {
+  id: ID
+  key: String!
+  subCategories: [Category]!
+  parent: Category
+  meta: String
+  themes: [Theme]!
+}
+
+input CategorySelection {
+  category: String!
+  subCategories: [String]
+  schema_version: Int
+}
+
+type Challenge {
+  id: ID!
+  title: String!
+  description: String
+  created_at: DateTime!
+  updated_at: DateTime
+  image: Asset
+  company: Company
+  reward: String
+  start_date: DateTime
+  end_date: DateTime
+  target_score: Int
+  current_score: Int
+  user_count: Int
+  joined_by_user: Boolean
+  goals: [Goal]
+  leaderboard: [ChallengeContribution]
+}
+
+type ChallengeContribution {
+  creator: User
+  team: Team
+  user_id: ID
+  total_score: Int!
+}
+
+"""A paginated list of Challenge items."""
+type ChallengePaginator {
+  """Pagination information about the list of items."""
+  paginatorInfo: PaginatorInfo!
+
+  """A list of Challenge items."""
+  data: [Challenge!]!
+}
+
+type Chat {
+  id: ID!
+  created_at: DateTime!
+  updated_at: DateTime!
+  messages: [ChatMessage]!
+  messagesV2: [LatestMessageNode]!
+  participants: [User]!
+  messageCount: Int
+  notice: Notice
+  employeeProfile: EmployeeProfile
+  companies: [Company]
+  team: Team
+}
+
+enum ChatFilter {
+  closed
+  all
+  unreads
+}
+
+type ChatMessage {
+  id: ID!
+  chat: Chat!
+  sender: User!
+  created_at: DateTime!
+  updated_at: DateTime!
+  deleted_at: DateTime!
+  message: String
+  location: ChatMessagePositionType
+  employeeProfile: EmployeeProfile
+  image: String
+  file: Asset
+  read_by: [User]!
+  sent_to: [User]!
+  pinned: Boolean
+  notice_id: ID
+  chat_id: ID
+  notice: Notice
+  parent: ChatMessage
+  tool_type: String
+  feedPost: FeedPost
+  feed_post_id: String
+  reactions: [MessageReactionCount!]!
+  my_reaction: String
+}
+
+"""A paginated list of ChatMessage items."""
+type ChatMessagePaginator {
+  """Pagination information about the list of items."""
+  paginatorInfo: PaginatorInfo!
+
+  """A list of ChatMessage items."""
+  data: [ChatMessage!]!
+}
+
+input ChatMessagePosition {
+  latitude: Float!
+  longitude: Float!
+}
+
+type ChatMessagePositionType {
+  latitude: String
+  longitude: String
+}
+
+"""A paginated list of Chat items."""
+type ChatPaginator {
+  """Pagination information about the list of items."""
+  paginatorInfo: PaginatorInfo!
+
+  """A list of Chat items."""
+  data: [Chat!]!
+}
+
+type CitizenBenefit {
+  id: ID!
+  created_at: DateTime!
+  updated_at: DateTime!
+  image: Asset
+  phone_number: String
+  email: String
+  website: String
+  contact_person: String
+  organisation: Company
+  languageVersions: [CitizenBenefitLanguageVersion!]!
+}
+
+type CitizenBenefitLanguageVersion {
+  id: ID!
+  created_at: DateTime!
+  updated_at: DateTime!
+  citizen_benefit: CitizenBenefit
+  citizen_benefit_id: ID!
+  language: String!
+  title: String
+  description: String
+}
+
+input CitizenBenefitPositionType {
+  latitude: String
+  longitude: String
+}
+
+type Company {
+  id: ID!
+  users: [User!]
+  notices_count: Int
+  subscriptionCompany: [orgSubscription!]
+  notices: [Notice!]
+  noticesWithInternals: [Notice!]
+  created_at: DateTime!
+  updated_at: DateTime!
+  name: String!
+  website: String
+  type: String
+  description: String @deprecated(reason: "Use `languageVersions` instead.")
+  logo_url: String
+  logo: Asset
+  cover: Asset
+  location: CompanyLocation
+  pivot: CompanyUserPivot
+  profile_translation_versions: [ProfileTranslation]
+  languageVersions: [CompanyLanguageVersion]
+  settings: CompanySettings
+  headquarters: String
+  users_count: Int
+  live_dashboard_activated: Boolean
+  feedPosts: [FeedPost]
+}
+
+type CompanyActivityData {
+  show_weekend_greeting: Boolean
+  active_users_count: Int
+  chats_count: Int
+  message_count: Int
+  posted_notices: Int
+  notices_count: Int
+}
+
+input CompanyActivityFromValues {
+  users: String
+  notices: String
+  chats: String
+}
+
+type CompanyLanguageVersion {
+  id: ID!
+  company_id: ID!
+  language: String!
+  description: String
+  values: String
+  benefits: String
+  operation_field: String
+}
+
+type CompanyLocation {
+  latitude: String!
+  longitude: String!
+}
+
+"""A paginated list of Company items."""
+type CompanyPaginator {
+  """Pagination information about the list of items."""
+  paginatorInfo: PaginatorInfo!
+
+  """A list of Company items."""
+  data: [Company!]!
+}
+
+type CompanySettings {
+  deal_settings: OrgDealSettings
+  notice_settings: OrgNoticeSettings
+  new_user_default_teams: [String]
+  frontpage_theme: FrontPageTemplates
+  org_as_theme: Boolean
+  default_internal_id: ID
+  general_team_id: ID
+  enabled_back_office_features: [String]
+  disabled_back_office_features: [String]
+}
+
+type CompanyStats {
+  total_helps_received: Int!
+  total_helps_given: Int!
+}
+
+type CompanyUserPivot {
+  role: String!
+  rights: [String]
+  id: ID
+  candidate: Boolean
+}
+
+input CompleteRequiresUserActionEventInput {
+  id: ID!
+}
+
+input ConfirmHelpRecordInput {
+  id: ID!
+  score: Int
+  note: String
+  show_name: Boolean
+}
+
+input ConnectCompanyUser {
+  id: ID!
+  role: String!
+}
+
+input ConnectContentInput {
+  type: String!
+  id: ID!
+}
+
+union Contents = PrivateUserContent
+
+input CreateBadgeBelongsTo {
+  connect: ID
+}
+
+input CreateBadgeInput {
+  name: String!
+  description: String
+  privateUserContent: CreateBadgeBelongsTo
+}
+
+input CreateChatInput {
+  notice: CreateChatMessageBelongsTo
+  team: CreateTeamBelongsTo
+  company: CreateCompanyBelongsTo
+  employeeProfile: CreateEmployeeBelongsTo
+  deal: CreateDealBelongsTo
+}
+
+input CreateChatMessageBelongsTo {
+  connect: ID
+}
+
+input CreateChatMessageInput {
+  chat: CreateChatMessageBelongsTo!
+  employeeProfile: CreateEmployeeBelongsTo
+  parent: CreateParentBelongsTo
+  message: String
+  location: ChatMessagePosition
+  image: String
+  noticeId: ID
+  file: String
+  fileName: String
+  toolType: String
+  feedPostId: String
+}
+
+input CreateCompanyBelongsTo {
+  connect: ID!
+}
+
+input CreateCompanyLanguageVersionInput {
+  language: String!
+  description: String
+}
+
+input CreateCompanyLocation {
+  latitude: Float!
+  longitude: Float!
+}
+
+input CreateDealBelongsTo {
+  connect: ID!
+}
+
+input CreateDealInput {
+  receiver: ID!
+  description: String!
+  notice: CreateNoticeBelongsTo!
+  team: CreateTeamBelongsTo
+  location: String
+
+  """
+  @deprecated:start_date - Use `start_date_utc` instead. This legacy value is
+  supposed to be in your local timezone while still being DateTime, and backend
+  tries to guess tz from user home country.
+  """
+  start_date: DateTime
+
+  """
+  @deprecated:end_date - Use `end_date_utc` instead. This legacy value is
+  supposed to be in your local timezone while still being DateTime, and backend
+  tries to guess tz from user home country.
+  """
+  end_date: DateTime
+  start_date_utc: DateTimeTz
+  end_date_utc: DateTimeTz
+  termination_conditions: String!
+  organisation: CreateCompanyBelongsTo
+  secondaryOrganisation: CreateCompanyBelongsTo
+}
+
+input CreateEmployeeBelongsTo {
+  connect: ID
+}
+
+input CreateFeedPostBelongsTo {
+  connect: ID!
+}
+
+input CreateFeedPostBelongsToReport {
+  connect: ID
+}
+
+input CreateFeedPostCommentInput {
+  text: String!
+  user: CreateUserBelongsTo
+  employeeProfile: CreateEmployeeBelongsTo
+  feed_post: CreateFeedPostBelongsTo!
+}
+
+input CreateFeedPostInput {
+  title: String!
+  description: String!
+  employeeProfile: CreateEmployeeBelongsTo
+  file: Upload
+  fileAsBase64: String
+  keywords: [String]
+  helpRecord: CreateHelpRecordBelongsTo
+}
+
+input CreateGiveSellContent {
+  price: Float!
+}
+
+input CreateGiveTradeContent {
+  preferred: String
+}
+
+input CreateGoalRecordInput {
+  organisation_id: ID!
+  goal_id: ID!
+  value: Int!
+  date: DateTime
+  description: String
+}
+
+input CreateHelpRecordBelongsTo {
+  connect: ID!
+}
+
+input CreateHelpRecordInput {
+  notice: CreateNoticeBelongsTo!
+  title: String
+  description: String
+  time_spent: Float
+  event_at: DateTime
+  helper: CreateUserBelongsTo
+  receiver: CreateUserBelongsTo
+  note: String
+  helperCompany: CreateCompanyBelongsTo
+  receiverCompany: CreateCompanyBelongsTo
+  receiverEmployeeProfile: CreateEmployeeBelongsTo
+  helperEmployeeProfile: CreateEmployeeBelongsTo
+  creator_role: RecordCreatorRole
+  show_name: Boolean
+  is_public: Boolean
+  creator_name_first: Boolean
+  schema_version: Int
+  impact_type_answers: [ImpactTypeInput]
+  allowDuplicates: Boolean
+}
+
+input CreateMyInterestBelongsTo {
+  connect: ID
+  create: CreateMyInterestInput
+  update: CreateMyInterestInput
+  upsert: CreateMyInterestInput
+}
+
+input CreateMyInterestInput {
+  side: [String]
+  company: [String]
+  owner: CreateUserBelongsTo!
+  categories: [CategorySelection]
+  keywordValue: [String]
+  interestMatch: interestMatchValue
+}
+
+input CreateNeedBuyContent {
+  priceEstimation: Float!
+  range: Float
+}
+
+input CreateNeedTradeContent {
+  offers: String!
+}
+
+input CreateNewsItemRead {
+  user: CreateUserBelongsTo!
+  news_item: ID!
+}
+
+input CreateNoticeBelongsTo {
+  connect: ID
+  create: CreateNoticeInput
+  update: CreateNoticeInput
+  upsert: CreateNoticeInput
+}
+
+input CreateNoticeBelongsToReport {
+  connect: ID
+}
+
+input CreateNoticeCategories {
+  schema_version: Int!
+  main: ID!
+  sub: [ID]!
+}
+
+input CreateNoticeInput {
+  owner: CreateUserBelongsTo!
+  company: CreateCompanyBelongsTo
+  internal_id: ID
+  employeeProfile: CreateEmployeeBelongsTo
+  type: NoticeType
+  side: NoticeSide
+  title: String!
+  description: String
+  categories: CreateNoticeCategories!
+  position: CreateNoticePosition!
+  giveSellContent: CreateGiveSellContent
+  giveTradeContent: CreateGiveTradeContent
+  needBuyContent: CreateNeedBuyContent
+  needTradeContent: CreateNeedTradeContent
+  registration_closed_hours_before: Int
+  in_return: String
+  theme: CreateThemeBelongsTo
+  expires_at: Date
+  image: String
+  invite_id: ID
+  remote: String
+}
+
+input CreateNoticePosition {
+  latitude: Float!
+  longitude: Float!
+}
+
+input CreateParentBelongsTo {
+  connect: ID
+}
+
+input CreatePrivateUserContentBelongsTo {
+  create: CreateUserInput
+}
+
+input CreatePrivateUserContentInput {
+  badges: [CreateBadgeInput]
+  email_verified: Boolean
+  strong_auth: Boolean
+}
+
+input CreateReviewAccolade {
+  name: String!
+  description: String!
+}
+
+input CreateReviewAccoladeBelongsTo {
+  connect: [ID]
+}
+
+input CreateReviewInput {
+  giver: CreateUserBelongsTo!
+  receiver: CreateUserBelongsTo!
+  description: String!
+  comment: String
+  comment_visible: Boolean
+  accolades: CreateReviewAccoladeBelongsTo
+}
+
+input CreateTeamBelongsTo {
+  connect: ID
+}
+
+input CreateTeamInput {
+  name: String!
+  companyId: ID!
+  description: String
+  visibility: String
+  default_team_role_id: ID
+}
+
+input CreateThemeBelongsTo {
+  connect: ID!
+}
+
+input CreateUserBelongsTo {
+  connect: ID
+  create: CreateUserInput
+  update: CreateUserInput
+  upsert: CreateUserInput
+}
+
+input CreateUserBelongsToReport {
+  connect: ID
+}
+
+input CreateUserInput {
+  name: String!
+  email: String!
+  description: String
+  avatar_url: String
+  phone: String
+  address: String
+  private_person_contents: CreatePrivateUserContentBelongsTo
+}
+
+input CreateUsersBelongsToMany {
+  connect: [ConnectCompanyUser!]
+  sync: [ConnectCompanyUser!]
+}
+
+type CustomerJourneyEvent {
+  id: ID!
+  event: String
+  type: String
+}
+
+type CustomRecordData {
+  name: String
+  sum_based: Boolean
+}
+
+scalar Date
+
+scalar DateTime
+
+scalar DateTimeTz
+
+type Deal {
+  id: ID!
+  users: [User]!
+  receiver: User
+  description: String!
+  cancellation_reason: String
+  start_date: DateTimeTz!
+  end_date: DateTimeTz
+  termination_conditions: String!
+  notice: Notice
+  type: String
+  team: Team
+  organisation: Company
+  created_at: DateTime
+  updated_at: DateTime
+  location: String
+  status: String!
+  sensitive_data: String
+}
+
+input DealIdInput {
+  dealId: ID!
+}
+
+"""A paginated list of Deal items."""
+type DealPaginator {
+  """Pagination information about the list of items."""
+  paginatorInfo: PaginatorInfo!
+
+  """A list of Deal items."""
+  data: [Deal!]!
+}
+
+type DealPivot {
+  deal_id: ID!
+  user_id: ID!
+  status: String
+  created_at: DateTime
+  updated_at: DateTime
+}
+
+type DelayedMessageResponse {
+  task_id: String
+  delayed_at: DateTime
+}
+
+input DeleteInterestSetInput {
+  id: ID!
+}
+
+type EmployeeProfile {
+  id: ID!
+  name: String!
+  description: String
+  avatar: Asset
+  avatar_url: String
+  user_id: ID!
+  company_id: ID!
+  updated_at: String
+  phone_number: String
+  address: String
+  alt_email: String
+  gender: String
+}
+
+union Entity = Notice | Company | FeedPost
+
+type ExternalUser {
+  name: String
+  email: String
+}
+
+type Favorite {
+  id: ID!
+  notice: Notice
+  user: User!
+}
+
+type FeedPost {
+  id: ID!
+  title: String!
+  description: String
+  image_url: String
+  image: Asset
+  owner: User
+  employeeProfile: EmployeeProfile
+  likes_count: Int
+  likes: [User]
+  comments_count: Int
+  created_at: DateTime!
+  updated_at: DateTime!
+  deleted_at: DateTime
+  keywords: [String]
+  facade_profile_data: FeedPostFacadeData
+}
+
+type FeedPostComment {
+  id: ID!
+  text: String!
+  user: User
+  employeeProfile: EmployeeProfile
+  feed_post: FeedPost
+  created_at: DateTime!
+  updated_at: DateTime!
+  deleted_at: DateTime
+}
+
+type FeedPostFacadeData {
+  username: String
+  avatar: String
+}
+
+"""A paginated list of FeedPost items."""
+type FeedPostPaginator {
+  """Pagination information about the list of items."""
+  paginatorInfo: PaginatorInfo!
+
+  """A list of FeedPost items."""
+  data: [FeedPost!]!
+}
+
+enum FrontPageTemplates {
+  DEFAULT
+  ORG_CONTENT_1
+  ORG_CONTENT_PREFER_INTERNAL
+}
+
+type GiveSellContent {
+  price: Float!
+  id: ID!
+  notice: Notice!
+}
+
+type GiveTradeContent {
+  """What user would prefer to get in return"""
+  preferred: String
+  notice: Notice!
+  id: ID!
+}
+
+type GlobalSearchItem {
+  type: String!
+  entity: GlobalSearchResult!
+  created_at: DateTime!
+}
+
+union GlobalSearchResult = Notice | FeedPost | NewsItem
+
+enum GlobalSearchSortBy {
+  CREATED_AT
+  DISTANCE_TO_USER
+}
+
+enum GlobalSearchSortDirection {
+  ASC
+  DESC
+}
+
+enum GlobalSearchType {
+  NOTICE
+  FEED_POST
+  NEWS_ITEM
+}
+
+type Goal {
+  id: ID!
+  created_at: DateTime!
+  updated_at: DateTime
+  title: String
+  description: String
+  type: String
+  related_sdgs: [String]
+  image: Asset
+  company: Company
+  valid_until: DateTime
+  valid_from: DateTime
+  target: Int
+  current_score: Int
+  my_score: Int
+  likes: Int
+  liked_by_user: Boolean
+  shared: Boolean
+  in_time: Float
+  goal: Int
+  tracking_format: String
+  custom_record_data: CustomRecordData
+  organisation: Company
+  categories: [Category]
+}
+
+"""A paginated list of Goal items."""
+type GoalPaginator {
+  """Pagination information about the list of items."""
+  paginatorInfo: PaginatorInfo!
+
+  """A list of Goal items."""
+  data: [Goal!]!
+}
+
+type GoalRecord {
+  id: ID!
+  created_at: DateTime!
+  updated_at: DateTime
+  goal_id: ID!
+  value: Int!
+  sum_based: Boolean!
+  date: DateTime
+  description: String
+}
+
+type HelpEntity {
+  is_confirmed: Boolean
+  information_public: Boolean
+  name_listed_first: Boolean
+  user: HelpEntityUser
+  externalUser: ExternalUser
+  employeeProfile: EmployeeProfile
+  company: Company
+  is_hidden: Boolean
+  role: String
+}
+
+type HelpEntityUser {
+  name: String
+  id: ID
+  avatar: Asset
+  avatar_url: String
+}
+
+type HelpRecord {
+  id: ID!
+  created_at: DateTime!
+  notice_title: String! @deprecated(reason: "Use title instead")
+  title: String!
+  notice_description: String @deprecated(reason: "Use description instead")
+  description: String
+  category: String @deprecated(reason: "Use mainCategory and subCategory instead")
+  mainCategory: Category
+  subCategory: Category
+  side: String! @deprecated(reason: "Check from notice instead")
+  owner: User! @deprecated(reason: "Use entities -> role:receiver instead")
+  entities: [HelpEntity]
+  receiver: HelpEntity!
+  confirmedBy: User @deprecated(reason: "Use entities -> role:helper instead")
+  helper: HelpEntity!
+  is_confirmed: Boolean
+  is_public: Boolean
+  notice: Notice
+  note: String
+  score: Int
+  time_spent: Float
+  event_at: DateTime
+  helper_names: String
+  location: String
+  helper_count: Int
+  customer_count: Int
+  helpRecordValues: [HelpRecordValue]
+}
+
+"""A paginated list of HelpRecord items."""
+type HelpRecordPaginator {
+  """Pagination information about the list of items."""
+  paginatorInfo: PaginatorInfo!
+
+  """A list of HelpRecord items."""
+  data: [HelpRecord!]!
+}
+
+type HelpRecordsPaginator {
+  data: [HelpRecord]!
+  paginatorInfo: PaginatorInfo!
+}
+
+type HelpRecordValue {
+  id: ID!
+  created_at: DateTime!
+  value: String!
+  impactTypeQuestion: ImpactTypeQuestion
+}
+
+type ImpactType {
+  id: ID!
+  created_at: DateTime!
+  nameContent: [Translation]
+  descriptionContent: [Translation]
+}
+
+input ImpactTypeInput {
+  type_id: ID!
+  question_id: ID!
+  value: String
+}
+
+type ImpactTypeQuestion {
+  id: ID!
+  created_at: DateTime!
+  questionContent: [Translation]
+  impactType: ImpactType
+}
+
+type Interest {
+  id: ID!
+  type: String!
+  value: String!
+}
+
+enum interestMatchValue {
+  all
+  any
+}
+
+type InterestSet {
+  id: ID!
+  name: String!
+  items: [Interest!]!
+  with_remotes: Boolean
+}
+
+input InterestSetItems {
+  side: [String]
+  company: [String]
+  category: CategorySelection
+  keywordValue: [String]
+  theme: ID
+}
+
+"""A paginated list of InterestSet items."""
+type InterestSetPaginator {
+  """Pagination information about the list of items."""
+  paginatorInfo: PaginatorInfo!
+
+  """A list of InterestSet items."""
+  data: [InterestSet!]!
+}
+
+type InterestTranslation {
+  keywordValue: String!
+  language: String!
+}
+
+type InterestVal {
+  id: ID!
+  type: [String]
+  value: [String]
+  updated_at: DateTime!
+  deleted_at: DateTime
+}
+
+input JoinOrLeaveChallengeInput {
+  challenge_id: ID!
+}
+
+type KeyCategory {
+  key: String
+}
+
+type KnownArea {
+  id: ID!
+  name: String
+  country: String
+  my_area_stats: Stats
+  my_area_place: Place
+  image: Asset
+  placement: Int
+  company: Company
+  current_score: Float
+}
+
+type LatestMessageEmployeeProfile {
+  id: ID!
+  name: String!
+  description: String
+  avatar: LatestMessageEntityAsset
+  user_id: ID!
+  company_id: ID!
+}
+
+type LatestMessageEntityAsset {
+  updated_at: DateTime
+  url: String
+  id: ID
+}
+
+type LatestMessageFeedpost {
+  id: ID
+}
+
+type LatestMessageNode {
+  id: ID!
+  sender: LatestMessageUser!
+  created_at: DateTime!
+  updated_at: DateTime!
+  deleted_at: DateTime
+  message: String
+  location: ChatMessagePositionType
+  employeeProfile: LatestMessageEmployeeProfile
+  image: String
+  file: LatestMessageEntityAsset
+  notice_id: ID
+  notice: LatestMessageNotice
+  feedPost: LatestMessageFeedpost
+  reactions: [MessageReactionCount!]!
+  my_reaction: String
+}
+
+type LatestMessageNotice {
+  id: ID
+}
+
+type LatestMessageUser {
+  id: ID!
+  name: String
+  avatar: LatestMessageEntityAsset
+}
+
+type LeaderboardArea {
+  id: ID!
+  name: String
+  placement: Int
+  company: Company
+  placementChange: Int
+}
+
+input LikeGoalInput {
+  orgId: ID!
+  goalId: ID!
+}
+
+type LikeGoalOutput {
+  likes: Int
+  liked: Boolean
+}
+
+type LimitedKnownArea {
+  id: ID!
+  name: String
+  country: String
+  image: Asset
+  placement: Int
+  score_diff: Float
+}
+
+input LocationUserPoint {
+  latitude: Float!
+  longitude: Float!
+}
+
+input MarkMessagesReadInput {
+  chatId: ID
+}
+
+type MessageReactionCount {
+  reaction: String!
+  count: Int!
+}
+
+"""
+Loose type that allows any value. Be careful when passing in large `Int` or `Float` literals,
+as they may not be parsed correctly on the server side. Use `String` literals if you are
+dealing with really large numbers to be on the safe side.
+"""
+scalar Mixed
+
+"""
+Root write mutation type, guarded via the type-level `@customGuard` directive — verified against
+its implementation (`app/GraphQL/Directives/CustomGuardDirective.php`): a thin wrapper around
+Lighthouse's built-in `@guard`, whose own docblock states the check "is run per field and may
+allow unauthenticated users to still receive partial results" — so an unauthenticated caller is
+not necessarily rejected outright for every field; don't assume hard-rejection without checking
+the specific field/resolver. Bare `@deprecated` with no `reason:` gives no migration path; when
+adding new deprecations, always include `reason: "Use X instead"` (see
+`docs/graphql-schema-conventions.md`). Naming is camelCase except `CreateMyInterest`, a known
+inconsistency already marked deprecated.
+"""
+type Mutation {
+  createNotice(input: CreateNoticeInput!): Notice
+  updateNotice(input: UpdateNoticeInput!): Notice
+  createFeedPost(input: CreateFeedPostInput!): FeedPost
+  createFeedPostComment(input: CreateFeedPostCommentInput!): FeedPostComment @deprecated(reason: "Use addFeedPostComment instead")
+  addFeedPostComment(input: CreateFeedPostCommentInput!): FeedPostComment
+  likeFeedPost(id: ID!): Int
+  createDeal(input: CreateDealInput!): Deal
+  respondDeal(input: RespondDealInput!): Deal
+  respondManyDeals(input: RespondManyDealsInput!): [Deal]
+  likeGoal(input: LikeGoalInput!): LikeGoalOutput
+  createGoalRecord(input: CreateGoalRecordInput!): GoalRecord
+  joinChallenge(input: JoinOrLeaveChallengeInput!): Challenge
+  leaveChallenge(input: JoinOrLeaveChallengeInput!): Challenge
+  updateDeal(input: UpdateDealInput!): Deal
+  nullifyDeal(input: NullifyDealInput!): Deal
+  createGiveSellContent(input: CreateGiveSellContent!): GiveSellContent
+  createGiveTradeContent(input: CreateGiveTradeContent!): GiveTradeContent
+  createNeedBuyContent(input: CreateNeedBuyContent!): NeedBuyContent
+  createNeedTradeContent(input: CreateNeedTradeContent!): NeedTradeContent
+  createReview(input: CreateReviewInput!): Review
+  updateReview(input: UpdateReviewInput!): Review
+  setReviewCommentVisibility(input: UpdateReviewCommentVisibilityInput!): Review
+  createReviewAccolade(input: CreateReviewAccolade!): ReviewAccolade
+  addBadgeToUser(input: CreateBadgeInput!): Badge
+  updateProfile(input: UpdateUserInput!): User
+  setProfilePicture(file: Upload, fileAsBase64: String): User
+  setCompanyLogo(file: Upload, fileAsBase64: String, company: ID!): Company
+  setEmployeeAvatar(file: Upload, fileAsBase64: String, employeeProfile: ID!): EmployeeProfile
+  deleteNotice(id: ID!, cancelDeals: Boolean): Notice
+  createChat(input: CreateChatInput): Chat
+  createTeam(input: CreateTeamInput!): Team
+  createChatMessage(input: CreateChatMessageInput): ChatMessage
+  createDelayedChatMessage(input: CreateChatMessageInput): DelayedMessageResponse
+  cancelDelayedChatMessage(taskId: String!): Boolean
+  markMessagesRead(input: MarkMessagesReadInput): [ChatMessage]!
+  updateCompany(input: UpdateCompanyInput!, id: ID!): Company
+  updateEmployee(input: UpdateEmployeeInput!, id: ID!): EmployeeProfile
+  completeRequiresUserActionEvent(input: CompleteRequiresUserActionEventInput): Boolean!
+  pinChatMessage(input: PinMessageInput): Boolean
+  toggleChatMessageReaction(messageId: ID!, reaction: String!): ChatMessage
+  acceptRules: Boolean
+  markReviewRequested: Boolean
+  likeNotice(id: ID!): Boolean
+  markNewsRead(newsIds: [ID]!): Boolean
+  createUserReport(input: UserReportInput): UserReport
+  createHelpRecord(input: CreateHelpRecordInput): HelpRecord
+  updateHelpRecord(input: UpdateHelpRecordInput): HelpRecord
+  confirmHelpRecord(input: ConfirmHelpRecordInput): HelpRecord
+  hideHelpRecord(id: ID!): HelpRecord
+  deleteFeedPost(id: ID!): Boolean
+  updateFeedPost(input: UpdateFeedPostInput!): Boolean
+  CreateMyInterest(input: CreateMyInterestInput!): [Interest]! @deprecated
+  upsertInterestSet(input: UpsertInterestSetInput!): InterestSet!
+  deleteInterestSet(input: DeleteInterestSetInput!): InterestSet!
+  saveInitialInterests(input: SaveInitialInterestInput!): Int!
+  hideChat(id: ID!): Boolean
+  blockUser(id: ID!): Boolean
+  setTeamLogo(input: SetTeamLogoInput!): Team
+  addOrRemoveAsFavorite(id: ID!): Favorite
+  restoreNotice(id: ID!): Notice
+  completeCustomerJourneyEvent(event: String): Boolean
+  replyPing(input: PingReplyInput!): PingReply
+  updateNotificationSettings(input: UpdateNotificationSettingsInput!): [NotificationSetting]
+  updatePreference(preference: String!): Boolean
+}
+
+type MyWeeklyContribution {
+  chats: Int
+  notices: Int
+  help_records: Int
+}
+
+type NeedBuyContent {
+  """Estimation about how much user is willing to pay"""
+  price_estimation: Float!
+
+  """+- value, if user prefers to display a price range"""
+  range: Float
+  notice: Notice!
+  id: ID!
+}
+
+type NeedTradeContent {
+  """What user prefers to give in return"""
+  offers: String!
+  notice: Notice!
+  id: ID!
+}
+
+type NewsItem {
+  id: ID!
+  type: NewsItemType!
+  created_at: DateTime!
+  news_item_lang_versions: [NewsItemLangVersion]!
+
+  """Use URL field in NewsItemLangVersion instead"""
+  url: String @deprecated
+  image_url: String @deprecated
+  image: Asset
+  area: NewsItemArea
+  profile: Company
+  notice: Notice
+  country: String
+  distance_to_user: Float
+}
+
+type NewsItemArea {
+  latitude: String!
+  longitude: String!
+  range: Float!
+}
+
+type NewsItemLangVersion {
+  title: String!
+  content_short: String
+  content_raw: String
+  language: String!
+  url: String
+}
+
+"""A paginated list of NewsItem items."""
+type NewsItemPaginator {
+  """Pagination information about the list of items."""
+  paginatorInfo: PaginatorInfo!
+
+  """A list of NewsItem items."""
+  data: [NewsItem!]!
+}
+
+enum NewsItemSource {
+  ALL
+  COMMU
+  COMPANY
+}
+
+enum NewsItemType {
+  POST
+  NOTICE
+  PROFILE
+  EXTERNAL
+  AD
+}
+
+enum NewsStatus {
+  unread
+  all
+}
+
+type Notice {
+  id: ID!
+  title: String!
+  description: String
+  owner: User
+
+  """Use categories field instead"""
+  category: String @deprecated
+
+  """Use categories field instead"""
+  sub_categories: [String] @deprecated
+  categories: NoticeCategories!
+  created_at: DateTime!
+  updated_at: DateTime!
+  expires_at: DateTime
+  deleted_at: DateTime
+  start_date: DateTime
+  end_date: DateTime
+  image: Asset
+  internal: Team
+  type: NoticeType!
+  side: NoticeSide
+  parents: [Notice]
+  children: [Notice]
+  levels: [Notice]
+  notice_language_versions: [NoticeTranslation]
+  position: NoticePosition!
+
+  """Shape is dictated by type field"""
+  content: NoticeContent
+  cid: Int
+  meta: NoticeMeta
+  metaRaw: String
+  company: Company
+  employeeProfile: EmployeeProfile
+  company_id: ID
+  employee_id: ID
+  in_return: String
+  needs_professional: Boolean
+  noticeViews: Int
+  distance_to_user: Float
+  is_expired: Boolean
+  likes: Int
+  deals: [Deal]
+  theme: Theme
+  userInvite: UserInvite
+  registration_closed_hours_before: Int
+  gives_count: Int
+  needs_count: Int
+  invite_id: ID
+  format: String
+  remote: String
+}
+
+type NoticeCategories {
+  schema_version: Int!
+  main: Category
+  sub: [Category]!
+}
+
+union NoticeContent = GiveSellContent | GiveTradeContent | NeedBuyContent | NeedTradeContent | OtherContent
+
+type NoticeMeta {
+  amounts: NoticeMetaAmounts!
+}
+
+type NoticeMetaAmounts {
+  give_sell: Int!
+  give_trade: Int!
+  give_free: Int!
+  give_generic: Int
+  need_buy: Int!
+  need_trade: Int!
+  need_free: Int!
+  need_generic: Int
+}
+
+"""A paginated list of Notice items."""
+type NoticePaginator {
+  """Pagination information about the list of items."""
+  paginatorInfo: PaginatorInfo!
+
+  """A list of Notice items."""
+  data: [Notice!]!
+}
+
+type NoticePosition {
+  latitude: Float!
+  longitude: Float!
+  level: String!
+}
+
+input NoticeSearch {
+  longMax: Float
+  longMin: Float
+  latMax: Float
+  latMin: Float
+  level: Int
+  types: [NoticeType]
+  query: String
+  categoryFilterConfig: [CategorySelection]
+  accountTypes: [String]
+  onlyIndividuals: Boolean
+  sides: [NoticeSide]
+  maxDistanceToUser: Float
+  long: Float
+  lat: Float
+  organisationIds: [ID]
+}
+
+enum NoticeSearchOrderBy {
+  DISTANCE
+  TIME
+}
+
+enum NoticeSide {
+  GIVE
+  NEED
+}
+
+enum NoticeStatus {
+  VERY_ACTIVE
+  MANY_HELP
+  NEEDS_SUPPORT
+  EXPIRED
+  NORMAl
+  UNKNOWN
+}
+
+type NoticeStatusContent {
+  notice_status: NoticeStatus!
+  help_records_count: Int
+  confirmed_help_records_count: Int
+}
+
+type NoticeTranslation {
+  title: String!
+  description: String
+  in_return: String
+  language: String!
+}
+
+enum NoticeType {
+  GIVE_SELL
+  GIVE_TRADE
+  GIVE_FREE
+  GIVE_GENERIC
+  NEED_BUY
+  NEED_TRADE
+  NEED_FREE
+  NEED_GENERIC
+  COLLECTOR
+}
+
+type Notification {
+  id: ID!
+  type: String!
+  created_at: DateTime!
+  updated_at: DateTime
+  data_as_json_string: String
+}
+
+enum NotificationCursorOperation {
+  DESC
+  ASC
+}
+
+type NotificationSetting {
+  id: ID!
+  name: String!
+  group: String
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+input NullifyDealInput {
+  dealId: ID!
+  cancellation_reason: String
+}
+
+"""Allows ordering a list of records."""
+input OrderByClause {
+  """The column that is used for ordering."""
+  column: String!
+
+  """The direction that is used for ordering."""
+  order: SortOrder!
+}
+
+"""
+Aggregate functions when ordering by a relation without specifying a column.
+"""
+enum OrderByRelationAggregateFunction {
+  """Amount of items."""
+  COUNT
+}
+
+"""
+Aggregate functions when ordering by a relation that may specify a column.
+"""
+enum OrderByRelationWithColumnAggregateFunction {
+  """Average."""
+  AVG
+
+  """Minimum."""
+  MIN
+
+  """Maximum."""
+  MAX
+
+  """Sum."""
+  SUM
+
+  """Amount of items."""
+  COUNT
+}
+
+type OrgDealCancellationPolicyTemplate {
+  content: String
+  language: String!
+}
+
+type OrgDealSettings {
+  has_cancellation_policy: Boolean
+  cancellation_policy: [OrgDealCancellationPolicyTemplate]
+}
+
+type OrgDealThatNeedsAttention {
+  id: ID
+  count: Int
+}
+
+type OrgNoticeSettings {
+  disable_organisation_as_profile: Boolean
+  team_selection_in_notice_creation: Boolean
+}
+
+type orgSubscription {
+  id: ID!
+  plan_name: String!
+  valid_until: DateTime!
+  payment_method: String!
+  base_price: Int!
+  employee_price: Int @deprecated
+  user_price: Int
+  company_id: Int!
+  quota_user: Int!
+  quota_notice: Int!
+  quota_teams: Int
+  quota_pings: Int
+  quota_integration: Int
+  quota_manage_user: Int
+  quota_invite_links: Int!
+  created_at: DateTime!
+}
+
+"""This kind of type doesn't have any additional content"""
+type OtherContent {
+  empty_description: String
+}
+
+"""Information about pagination using a fully featured paginator."""
+type PaginatorInfo {
+  """Number of items in the current page."""
+  count: Int!
+
+  """Index of the current page."""
+  currentPage: Int!
+
+  """Index of the first item in the current page."""
+  firstItem: Int
+
+  """Are there more pages after this one?"""
+  hasMorePages: Boolean!
+
+  """Index of the last item in the current page."""
+  lastItem: Int
+
+  """Index of the last available page."""
+  lastPage: Int!
+
+  """Number of items per page."""
+  perPage: Int!
+
+  """Number of total available items."""
+  total: Int!
+}
+
+type Partner {
+  id: ID!
+  created_at: DateTime!
+  updated_at: DateTime!
+  name: String!
+  country: String!
+  avatar_url: String
+  avatar: Asset
+  language_versions: [PartnerLanguageVersion]!
+  link: String @deprecated
+  description: String @deprecated
+}
+
+type PartnerLanguageVersion {
+  id: ID!
+  created_at: DateTime!
+  updated_at: DateTime!
+  partner_id: ID!
+  language: String!
+  description: String
+  link: String!
+  keywords: [String]
+}
+
+type PersonalAndOrgDealsThatNeedsAttention {
+  personalCount: Int
+  organisationDeals: [OrgDealThatNeedsAttention]
+}
+
+type Ping {
+  id: ID!
+  created_at: DateTime!
+  updated_at: DateTime
+  message: String!
+  title: String
+  notice: Notice
+  languages: [String]
+  team: Team
+  creator: User
+  employeeProfile: EmployeeProfile
+  company: Company
+  questions: [PingQuestionsData]
+  replying_open_until: DateTime
+}
+
+enum PingIncludingProp {
+  ALL
+  UNREADS
+}
+
+"""A paginated list of Ping items."""
+type PingPaginator {
+  """Pagination information about the list of items."""
+  paginatorInfo: PaginatorInfo!
+
+  """A list of Ping items."""
+  data: [Ping!]!
+}
+
+type PingQuestionOption {
+  value: String
+  id: ID
+}
+
+type PingQuestionsData {
+  label: String
+  type: String
+  options: [PingQuestionOption]
+  required: String
+  id: ID
+}
+
+type PingReply {
+  ping: Ping
+  user: User!
+  answer: String
+  question_id: String!
+  id: ID!
+}
+
+input PingReplyInput {
+  answer: String
+  questionId: ID!
+  pingId: ID!
+}
+
+input PinMessageInput {
+  messageId: ID
+}
+
+type PivotHidden {
+  chat_id: ID!
+  user_id: ID!
+  hidden: Boolean
+}
+
+type Place {
+  placement: Int
+  current_score: Float
+  current_score_change: Float
+  mood: Int
+  created_at: DateTime
+  current_period_start_date: DateTime
+  communities_around: [LimitedKnownArea]
+}
+
+type PrimitiveBooleanResponse {
+  value: Boolean
+}
+
+type PrimitiveStringResponse {
+  value: String
+}
+
+type PrivateUserContent {
+  strong_auth: Boolean!
+  email_verified: Boolean!
+  badges: [Badge]!
+  user: User
+}
+
+type ProfileTranslation {
+  description: String
+  language: String!
+}
+
+type PublicHelpRecord {
+  id: String
+  created_at: DateTime!
+  title: String!
+  description: String
+  entities: [HelpEntity]
+  city: String
+}
+
+"""
+Root read query type. Auth/authorization is per-field (`@customGuard`, `@can`, `@customCan`) —
+the absence of one of those directives on a field does not necessarily mean it's unauthenticated,
+it may enforce access in its resolver instead. Fields using an untyped `where: _` / `orderBy: _`
+argument are dynamically filterable/sortable per the `@whereConditions`/`@orderBy` directive's
+`columns` list, not per any type visible here. See `docs/graphql-schema-conventions.md` for the
+full set of conventions and a list of field clusters that still need SME-authored descriptions
+(the `notices*` family and the `ping`/`pings`/`myPings` cluster in particular).
+"""
+type Query {
+  user(id: ID): User
+  company(id: ID): Company
+  team(id: ID): Team
+  partners: [Partner]!
+  partner(id: ID): Partner
+  citizenBenefits(municipalityId: ID, position: CitizenBenefitPositionType): [CitizenBenefit]!
+  citizenBenefit(id: ID): CitizenBenefit
+  notice(id: ID, distanceToPoint: LocationUserPoint): Notice
+  feedPost(id: ID): FeedPost
+  feedPostComments(id: ID): [FeedPostComment]!
+  dealsThatNeedAttentionCount: Int!
+  pendingDeals: [Deal]
+  dealsThatNeedAttentionByCategory: PersonalAndOrgDealsThatNeedsAttention!
+  communityLeaderboard: [LeaderboardArea]
+  myTeamChats(orgId: ID!): [Chat]
+  deal(id: ID): Deal
+  teamRole(team_id: ID): [TeamRole]
+  review(id: ID): Review
+  asset(id: ID): Asset
+  knownArea(name: String, latitude: Float, longitude: Float): KnownArea
+  myWeeklyContribution: MyWeeklyContribution
+  leaderboard: [KnownArea]
+  employeeProfile(id: ID): EmployeeProfile
+
+  """
+  Rectangular bounding-box map query (longMax/longMin/latMax/latMin form the box), gated by
+  auth (`@customGuard`, requires a logged-in user per the resolver). One of six similarly-named
+  notices* queries — see `docs/graphql-schema-conventions.md` for how they relate.
+  """
+  noticesWhereLocation(longMax: Float!, longMin: Float!, latMax: Float!, latMin: Float!, level: Int, types: [NoticeType], unfiltered: Boolean, categorySelection: [CategorySelection], themes: [ID]): [Notice]!
+
+  """
+  Same bounding-box idea as noticesWhereLocation, but takes a structured `NoticeSearch` filter
+  object instead of raw lat/long extremes, and — unlike noticesWhereLocation — does not require
+  an authenticated user in its resolver, supporting `publicLandingPageCompanyId` for unauthenticated
+  public company-landing-page embeds.
+  """
+  noticesWhereLocationFiltered(searchParams: NoticeSearch, themes: [ID], publicLandingPageCompanyId: CreateCompanyBelongsTo): [Notice]!
+
+  """
+  Free-text/keyword search (`query`) across notices with many optional filters
+  (organisation, distance, themes, cursor-based `olderThanCursor` pagination). No `@customGuard`
+  — appears intended to support unauthenticated/public search unlike noticesWhereLocation.
+  """
+  noticesByQueryWord(query: String, categoryFilterConfig: [CategorySelection], accountTypes: [String], onlyIndividuals: Boolean, types: [NoticeType], sides: [NoticeSide], maxDistanceToUser: Float, long: Float, lat: Float, themes: [ID], organisationIds: [ID], publicLandingPageCompanyId: CreateCompanyBelongsTo, limit: Int, skip: Int, olderThanCursor: DateTime, orderBy: NoticeSearchOrderBy, remote: Boolean): [Notice]!
+  teamUserSearch(query: String, companyId: ID, ids: [ID], limit: Int): [UserSearchResult]!
+  organisationOpenTeams(organisationId: ID): [Team]!
+
+  """
+  Notices ranked/filtered by a popularity metric near an optional location, requires auth.
+  """
+  popularNotices(themes: [ID], long: Float, lat: Float, limit: Int): [Notice]
+  me: User
+  heartbeat: String!
+  hasRecommendation(for: ID!): PrimitiveBooleanResponse!
+  chat(id: ID!): Chat
+  chatsByNotice(noticeId: ID!, companyId: ID, withParticipant: ID): [Chat]!
+  chatsByTeam(teamId: ID!, companyId: ID): Chat
+  getUserInvites(companyId: ID): [Team]
+  getPinnedChatMessages(chatId: ID!): [ChatMessage]
+  companyChats(companyId: ID, orderBy: [QueryCompanyChatsOrderByOrderByClause!], chatFilter: ChatFilter): [Chat]!
+  companyActivityData(companyId: ID!, from: DateTime, fromValues: CompanyActivityFromValues): CompanyActivityData
+  chatMessage(id: ID!): ChatMessage
+  translatedChatMessage(id: ID!, target: String): ChatMessage
+  helpRecord(id: ID!): HelpRecord
+  helpRecords(userId: ID!, first: Int, page: Int): HelpRecordsPaginator
+  publicHelpRecords(where: QueryPublicHelpRecordsWhereWhereConditions, orderBy: [QueryPublicHelpRecordsOrderByOrderByClause!], cursor: String, preferLocal: Boolean, forceLocal: Boolean): [PublicHelpRecord]!
+  helpRecordById(noticeId: ID, userId: ID): HelpRecord
+  userStats(userId: ID!): UserStats
+  companyStats(companyId: ID!): CompanyStats
+  themes: [Theme]!
+  categories: [Category!]!
+  theme(id: ID): Theme
+  userInterestMatches: [UserInterestMatch]!
+  myInterestMatches: [UserInterestMatch]
+  dealsById(noticeId: ID, userId: ID): [Deal]
+
+  """
+  NOTE: This endpoint is automatically paginated, although it lacks @paginate directive.
+  Max limit number is 100. Larger numbers are downscaled to 100.
+  Cursor is a timestamp and checks against created_at.
+  """
+  myNotifications(cursor: DateTime, cursorOperation: NotificationCursorOperation = DESC, limit: Int): [Notification]!
+  ping(id: ID!): Ping
+
+  """
+  Pings *created by* the current user (resolver: `$user->createdPings()`) — not received pings.
+  """
+  myPings: Ping
+  noticeStatus(id: ID): NoticeStatus
+  noticeStatusV2(id: ID): NoticeStatusContent
+  latestOrgTeamActivity(organisationId: ID): [ChatMessage]
+
+  """
+  The current user's own answers to a specific ping (by pingId) — not the ping's other responses.
+  """
+  myPingAnswers(pingId: ID!): [PingReply]
+  notificationSettings: [NotificationSetting]!
+  globalSearch(searchParams: NoticeSearch!, themes: [ID], types: [GlobalSearchType], sortBy: GlobalSearchSortBy, sortDirection: GlobalSearchSortDirection, limit: Int): [GlobalSearchItem]!
+  users(
+    """Limits number of fetched items."""
+    first: Int! = 10
+
+    """The offset from which items are returned."""
+    page: Int
+  ): UserPaginator!
+  companies(
+    where: QueryCompaniesWhereWhereConditions
+    orderBy: [QueryCompaniesOrderByOrderByClause!]
+
+    """Limits number of fetched items."""
+    first: Int! = 20
+
+    """The offset from which items are returned."""
+    page: Int
+  ): CompanyPaginator!
+  notices(
+    where: QueryNoticesWhereWhereConditions
+    orderBy: [QueryNoticesOrderByOrderByClause!]
+
+    """Limits number of fetched items."""
+    first: Int! = 10
+
+    """The offset from which items are returned."""
+    page: Int
+
+    """Allows to filter if trashed elements should be fetched."""
+    trashed: Trashed
+  ): NoticePaginator!
+  feedPosts(
+    where: QueryFeedPostsWhereWhereConditions
+    orderBy: [QueryFeedPostsOrderByOrderByClause!]
+    local: Boolean
+
+    """Limits number of fetched items."""
+    first: Int! = 10
+
+    """The offset from which items are returned."""
+    page: Int
+  ): FeedPostPaginator!
+  deals(
+    """Limits number of fetched items."""
+    first: Int! = 10
+
+    """The offset from which items are returned."""
+    page: Int
+  ): DealPaginator!
+  dealsByStartingDate(
+    """Limits number of fetched items."""
+    first: Int! = 10
+
+    """The offset from which items are returned."""
+    page: Int
+  ): DealPaginator!
+  reviews(
+    """Limits number of fetched items."""
+    first: Int! = 10
+
+    """The offset from which items are returned."""
+    page: Int
+  ): ReviewPaginator!
+  goals(
+    company_id: ID
+
+    """Limits number of fetched items."""
+    first: Int! = 10
+
+    """The offset from which items are returned."""
+    page: Int
+    where: QueryGoalsWhereWhereConditions
+  ): GoalPaginator!
+  challenges(
+    company_id: ID!
+    where: QueryChallengesWhereWhereConditions
+
+    """Limits number of fetched items."""
+    first: Int! = 10
+
+    """The offset from which items are returned."""
+    page: Int
+  ): ChallengePaginator!
+  myChallenges(
+    company_id: ID
+
+    """Limits number of fetched items."""
+    first: Int! = 10
+
+    """The offset from which items are returned."""
+    page: Int
+  ): ChallengePaginator!
+
+  """
+  Radius search from a given lat/long point out to `distance`, requires auth. Paginated
+  (defaultCount 50) via a custom builder class rather than the bounding-box approach used by
+  noticesWhereLocation.
+  """
+  noticesWhereDistance(
+    distance: Int!
+    lat: Float!
+    long: Float!
+    orderBy: [QueryNoticesWhereDistanceOrderByOrderByClause!]
+    types: [NoticeType]
+
+    """Use categorySelection instead"""
+    omitCategories: [String]
+    categorySelection: [ReversableCategorySelection]
+    themes: [ID]
+
+    """Limits number of fetched items."""
+    first: Int! = 50
+
+    """The offset from which items are returned."""
+    page: Int
+  ): NoticePaginator!
+
+  """
+  Notices belonging to given `parentIds` (hierarchical/related notices), not a
+  location/distance/keyword search at all despite the `notices*` naming family. No
+  `@customGuard`, supports the same `publicLandingPageCompanyId` unauthenticated-embed pattern
+  as noticesWhereLocationFiltered.
+  """
+  noticesWhereParent(
+    parentIds: [ID]!
+    types: [NoticeType]
+    sides: [NoticeSide]
+    searchParams: NoticeSearch
+    publicLandingPageCompanyId: CreateCompanyBelongsTo
+
+    """Limits number of fetched items."""
+    first: Int! = 100
+
+    """The offset from which items are returned."""
+    page: Int
+  ): NoticePaginator!
+  chats(
+    where: QueryChatsWhereWhereHasConditions
+    orderBy: [QueryChatsOrderByOrderByClause!]
+
+    """Limits number of fetched items."""
+    first: Int! = 10
+
+    """The offset from which items are returned."""
+    page: Int
+  ): ChatPaginator!
+  companyChatsPaginated(
+    companyId: ID
+    orderBy: [QueryCompanyChatsPaginatedOrderByOrderByClause!]
+    chatFilter: ChatFilter
+
+    """Limits number of fetched items."""
+    first: Int! = 10
+
+    """The offset from which items are returned."""
+    page: Int
+  ): ChatPaginator!
+  chatMessages(
+    where: QueryChatMessagesWhereWhereConditions
+    hasChat: QueryChatMessagesHasChatWhereHasConditions
+    noNullNotices: Boolean
+    hasReadBy: QueryChatMessagesHasReadByWhereHasConditions
+    notReadBy: QueryChatMessagesNotReadByWhereDoesntHaveConditionsInput
+    orderBy: [QueryChatMessagesOrderByOrderByClause!]
+    companyId: ID
+
+    """Limits number of fetched items."""
+    first: Int! = 30
+
+    """The offset from which items are returned."""
+    page: Int
+  ): ChatMessagePaginator!
+  newsItems(
+    where: QueryNewsItemsWhereWhereConditions
+    orderBy: [QueryNewsItemsOrderByOrderByClause!]
+    language: String
+    source: NewsItemSource
+    status: NewsStatus
+
+    """Limits number of fetched items."""
+    first: Int! = 30
+
+    """The offset from which items are returned."""
+    page: Int
+  ): NewsItemPaginator!
+  companyNewsItems(
+    where: QueryCompanyNewsItemsWhereWhereConditions
+    orderBy: [QueryCompanyNewsItemsOrderByOrderByClause!]
+    companyId: ID!
+    status: NewsStatus
+
+    """Limits number of fetched items."""
+    first: Int! = 30
+
+    """The offset from which items are returned."""
+    page: Int
+  ): NewsItemPaginator!
+  myHelpRecords(
+    onlyUnconfirmed: Boolean
+
+    """Limits number of fetched items."""
+    first: Int! = 20
+
+    """The offset from which items are returned."""
+    page: Int
+  ): HelpRecordPaginator!
+
+  """
+  Pings *received by* the current user (resolver: `$user->pings()`), unread-only by default;
+  pass `including: "all"` to include already-read ones too. Distinct from myPings (created) and
+  myPingAnswers (the user's own answers to a specific ping).
+  """
+  pings(
+    including: PingIncludingProp
+
+    """Limits number of fetched items."""
+    first: Int! = 10
+
+    """The offset from which items are returned."""
+    page: Int
+  ): PingPaginator!
+  myChats(
+    chatFilter: ChatFilter
+    showHidden: Boolean
+
+    """Limits number of fetched items."""
+    first: Int! = 10
+
+    """The offset from which items are returned."""
+    page: Int
+  ): ChatPaginator!
+  myInterestSets(
+    """Limits number of fetched items."""
+    first: Int! = 10
+
+    """The offset from which items are returned."""
+    page: Int
+  ): InterestSetPaginator!
+}
+
+"""Allowed column names for Query.challenges.where."""
+enum QueryChallengesWhereColumn {
+  ID
+}
+
+"""
+Dynamic WHERE conditions for the `where` argument of the query `challenges`.
+"""
+input QueryChallengesWhereWhereConditions {
+  """The column that is used for the condition."""
+  column: QueryChallengesWhereColumn
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryChallengesWhereWhereConditions!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryChallengesWhereWhereConditions!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryChallengesWhereWhereConditionsRelation
+}
+
+"""
+Dynamic WHERE HAS conditions for the `where` argument of the query `challenges`.
+"""
+input QueryChallengesWhereWhereConditionsHasCondition {
+  """The column that is used for the condition."""
+  column: String
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryChallengesWhereWhereConditionsHasCondition!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryChallengesWhereWhereConditionsHasCondition!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryChallengesWhereWhereConditionsRelation
+}
+
+"""
+Dynamic HAS conditions for WHERE conditions for the `where` argument of the query `challenges`.
+"""
+input QueryChallengesWhereWhereConditionsRelation {
+  """The relation that is checked."""
+  relation: String!
+
+  """The comparison operator to test against the amount."""
+  operator: SQLOperator = GTE
+
+  """The amount to test."""
+  amount: Int = 1
+
+  """Additional condition logic."""
+  condition: QueryChallengesWhereWhereConditionsHasCondition
+}
+
+"""Allowed column names for Query.chatMessages.hasChat."""
+enum QueryChatMessagesHasChatColumn {
+  ID
+}
+
+"""
+Dynamic WHERE conditions for the `hasChat` argument of the query `chatMessages`.
+"""
+input QueryChatMessagesHasChatWhereHasConditions {
+  """The column that is used for the condition."""
+  column: QueryChatMessagesHasChatColumn
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryChatMessagesHasChatWhereHasConditions!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryChatMessagesHasChatWhereHasConditions!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryChatMessagesHasChatWhereHasConditionsRelation
+}
+
+"""
+Dynamic WHERE HAS conditions for the `hasChat` argument of the query `chatMessages`.
+"""
+input QueryChatMessagesHasChatWhereHasConditionsHasCondition {
+  """The column that is used for the condition."""
+  column: String
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryChatMessagesHasChatWhereHasConditionsHasCondition!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryChatMessagesHasChatWhereHasConditionsHasCondition!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryChatMessagesHasChatWhereHasConditionsRelation
+}
+
+"""
+Dynamic HAS conditions for WHERE conditions for the `hasChat` argument of the query `chatMessages`.
+"""
+input QueryChatMessagesHasChatWhereHasConditionsRelation {
+  """The relation that is checked."""
+  relation: String!
+
+  """The comparison operator to test against the amount."""
+  operator: SQLOperator = GTE
+
+  """The amount to test."""
+  amount: Int = 1
+
+  """Additional condition logic."""
+  condition: QueryChatMessagesHasChatWhereHasConditionsHasCondition
+}
+
+"""Allowed column names for Query.chatMessages.hasReadBy."""
+enum QueryChatMessagesHasReadByColumn {
+  USER_ID
+}
+
+"""
+Dynamic WHERE conditions for the `hasReadBy` argument of the query `chatMessages`.
+"""
+input QueryChatMessagesHasReadByWhereHasConditions {
+  """The column that is used for the condition."""
+  column: QueryChatMessagesHasReadByColumn
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryChatMessagesHasReadByWhereHasConditions!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryChatMessagesHasReadByWhereHasConditions!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryChatMessagesHasReadByWhereHasConditionsRelation
+}
+
+"""
+Dynamic WHERE HAS conditions for the `hasReadBy` argument of the query `chatMessages`.
+"""
+input QueryChatMessagesHasReadByWhereHasConditionsHasCondition {
+  """The column that is used for the condition."""
+  column: String
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryChatMessagesHasReadByWhereHasConditionsHasCondition!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryChatMessagesHasReadByWhereHasConditionsHasCondition!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryChatMessagesHasReadByWhereHasConditionsRelation
+}
+
+"""
+Dynamic HAS conditions for WHERE conditions for the `hasReadBy` argument of the query `chatMessages`.
+"""
+input QueryChatMessagesHasReadByWhereHasConditionsRelation {
+  """The relation that is checked."""
+  relation: String!
+
+  """The comparison operator to test against the amount."""
+  operator: SQLOperator = GTE
+
+  """The amount to test."""
+  amount: Int = 1
+
+  """Additional condition logic."""
+  condition: QueryChatMessagesHasReadByWhereHasConditionsHasCondition
+}
+
+"""Allowed column names for Query.chatMessages.notReadBy."""
+enum QueryChatMessagesNotReadByColumn {
+  USER_ID
+}
+
+"""
+Dynamic WHERE conditions for the `notReadBy` argument of the query `chatMessages`.
+"""
+input QueryChatMessagesNotReadByWhereDoesntHaveConditionsInput {
+  """The column that is used for the condition."""
+  column: QueryChatMessagesNotReadByColumn
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryChatMessagesNotReadByWhereDoesntHaveConditionsInput!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryChatMessagesNotReadByWhereDoesntHaveConditionsInput!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryChatMessagesNotReadByWhereDoesntHaveConditionsInputRelation
+}
+
+"""
+Dynamic WHERE HAS conditions for the `notReadBy` argument of the query `chatMessages`.
+"""
+input QueryChatMessagesNotReadByWhereDoesntHaveConditionsInputHasCondition {
+  """The column that is used for the condition."""
+  column: String
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryChatMessagesNotReadByWhereDoesntHaveConditionsInputHasCondition!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryChatMessagesNotReadByWhereDoesntHaveConditionsInputHasCondition!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryChatMessagesNotReadByWhereDoesntHaveConditionsInputRelation
+}
+
+"""
+Dynamic HAS conditions for WHERE conditions for the `notReadBy` argument of the query `chatMessages`.
+"""
+input QueryChatMessagesNotReadByWhereDoesntHaveConditionsInputRelation {
+  """The relation that is checked."""
+  relation: String!
+
+  """The comparison operator to test against the amount."""
+  operator: SQLOperator = GTE
+
+  """The amount to test."""
+  amount: Int = 1
+
+  """Additional condition logic."""
+  condition: QueryChatMessagesNotReadByWhereDoesntHaveConditionsInputHasCondition
+}
+
+"""Allowed column names for Query.chatMessages.orderBy."""
+enum QueryChatMessagesOrderByColumn {
+  CREATED_AT
+}
+
+"""Order by clause for Query.chatMessages.orderBy."""
+input QueryChatMessagesOrderByOrderByClause {
+  """The column that is used for ordering."""
+  column: QueryChatMessagesOrderByColumn!
+
+  """The direction that is used for ordering."""
+  order: SortOrder!
+}
+
+"""Allowed column names for Query.chatMessages.where."""
+enum QueryChatMessagesWhereColumn {
+  CREATED_AT
+  NOTICE_ID
+  IMAGE
+  IMAGE_ID
+  FILE_ID
+  LOCATION
+  FEED_POST_ID
+}
+
+"""
+Dynamic WHERE conditions for the `where` argument of the query `chatMessages`.
+"""
+input QueryChatMessagesWhereWhereConditions {
+  """The column that is used for the condition."""
+  column: QueryChatMessagesWhereColumn
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryChatMessagesWhereWhereConditions!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryChatMessagesWhereWhereConditions!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryChatMessagesWhereWhereConditionsRelation
+}
+
+"""
+Dynamic WHERE HAS conditions for the `where` argument of the query `chatMessages`.
+"""
+input QueryChatMessagesWhereWhereConditionsHasCondition {
+  """The column that is used for the condition."""
+  column: String
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryChatMessagesWhereWhereConditionsHasCondition!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryChatMessagesWhereWhereConditionsHasCondition!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryChatMessagesWhereWhereConditionsRelation
+}
+
+"""
+Dynamic HAS conditions for WHERE conditions for the `where` argument of the query `chatMessages`.
+"""
+input QueryChatMessagesWhereWhereConditionsRelation {
+  """The relation that is checked."""
+  relation: String!
+
+  """The comparison operator to test against the amount."""
+  operator: SQLOperator = GTE
+
+  """The amount to test."""
+  amount: Int = 1
+
+  """Additional condition logic."""
+  condition: QueryChatMessagesWhereWhereConditionsHasCondition
+}
+
+"""Allowed column names for Query.chats.orderBy."""
+enum QueryChatsOrderByColumn {
+  CREATED_AT
+}
+
+"""Order by clause for Query.chats.orderBy."""
+input QueryChatsOrderByOrderByClause {
+  """The column that is used for ordering."""
+  column: QueryChatsOrderByColumn!
+
+  """The direction that is used for ordering."""
+  order: SortOrder!
+}
+
+"""Allowed column names for Query.chats.where."""
+enum QueryChatsWhereColumn {
+  PARTICIPANTS
+}
+
+"""
+Dynamic WHERE conditions for the `where` argument of the query `chats`.
+"""
+input QueryChatsWhereWhereHasConditions {
+  """The column that is used for the condition."""
+  column: QueryChatsWhereColumn
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryChatsWhereWhereHasConditions!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryChatsWhereWhereHasConditions!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryChatsWhereWhereHasConditionsRelation
+}
+
+"""
+Dynamic WHERE HAS conditions for the `where` argument of the query `chats`.
+"""
+input QueryChatsWhereWhereHasConditionsHasCondition {
+  """The column that is used for the condition."""
+  column: String
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryChatsWhereWhereHasConditionsHasCondition!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryChatsWhereWhereHasConditionsHasCondition!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryChatsWhereWhereHasConditionsRelation
+}
+
+"""
+Dynamic HAS conditions for WHERE conditions for the `where` argument of the query `chats`.
+"""
+input QueryChatsWhereWhereHasConditionsRelation {
+  """The relation that is checked."""
+  relation: String!
+
+  """The comparison operator to test against the amount."""
+  operator: SQLOperator = GTE
+
+  """The amount to test."""
+  amount: Int = 1
+
+  """Additional condition logic."""
+  condition: QueryChatsWhereWhereHasConditionsHasCondition
+}
+
+"""Allowed column names for Query.companies.orderBy."""
+enum QueryCompaniesOrderByColumn {
+  CREATED_AT
+  UPDATED_AT
+  NAME
+}
+
+"""Order by clause for Query.companies.orderBy."""
+input QueryCompaniesOrderByOrderByClause {
+  """The column that is used for ordering."""
+  column: QueryCompaniesOrderByColumn!
+
+  """The direction that is used for ordering."""
+  order: SortOrder!
+}
+
+"""Allowed column names for Query.companies.where."""
+enum QueryCompaniesWhereColumn {
+  TYPE
+  NAME
+  ID
+}
+
+"""
+Dynamic WHERE conditions for the `where` argument of the query `companies`.
+"""
+input QueryCompaniesWhereWhereConditions {
+  """The column that is used for the condition."""
+  column: QueryCompaniesWhereColumn
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryCompaniesWhereWhereConditions!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryCompaniesWhereWhereConditions!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryCompaniesWhereWhereConditionsRelation
+}
+
+"""
+Dynamic WHERE HAS conditions for the `where` argument of the query `companies`.
+"""
+input QueryCompaniesWhereWhereConditionsHasCondition {
+  """The column that is used for the condition."""
+  column: String
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryCompaniesWhereWhereConditionsHasCondition!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryCompaniesWhereWhereConditionsHasCondition!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryCompaniesWhereWhereConditionsRelation
+}
+
+"""
+Dynamic HAS conditions for WHERE conditions for the `where` argument of the query `companies`.
+"""
+input QueryCompaniesWhereWhereConditionsRelation {
+  """The relation that is checked."""
+  relation: String!
+
+  """The comparison operator to test against the amount."""
+  operator: SQLOperator = GTE
+
+  """The amount to test."""
+  amount: Int = 1
+
+  """Additional condition logic."""
+  condition: QueryCompaniesWhereWhereConditionsHasCondition
+}
+
+"""Allowed column names for Query.companyChats.orderBy."""
+enum QueryCompanyChatsOrderByColumn {
+  CREATED_AT
+}
+
+"""Order by clause for Query.companyChats.orderBy."""
+input QueryCompanyChatsOrderByOrderByClause {
+  """The column that is used for ordering."""
+  column: QueryCompanyChatsOrderByColumn!
+
+  """The direction that is used for ordering."""
+  order: SortOrder!
+}
+
+"""Allowed column names for Query.companyChatsPaginated.orderBy."""
+enum QueryCompanyChatsPaginatedOrderByColumn {
+  CREATED_AT
+}
+
+"""Order by clause for Query.companyChatsPaginated.orderBy."""
+input QueryCompanyChatsPaginatedOrderByOrderByClause {
+  """The column that is used for ordering."""
+  column: QueryCompanyChatsPaginatedOrderByColumn!
+
+  """The direction that is used for ordering."""
+  order: SortOrder!
+}
+
+"""Allowed column names for Query.companyNewsItems.orderBy."""
+enum QueryCompanyNewsItemsOrderByColumn {
+  CREATED_AT
+}
+
+"""Order by clause for Query.companyNewsItems.orderBy."""
+input QueryCompanyNewsItemsOrderByOrderByClause {
+  """The column that is used for ordering."""
+  column: QueryCompanyNewsItemsOrderByColumn!
+
+  """The direction that is used for ordering."""
+  order: SortOrder!
+}
+
+"""Allowed column names for Query.companyNewsItems.where."""
+enum QueryCompanyNewsItemsWhereColumn {
+  CREATED_AT
+  TYPE
+  ID
+}
+
+"""
+Dynamic WHERE conditions for the `where` argument of the query `companyNewsItems`.
+"""
+input QueryCompanyNewsItemsWhereWhereConditions {
+  """The column that is used for the condition."""
+  column: QueryCompanyNewsItemsWhereColumn
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryCompanyNewsItemsWhereWhereConditions!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryCompanyNewsItemsWhereWhereConditions!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryCompanyNewsItemsWhereWhereConditionsRelation
+}
+
+"""
+Dynamic WHERE HAS conditions for the `where` argument of the query `companyNewsItems`.
+"""
+input QueryCompanyNewsItemsWhereWhereConditionsHasCondition {
+  """The column that is used for the condition."""
+  column: String
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryCompanyNewsItemsWhereWhereConditionsHasCondition!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryCompanyNewsItemsWhereWhereConditionsHasCondition!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryCompanyNewsItemsWhereWhereConditionsRelation
+}
+
+"""
+Dynamic HAS conditions for WHERE conditions for the `where` argument of the query `companyNewsItems`.
+"""
+input QueryCompanyNewsItemsWhereWhereConditionsRelation {
+  """The relation that is checked."""
+  relation: String!
+
+  """The comparison operator to test against the amount."""
+  operator: SQLOperator = GTE
+
+  """The amount to test."""
+  amount: Int = 1
+
+  """Additional condition logic."""
+  condition: QueryCompanyNewsItemsWhereWhereConditionsHasCondition
+}
+
+"""Allowed column names for Query.feedPosts.orderBy."""
+enum QueryFeedPostsOrderByColumn {
+  CREATED_AT
+  UPDATED_AT
+}
+
+"""Order by clause for Query.feedPosts.orderBy."""
+input QueryFeedPostsOrderByOrderByClause {
+  """The column that is used for ordering."""
+  column: QueryFeedPostsOrderByColumn!
+
+  """The direction that is used for ordering."""
+  order: SortOrder!
+}
+
+"""Allowed column names for Query.feedPosts.where."""
+enum QueryFeedPostsWhereColumn {
+  CREATED_AT
+  ID
+}
+
+"""
+Dynamic WHERE conditions for the `where` argument of the query `feedPosts`.
+"""
+input QueryFeedPostsWhereWhereConditions {
+  """The column that is used for the condition."""
+  column: QueryFeedPostsWhereColumn
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryFeedPostsWhereWhereConditions!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryFeedPostsWhereWhereConditions!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryFeedPostsWhereWhereConditionsRelation
+}
+
+"""
+Dynamic WHERE HAS conditions for the `where` argument of the query `feedPosts`.
+"""
+input QueryFeedPostsWhereWhereConditionsHasCondition {
+  """The column that is used for the condition."""
+  column: String
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryFeedPostsWhereWhereConditionsHasCondition!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryFeedPostsWhereWhereConditionsHasCondition!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryFeedPostsWhereWhereConditionsRelation
+}
+
+"""
+Dynamic HAS conditions for WHERE conditions for the `where` argument of the query `feedPosts`.
+"""
+input QueryFeedPostsWhereWhereConditionsRelation {
+  """The relation that is checked."""
+  relation: String!
+
+  """The comparison operator to test against the amount."""
+  operator: SQLOperator = GTE
+
+  """The amount to test."""
+  amount: Int = 1
+
+  """Additional condition logic."""
+  condition: QueryFeedPostsWhereWhereConditionsHasCondition
+}
+
+"""Allowed column names for Query.goals.where."""
+enum QueryGoalsWhereColumn {
+  ID
+  SHARED
+}
+
+"""
+Dynamic WHERE conditions for the `where` argument of the query `goals`.
+"""
+input QueryGoalsWhereWhereConditions {
+  """The column that is used for the condition."""
+  column: QueryGoalsWhereColumn
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryGoalsWhereWhereConditions!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryGoalsWhereWhereConditions!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryGoalsWhereWhereConditionsRelation
+}
+
+"""
+Dynamic WHERE HAS conditions for the `where` argument of the query `goals`.
+"""
+input QueryGoalsWhereWhereConditionsHasCondition {
+  """The column that is used for the condition."""
+  column: String
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryGoalsWhereWhereConditionsHasCondition!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryGoalsWhereWhereConditionsHasCondition!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryGoalsWhereWhereConditionsRelation
+}
+
+"""
+Dynamic HAS conditions for WHERE conditions for the `where` argument of the query `goals`.
+"""
+input QueryGoalsWhereWhereConditionsRelation {
+  """The relation that is checked."""
+  relation: String!
+
+  """The comparison operator to test against the amount."""
+  operator: SQLOperator = GTE
+
+  """The amount to test."""
+  amount: Int = 1
+
+  """Additional condition logic."""
+  condition: QueryGoalsWhereWhereConditionsHasCondition
+}
+
+"""Allowed column names for Query.newsItems.orderBy."""
+enum QueryNewsItemsOrderByColumn {
+  CREATED_AT
+}
+
+"""Order by clause for Query.newsItems.orderBy."""
+input QueryNewsItemsOrderByOrderByClause {
+  """The column that is used for ordering."""
+  column: QueryNewsItemsOrderByColumn!
+
+  """The direction that is used for ordering."""
+  order: SortOrder!
+}
+
+"""Allowed column names for Query.newsItems.where."""
+enum QueryNewsItemsWhereColumn {
+  CREATED_AT
+  TYPE
+  ID
+}
+
+"""
+Dynamic WHERE conditions for the `where` argument of the query `newsItems`.
+"""
+input QueryNewsItemsWhereWhereConditions {
+  """The column that is used for the condition."""
+  column: QueryNewsItemsWhereColumn
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryNewsItemsWhereWhereConditions!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryNewsItemsWhereWhereConditions!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryNewsItemsWhereWhereConditionsRelation
+}
+
+"""
+Dynamic WHERE HAS conditions for the `where` argument of the query `newsItems`.
+"""
+input QueryNewsItemsWhereWhereConditionsHasCondition {
+  """The column that is used for the condition."""
+  column: String
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryNewsItemsWhereWhereConditionsHasCondition!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryNewsItemsWhereWhereConditionsHasCondition!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryNewsItemsWhereWhereConditionsRelation
+}
+
+"""
+Dynamic HAS conditions for WHERE conditions for the `where` argument of the query `newsItems`.
+"""
+input QueryNewsItemsWhereWhereConditionsRelation {
+  """The relation that is checked."""
+  relation: String!
+
+  """The comparison operator to test against the amount."""
+  operator: SQLOperator = GTE
+
+  """The amount to test."""
+  amount: Int = 1
+
+  """Additional condition logic."""
+  condition: QueryNewsItemsWhereWhereConditionsHasCondition
+}
+
+"""Allowed column names for Query.notices.orderBy."""
+enum QueryNoticesOrderByColumn {
+  CREATED_AT
+  UPDATED_AT
+  TITLE
+}
+
+"""Order by clause for Query.notices.orderBy."""
+input QueryNoticesOrderByOrderByClause {
+  """The column that is used for ordering."""
+  column: QueryNoticesOrderByColumn!
+
+  """The direction that is used for ordering."""
+  order: SortOrder!
+}
+
+"""Allowed column names for Query.notices.where."""
+enum QueryNoticesWhereColumn {
+  OWNER_ID
+  COMPANY_ID
+  TYPE
+  LEVEL
+  TITLE
+  CATEGORY
+  CONTENT_TYPE
+  ID
+  FORMAT
+  INTERNAL_ID
+}
+
+"""Allowed column names for Query.noticesWhereDistance.orderBy."""
+enum QueryNoticesWhereDistanceOrderByColumn {
+  CREATED_AT
+}
+
+"""Order by clause for Query.noticesWhereDistance.orderBy."""
+input QueryNoticesWhereDistanceOrderByOrderByClause {
+  """The column that is used for ordering."""
+  column: QueryNoticesWhereDistanceOrderByColumn!
+
+  """The direction that is used for ordering."""
+  order: SortOrder!
+}
+
+"""
+Dynamic WHERE conditions for the `where` argument of the query `notices`.
+"""
+input QueryNoticesWhereWhereConditions {
+  """The column that is used for the condition."""
+  column: QueryNoticesWhereColumn
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryNoticesWhereWhereConditions!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryNoticesWhereWhereConditions!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryNoticesWhereWhereConditionsRelation
+}
+
+"""
+Dynamic WHERE HAS conditions for the `where` argument of the query `notices`.
+"""
+input QueryNoticesWhereWhereConditionsHasCondition {
+  """The column that is used for the condition."""
+  column: String
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryNoticesWhereWhereConditionsHasCondition!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryNoticesWhereWhereConditionsHasCondition!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryNoticesWhereWhereConditionsRelation
+}
+
+"""
+Dynamic HAS conditions for WHERE conditions for the `where` argument of the query `notices`.
+"""
+input QueryNoticesWhereWhereConditionsRelation {
+  """The relation that is checked."""
+  relation: String!
+
+  """The comparison operator to test against the amount."""
+  operator: SQLOperator = GTE
+
+  """The amount to test."""
+  amount: Int = 1
+
+  """Additional condition logic."""
+  condition: QueryNoticesWhereWhereConditionsHasCondition
+}
+
+"""Allowed column names for Query.publicHelpRecords.orderBy."""
+enum QueryPublicHelpRecordsOrderByColumn {
+  CREATED_AT
+  UPDATED_AT
+}
+
+"""Order by clause for Query.publicHelpRecords.orderBy."""
+input QueryPublicHelpRecordsOrderByOrderByClause {
+  """The column that is used for ordering."""
+  column: QueryPublicHelpRecordsOrderByColumn!
+
+  """The direction that is used for ordering."""
+  order: SortOrder!
+}
+
+"""Allowed column names for Query.publicHelpRecords.where."""
+enum QueryPublicHelpRecordsWhereColumn {
+  CREATED_AT
+  ID
+}
+
+"""
+Dynamic WHERE conditions for the `where` argument of the query `publicHelpRecords`.
+"""
+input QueryPublicHelpRecordsWhereWhereConditions {
+  """The column that is used for the condition."""
+  column: QueryPublicHelpRecordsWhereColumn
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryPublicHelpRecordsWhereWhereConditions!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryPublicHelpRecordsWhereWhereConditions!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryPublicHelpRecordsWhereWhereConditionsRelation
+}
+
+"""
+Dynamic WHERE HAS conditions for the `where` argument of the query `publicHelpRecords`.
+"""
+input QueryPublicHelpRecordsWhereWhereConditionsHasCondition {
+  """The column that is used for the condition."""
+  column: String
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [QueryPublicHelpRecordsWhereWhereConditionsHasCondition!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [QueryPublicHelpRecordsWhereWhereConditionsHasCondition!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: QueryPublicHelpRecordsWhereWhereConditionsRelation
+}
+
+"""
+Dynamic HAS conditions for WHERE conditions for the `where` argument of the query `publicHelpRecords`.
+"""
+input QueryPublicHelpRecordsWhereWhereConditionsRelation {
+  """The relation that is checked."""
+  relation: String!
+
+  """The comparison operator to test against the amount."""
+  operator: SQLOperator = GTE
+
+  """The amount to test."""
+  amount: Int = 1
+
+  """Additional condition logic."""
+  condition: QueryPublicHelpRecordsWhereWhereConditionsHasCondition
+}
+
+enum RecordCreatorRole {
+  HELPER
+  RECEIVER
+}
+
+type RequiresUserActionEvent {
+  id: ID!
+  event_name: String!
+  payload: String
+}
+
+input RespondDealInput {
+  dealId: ID!
+  status: String!
+}
+
+input RespondManyDealsInput {
+  dealIds: [ID]!
+  status: String!
+}
+
+input ReversableCategorySelection {
+  include: [CategorySelection]
+  exclude: [CategorySelection]
+}
+
+type Review {
+  id: ID!
+  giver: User
+  receiver: User!
+  comment: String
+  comment_visible: Boolean
+  description: String
+  updated_at: DateTime!
+  created_at: DateTime!
+  accolades: [ReviewAccolade]!
+}
+
+"""
+These are extra labels that review provider can give to user. User gets badges based on these
+"""
+type ReviewAccolade {
+  name: String!
+  description: String!
+  reviews: [Review]!
+  id: ID!
+}
+
+"""A paginated list of Review items."""
+type ReviewPaginator {
+  """Pagination information about the list of items."""
+  paginatorInfo: PaginatorInfo!
+
+  """A list of Review items."""
+  data: [Review!]!
+}
+
+input SaveInitialInterestInput {
+  side: [String]
+  categories: [CategorySelection]
+  themes: [ID]
+  withRemotePosts: Boolean
+}
+
+type ScheduledUserDeletion {
+  id: ID!
+  date: String
+  user_id: ID!
+}
+
+input SetTeamLogoInput {
+  file: Upload
+  fileAsBase64: String
+  team: ID!
+}
+
+"""Directions for ordering a list of records."""
+enum SortOrder {
+  """Sort records in ascending order."""
+  ASC
+
+  """Sort records in descending order."""
+  DESC
+}
+
+"""The available SQL operators that are used to filter query results."""
+enum SQLOperator {
+  """Equal operator (`=`)"""
+  EQ
+
+  """Not equal operator (`!=`)"""
+  NEQ
+
+  """Greater than operator (`>`)"""
+  GT
+
+  """Greater than or equal operator (`>=`)"""
+  GTE
+
+  """Less than operator (`<`)"""
+  LT
+
+  """Less than or equal operator (`<=`)"""
+  LTE
+
+  """Simple pattern matching (`LIKE`)"""
+  LIKE
+
+  """Negation of simple pattern matching (`NOT LIKE`)"""
+  NOT_LIKE
+
+  """Whether a value is within a set of values (`IN`)"""
+  IN
+
+  """Whether a value is not within a set of values (`NOT IN`)"""
+  NOT_IN
+
+  """Whether a value is within a range of values (`BETWEEN`)"""
+  BETWEEN
+
+  """Whether a value is not within a range of values (`NOT BETWEEN`)"""
+  NOT_BETWEEN
+
+  """Whether a value is null (`IS NULL`)"""
+  IS_NULL
+
+  """Whether a value is not null (`IS NOT NULL`)"""
+  IS_NOT_NULL
+}
+
+type Stats {
+  helpings: Int
+  topCategories: [TopCategory]
+  placementChange: Int
+  activeUsers: Int
+  chatsChange: Float
+  noticesChange: Float
+}
+
+type Team {
+  id: ID!
+  name: String!
+  created_at: DateTime!
+  updated_at: DateTime
+  description: String
+  users: [User]!
+  usersCount: Int
+  messageCount: Int
+  invitedUsers: [TeamUser]
+  company_id: ID
+  pendingInvite: Boolean
+  roles: [TeamRole]
+  userRole: TeamRole
+  logo_url: String
+  logo: Asset
+}
+
+type TeamRole {
+  id: ID!
+  name: String!
+  users: [User]
+  rights: [String]
+  team_id: ID!
+}
+
+type TeamUser {
+  id: ID!
+  name: String!
+  avatar_url: String
+  avatar: Asset
+  invitedAt: DateTime
+}
+
+type Theme {
+  id: ID!
+  key: String!
+  image: String
+  imageAsset: Asset
+  created_at: DateTime!
+  updated_at: DateTime!
+  deleted_at: DateTime
+  default_front_page: String!
+  features: [String]!
+  notice_creation_features: [String]!
+  categories: [Category]
+  contents: [ThemeContent]!
+  default: Boolean!
+  country: String @deprecated
+  countries: [String]
+  no_countries: [String]
+  post_rules_raw: String
+  org_types: [String]
+  user_notices_within_period: Int
+  notice_count: Int
+  priority: Int
+  color: String
+}
+
+type ThemeContent {
+  title: String
+  description: String!
+  rules_explanation: String
+  org_only_block_reason: String
+  org_only_cta_text: String
+  org_only_cta_link: String
+  language: String!
+}
+
+type TopCategory {
+  category: KeyCategory
+  change: Int
+}
+
+type Translation {
+  lang: String
+  content: String
+}
+
+"""
+Specify if you want to include or exclude trashed results from a query.
+"""
+enum Trashed {
+  """Only return trashed results."""
+  ONLY
+
+  """Return both trashed and non-trashed results."""
+  WITH
+
+  """Only return non-trashed results."""
+  WITHOUT
+}
+
+input UpdateCompanyInput {
+  name: String
+  description: String
+  avatar_url: String
+  location: CreateCompanyLocation
+  users: CreateUsersBelongsToMany
+  languageVersions: [CreateCompanyLanguageVersionInput]
+}
+
+input UpdateContentMorphTo {
+  connect: ConnectContentInput
+  disconnect: Boolean
+  delete: Boolean
+}
+
+input UpdateDealInput {
+  description: String!
+  location: String
+  start_date: DateTime!
+  end_date: DateTime!
+  termination_conditions: String!
+  organisation: CreateCompanyBelongsTo
+  dealId: ID!
+}
+
+input UpdateEmployeeInput {
+  name: String
+  description: String
+  avatar_url: String
+  phone_number: String
+  address: String
+  alt_email: String
+  gender: String
+}
+
+input UpdateFeedPostInput {
+  id: ID!
+  title: String
+  description: String
+  keywords: [String]
+}
+
+input UpdateHelpRecordInput {
+  id: ID!
+  note: String
+  is_public: Boolean
+  title: String
+  description: String
+  time_spent: Float
+  event_at: DateTime
+  helper_names: String
+  helper_count: Int
+  customer_count: Int
+}
+
+input UpdateNoticeInput {
+  id: ID!
+  title: String
+  description: String
+  category: String
+  sub_categories: [String]
+  categories: CreateNoticeCategories
+  position: CreateNoticePosition
+  giveSellContent: CreateGiveSellContent
+  giveTradeContent: CreateGiveTradeContent
+  needBuyContent: CreateNeedBuyContent
+  needTradeContent: CreateNeedTradeContent
+  in_return: String
+  expires_at: Date
+  registration_closed_hours_before: Int
+  image: String
+  invite_id: ID
+  remote: String
+}
+
+input UpdateNotificationSettingsInput {
+  ids: [ID!]!
+}
+
+input UpdateReviewCommentVisibilityInput {
+  id: ID!
+  comment_visible: Boolean
+}
+
+input UpdateReviewInput {
+  id: ID!
+  description: String
+  comment: String
+  comment_visible: Boolean
+  accolades: CreateReviewAccoladeBelongsTo
+}
+
+input UpdateUserInput {
+  name: String
+  email: String
+  phone: String
+  description: String
+  address: String
+  privatePersonContents: CreatePrivateUserContentBelongsTo
+  preferred_language: String
+  preferred_distance: Int
+  email_preference: String
+  home_country: String
+  home_city: String
+  real_name: String
+  age: Int
+  gender: String
+  spoken_languages: [String]
+}
+
+scalar Upload
+
+input UpsertInterestSetInput {
+  id: ID
+  name: String!
+  items: InterestSetItems!
+  withRemotePosts: Boolean
+}
+
+type User {
+  id: ID!
+  name: String!
+  real_name: String
+  type: String!
+  description: String
+  professional_title: String
+  email: String
+  email_verified_at: DateTime
+  email_preference: String @deprecated(reason: "Use notificatonSettings instead")
+  interest_match_preference: String
+  userPreferences: [UserPreference]
+  avatar_url: String
+  avatar: Asset
+  phone: String
+  address: String
+  created_at: DateTime!
+  updated_at: DateTime!
+  deleted_at: DateTime
+  hours_helped: Float
+  blocks: [Block]
+  chats: [Chat]!
+  notices: [Notice]!
+  notice_count: Int
+  deals: [Deal]!
+  content: Contents
+  recommendations: [Review]!
+  teams: [Team]
+  companies: [Company]
+  requiresUserActionEvents: [RequiresUserActionEvent]
+  profile_translation_versions: [ProfileTranslation]
+  profile_translation_versions_array: [ProfileTranslation]
+  customerJourneyEvents: [CustomerJourneyEvent!]
+  scheduledUserDeletion: ScheduledUserDeletion
+  trust_level: Int
+  preferred_distance: Int
+  accountVerifications: [AccountVerification]!
+  employeeProfiles: [EmployeeProfile]!
+  likedNotices: [Notice]
+  interests: [Interest]!
+  userInterestMatches: [UserInterestMatch]!
+  feedPosts: [FeedPost]!
+  dealPivot: DealPivot
+  pivotHidden: PivotHidden
+  home_country: String
+  home_city: String
+  favorites: [Favorite]
+  availableVerificationTypes: [String]
+  pendingTeamInvites: [Team]
+  notificationSettings: [NotificationSetting]
+  known_login_methods: [String]
+  age: Int
+  ageGroup: String
+  gender: String
+  spoken_languages: [String]
+}
+
+type UserInterestMatch {
+  id: ID!
+  entity_id: ID!
+  entity_type: String!
+  user: User!
+  weight: Int!
+  created_at: DateTime!
+}
+
+type UserInvite {
+  invite_id: ID!
+  link: String
+  invite_expiry_date: Date
+  company: Company
+  language: String
+}
+
+"""A paginated list of User items."""
+type UserPaginator {
+  """Pagination information about the list of items."""
+  paginatorInfo: PaginatorInfo!
+
+  """A list of User items."""
+  data: [User!]!
+}
+
+type UserPreference {
+  id: ID
+  key: String
+  data: String
+}
+
+type UserReport {
+  id: ID!
+  reason: String!
+  reporter: User
+  reported: User
+  notice: Notice
+  feedpost: FeedPost
+}
+
+input UserReportInput {
+  reported: CreateUserBelongsToReport!
+  reason: String
+  notice: CreateNoticeBelongsToReport
+  feedpost: CreateFeedPostBelongsToReport
+}
+
+type UserSearchResult {
+  id: ID!
+  name: String
+  avatar_url: String
+  avatar: Asset
+  profile_id: ID
+}
+
+type UserStats {
+  total_notices: Int!
+  active_notices: Int!
+  total_chats: Int!
+  total_helpings: Int!
+  total_helps_received: Int!
+  total_helps_given: Int!
+  recommendations: Int!
+  total_messages: Int
+  reviews: Int
+  email_is_verified: Boolean
+}
+
+"""Dynamic WHERE conditions for queries."""
+input WhereConditions {
+  """The column that is used for the condition."""
+  column: String
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [WhereConditions!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [WhereConditions!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: WhereConditionsRelation
+}
+
+"""Dynamic WHERE conditions for HAS conditions."""
+input WhereConditionsHasCondition {
+  """The column that is used for the condition."""
+  column: String
+
+  """The operator that is used for the condition."""
+  operator: SQLOperator = EQ
+
+  """The value that is used for the condition."""
+  value: Mixed
+
+  """A set of conditions that requires all conditions to match."""
+  AND: [WhereConditionsHasCondition!]
+
+  """A set of conditions that requires at least one condition to match."""
+  OR: [WhereConditionsHasCondition!]
+
+  """
+  Check whether a relation exists. Extra conditions or a minimum amount can be applied.
+  """
+  HAS: WhereConditionsRelation
+}
+
+"""Dynamic HAS conditions for WHERE condition queries."""
+input WhereConditionsRelation {
+  """The relation that is checked."""
+  relation: String!
+
+  """The comparison operator to test against the amount."""
+  operator: SQLOperator = GTE
+
+  """The amount to test."""
+  amount: Int = 1
+
+  """Additional condition logic."""
+  condition: WhereConditionsHasCondition
+}
