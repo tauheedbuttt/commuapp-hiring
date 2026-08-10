@@ -6,8 +6,10 @@ namespace App\Services\Geocoding;
 
 use App\Enums\ErrorCategory;
 use App\Exceptions\GraphQLClientException;
+use App\Services\Cache\FailOpenCache;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 /**
  * Resolves a town name to coordinates via the Nominatim (OpenStreetMap)
@@ -18,8 +20,21 @@ class NominatimGeocoder
 {
     private const TIMEOUT_SECONDS = 5;
 
+    public function __construct(
+        private readonly FailOpenCache $cache,
+    ) {}
+
     /** @return array{town: string, latitude: float, longitude: float} */
     public function geocode(string $town): array
+    {
+        $key = 'geocode:'.Str::lower(trim($town));
+        $ttl = (int) config('services.geocode_cache.ttl_seconds');
+
+        return $this->cache->remember($key, $ttl, fn () => $this->fetch($town));
+    }
+
+    /** @return array{town: string, latitude: float, longitude: float} */
+    private function fetch(string $town): array
     {
         try {
             $response = Http::withHeaders([

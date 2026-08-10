@@ -1,0 +1,46 @@
+query NoticesWhereDistance(
+    $lat: Float!
+    $long: Float!
+    $distance: Int!
+    $first: Int!
+    $page: Int
+    $orderBy: [QueryNoticesWhereDistanceOrderByOrderByClause!]
+) {
+    noticesWhereDistance(
+        lat: $lat
+        long: $long
+        distance: $distance
+        first: $first
+        page: $page
+        orderBy: $orderBy
+    ) {
+        paginatorInfo {
+            total
+            currentPage
+            hasMorePages
+        }
+        data {
+            id
+            title
+            description
+            type
+            side
+            created_at
+            distance_to_user
+            position {
+                latitude
+                longitude
+            }
+            categories {
+                main {
+                    id
+                    key
+                }
+                sub {
+                    id
+                    key
+                }
+            }
+        }
+    }
+}

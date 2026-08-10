@@ -1,0 +1,777 @@
+type Query {
+  """
+  Radius search from a given lat/long point out to `distance`, requires auth. Paginated
+  (defaultCount 50) via a custom builder class rather than the bounding-box approach used by
+  noticesWhereLocation.
+  """
+  noticesWhereDistance(
+    distance: Int!
+    lat: Float!
+    long: Float!
+    orderBy: [QueryNoticesWhereDistanceOrderByOrderByClause!]
+    types: [NoticeType]
+
+    "Use categorySelection instead"
+    omitCategories: [String]
+
+    categorySelection: [ReversableCategorySelection]
+    themes: [ID]
+
+    "Limits number of fetched items."
+    first: Int! = 50
+
+    "The offset from which items are returned."
+    page: Int
+  ): NoticePaginator!
+}
+
+"Order by clause for Query.noticesWhereDistance.orderBy."
+input QueryNoticesWhereDistanceOrderByOrderByClause {
+  "The column that is used for ordering."
+  column: QueryNoticesWhereDistanceOrderByColumn!
+
+  "The direction that is used for ordering."
+  order: SortOrder!
+}
+
+"Allowed column names for Query.noticesWhereDistance.orderBy."
+enum QueryNoticesWhereDistanceOrderByColumn {
+  CREATED_AT
+}
+
+"Directions for ordering a list of records."
+enum SortOrder {
+  "Sort records in ascending order."
+  ASC
+
+  "Sort records in descending order."
+  DESC
+}
+
+enum NoticeType {
+  GIVE_SELL
+  GIVE_TRADE
+  GIVE_FREE
+  GIVE_GENERIC
+  NEED_BUY
+  NEED_TRADE
+  NEED_FREE
+  NEED_GENERIC
+  COLLECTOR
+}
+
+input ReversableCategorySelection {
+  include: [CategorySelection]
+  exclude: [CategorySelection]
+}
+
+input CategorySelection {
+  category: String!
+  subCategories: [String]
+  schema_version: Int
+}
+
+"A paginated list of Notice items."
+type NoticePaginator {
+  "Pagination information about the list of items."
+  paginatorInfo: PaginatorInfo!
+
+  "A list of Notice items."
+  data: [Notice!]!
+}
+
+"Information about pagination using a fully featured paginator."
+type PaginatorInfo {
+  "Number of items in the current page."
+  count: Int!
+
+  "Index of the current page."
+  currentPage: Int!
+
+  "Index of the first item in the current page."
+  firstItem: Int
+
+  "Are there more pages after this one?"
+  hasMorePages: Boolean!
+
+  "Index of the last item in the current page."
+  lastItem: Int
+
+  "Index of the last available page."
+  lastPage: Int!
+
+  "Number of items per page."
+  perPage: Int!
+
+  "Number of total available items."
+  total: Int!
+}
+
+type Notice {
+  id: ID!
+  title: String!
+  description: String
+  owner: User
+
+  "Use categories field instead"
+  category: String @deprecated
+
+  "Use categories field instead"
+  sub_categories: [String] @deprecated
+
+  categories: NoticeCategories!
+  created_at: DateTime!
+  updated_at: DateTime!
+  expires_at: DateTime
+  deleted_at: DateTime
+  start_date: DateTime
+  end_date: DateTime
+  image: Asset
+  internal: Team
+  type: NoticeType!
+  side: NoticeSide
+  parents: [Notice]
+  children: [Notice]
+  levels: [Notice]
+  notice_language_versions: [NoticeTranslation]
+  position: NoticePosition!
+
+  "Shape is dictated by type field"
+  content: NoticeContent
+
+  cid: Int
+  meta: NoticeMeta
+  metaRaw: String
+  company: Company
+  employeeProfile: EmployeeProfile
+  company_id: ID
+  employee_id: ID
+  in_return: String
+  needs_professional: Boolean
+  noticeViews: Int
+  distance_to_user: Float
+  is_expired: Boolean
+  likes: Int
+  deals: [Deal]
+  theme: Theme
+  userInvite: UserInvite
+  registration_closed_hours_before: Int
+  gives_count: Int
+  needs_count: Int
+  invite_id: ID
+  format: String
+  remote: String
+}
+
+type User {
+  id: ID!
+  name: String!
+  real_name: String
+  type: String!
+  description: String
+  professional_title: String
+  email: String
+  email_verified_at: DateTime
+  email_preference: String @deprecated(reason: "Use notificatonSettings instead")
+  interest_match_preference: String
+  userPreferences: [UserPreference]
+  avatar_url: String
+  avatar: Asset
+  phone: String
+  address: String
+  created_at: DateTime!
+  updated_at: DateTime!
+  deleted_at: DateTime
+  hours_helped: Float
+  blocks: [Block]
+  chats: [Chat]!
+  notices: [Notice]!
+  notice_count: Int
+  deals: [Deal]!
+  content: Contents
+  recommendations: [Review]!
+  teams: [Team]
+  companies: [Company]
+  requiresUserActionEvents: [RequiresUserActionEvent]
+  profile_translation_versions: [ProfileTranslation]
+  profile_translation_versions_array: [ProfileTranslation]
+  customerJourneyEvents: [CustomerJourneyEvent!]
+  scheduledUserDeletion: ScheduledUserDeletion
+  trust_level: Int
+  preferred_distance: Int
+  accountVerifications: [AccountVerification]!
+  employeeProfiles: [EmployeeProfile]!
+  likedNotices: [Notice]
+  interests: [Interest]!
+  userInterestMatches: [UserInterestMatch]!
+  feedPosts: [FeedPost]!
+  dealPivot: DealPivot
+  pivotHidden: PivotHidden
+  home_country: String
+  home_city: String
+  favorites: [Favorite]
+  availableVerificationTypes: [String]
+  pendingTeamInvites: [Team]
+  notificationSettings: [NotificationSetting]
+  known_login_methods: [String]
+  age: Int
+  ageGroup: String
+  gender: String
+  spoken_languages: [String]
+}
+
+scalar DateTime
+
+type UserPreference {
+  id: ID
+  key: String
+  data: String
+}
+
+type Asset {
+  id: ID
+  url: String
+  content_type: String
+  asset_original_name: String
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+type Block {
+  id: ID
+  blocker: User
+  blocked: User
+  created_at: DateTime
+}
+
+type Chat {
+  id: ID!
+  created_at: DateTime!
+  updated_at: DateTime!
+  messages: [ChatMessage]!
+  messagesV2: [LatestMessageNode]!
+  participants: [User]!
+  messageCount: Int
+  notice: Notice
+  employeeProfile: EmployeeProfile
+  companies: [Company]
+  team: Team
+}
+
+type ChatMessage {
+  id: ID!
+  chat: Chat!
+  sender: User!
+  created_at: DateTime!
+  updated_at: DateTime!
+  deleted_at: DateTime!
+  message: String
+  location: ChatMessagePositionType
+  employeeProfile: EmployeeProfile
+  image: String
+  file: Asset
+  read_by: [User]!
+  sent_to: [User]!
+  pinned: Boolean
+  notice_id: ID
+  chat_id: ID
+  notice: Notice
+  parent: ChatMessage
+  tool_type: String
+  feedPost: FeedPost
+  feed_post_id: String
+  reactions: [MessageReactionCount!]!
+  my_reaction: String
+}
+
+type ChatMessagePositionType {
+  latitude: String
+  longitude: String
+}
+
+type EmployeeProfile {
+  id: ID!
+  name: String!
+  description: String
+  avatar: Asset
+  avatar_url: String
+  user_id: ID!
+  company_id: ID!
+  updated_at: String
+  phone_number: String
+  address: String
+  alt_email: String
+  gender: String
+}
+
+type FeedPost {
+  id: ID!
+  title: String!
+  description: String
+  image_url: String
+  image: Asset
+  owner: User
+  employeeProfile: EmployeeProfile
+  likes_count: Int
+  likes: [User]
+  comments_count: Int
+  created_at: DateTime!
+  updated_at: DateTime!
+  deleted_at: DateTime
+  keywords: [String]
+  facade_profile_data: FeedPostFacadeData
+}
+
+type FeedPostFacadeData {
+  username: String
+  avatar: String
+}
+
+type MessageReactionCount {
+  reaction: String!
+  count: Int!
+}
+
+type LatestMessageNode {
+  id: ID!
+  sender: LatestMessageUser!
+  created_at: DateTime!
+  updated_at: DateTime!
+  deleted_at: DateTime
+  message: String
+  location: ChatMessagePositionType
+  employeeProfile: LatestMessageEmployeeProfile
+  image: String
+  file: LatestMessageEntityAsset
+  notice_id: ID
+  notice: LatestMessageNotice
+  feedPost: LatestMessageFeedpost
+  reactions: [MessageReactionCount!]!
+  my_reaction: String
+}
+
+type LatestMessageUser {
+  id: ID!
+  name: String
+  avatar: LatestMessageEntityAsset
+}
+
+type LatestMessageEntityAsset {
+  updated_at: DateTime
+  url: String
+  id: ID
+}
+
+type LatestMessageEmployeeProfile {
+  id: ID!
+  name: String!
+  description: String
+  avatar: LatestMessageEntityAsset
+  user_id: ID!
+  company_id: ID!
+}
+
+type LatestMessageNotice {
+  id: ID
+}
+
+type LatestMessageFeedpost {
+  id: ID
+}
+
+type Company {
+  id: ID!
+  users: [User!]
+  notices_count: Int
+  subscriptionCompany: [orgSubscription!]
+  notices: [Notice!]
+  noticesWithInternals: [Notice!]
+  created_at: DateTime!
+  updated_at: DateTime!
+  name: String!
+  website: String
+  type: String
+  description: String @deprecated(reason: "Use `languageVersions` instead.")
+  logo_url: String
+  logo: Asset
+  cover: Asset
+  location: CompanyLocation
+  pivot: CompanyUserPivot
+  profile_translation_versions: [ProfileTranslation]
+  languageVersions: [CompanyLanguageVersion]
+  settings: CompanySettings
+  headquarters: String
+  users_count: Int
+  live_dashboard_activated: Boolean
+  feedPosts: [FeedPost]
+}
+
+type orgSubscription {
+  id: ID!
+  plan_name: String!
+  valid_until: DateTime!
+  payment_method: String!
+  base_price: Int!
+  employee_price: Int @deprecated
+  user_price: Int
+  company_id: Int!
+  quota_user: Int!
+  quota_notice: Int!
+  quota_teams: Int
+  quota_pings: Int
+  quota_integration: Int
+  quota_manage_user: Int
+  quota_invite_links: Int!
+  created_at: DateTime!
+}
+
+type CompanyLocation {
+  latitude: String!
+  longitude: String!
+}
+
+type CompanyUserPivot {
+  role: String!
+  rights: [String]
+  id: ID
+  candidate: Boolean
+}
+
+type ProfileTranslation {
+  description: String
+  language: String!
+}
+
+type CompanyLanguageVersion {
+  id: ID!
+  company_id: ID!
+  language: String!
+  description: String
+  values: String
+  benefits: String
+  operation_field: String
+}
+
+type CompanySettings {
+  deal_settings: OrgDealSettings
+  notice_settings: OrgNoticeSettings
+  new_user_default_teams: [String]
+  frontpage_theme: FrontPageTemplates
+  org_as_theme: Boolean
+  default_internal_id: ID
+  general_team_id: ID
+  enabled_back_office_features: [String]
+  disabled_back_office_features: [String]
+}
+
+type OrgDealSettings {
+  has_cancellation_policy: Boolean
+  cancellation_policy: [OrgDealCancellationPolicyTemplate]
+}
+
+type OrgDealCancellationPolicyTemplate {
+  content: String
+  language: String!
+}
+
+type OrgNoticeSettings {
+  disable_organisation_as_profile: Boolean
+  team_selection_in_notice_creation: Boolean
+}
+
+enum FrontPageTemplates {
+  DEFAULT
+  ORG_CONTENT_1
+  ORG_CONTENT_PREFER_INTERNAL
+}
+
+type Team {
+  id: ID!
+  name: String!
+  created_at: DateTime!
+  updated_at: DateTime
+  description: String
+  users: [User]!
+  usersCount: Int
+  messageCount: Int
+  invitedUsers: [TeamUser]
+  company_id: ID
+  pendingInvite: Boolean
+  roles: [TeamRole]
+  userRole: TeamRole
+  logo_url: String
+  logo: Asset
+}
+
+type TeamUser {
+  id: ID!
+  name: String!
+  avatar_url: String
+  avatar: Asset
+  invitedAt: DateTime
+}
+
+type TeamRole {
+  id: ID!
+  name: String!
+  users: [User]
+  rights: [String]
+  team_id: ID!
+}
+
+type Deal {
+  id: ID!
+  users: [User]!
+  receiver: User
+  description: String!
+  cancellation_reason: String
+  start_date: DateTimeTz!
+  end_date: DateTimeTz
+  termination_conditions: String!
+  notice: Notice
+  type: String
+  team: Team
+  organisation: Company
+  created_at: DateTime
+  updated_at: DateTime
+  location: String
+  status: String!
+  sensitive_data: String
+}
+
+scalar DateTimeTz
+
+union Contents = PrivateUserContent
+
+type PrivateUserContent {
+  strong_auth: Boolean!
+  email_verified: Boolean!
+  badges: [Badge]!
+  user: User
+}
+
+type Badge {
+  name: String!
+  description: String
+  private_user_content: PrivateUserContent
+}
+
+type Review {
+  id: ID!
+  giver: User
+  receiver: User!
+  comment: String
+  comment_visible: Boolean
+  description: String
+  updated_at: DateTime!
+  created_at: DateTime!
+  accolades: [ReviewAccolade]!
+}
+
+"These are extra labels that review provider can give to user. User gets badges based on these"
+type ReviewAccolade {
+  name: String!
+  description: String!
+  reviews: [Review]!
+  id: ID!
+}
+
+type RequiresUserActionEvent {
+  id: ID!
+  event_name: String!
+  payload: String
+}
+
+type CustomerJourneyEvent {
+  id: ID!
+  event: String
+  type: String
+}
+
+type ScheduledUserDeletion {
+  id: ID!
+  date: String
+  user_id: ID!
+}
+
+type AccountVerification {
+  id: ID!
+  type: String!
+  completed_at: DateTime
+}
+
+type Interest {
+  id: ID!
+  type: String!
+  value: String!
+}
+
+type UserInterestMatch {
+  id: ID!
+  entity_id: ID!
+  entity_type: String!
+  user: User!
+  weight: Int!
+  created_at: DateTime!
+}
+
+type DealPivot {
+  deal_id: ID!
+  user_id: ID!
+  status: String
+  created_at: DateTime
+  updated_at: DateTime
+}
+
+type PivotHidden {
+  chat_id: ID!
+  user_id: ID!
+  hidden: Boolean
+}
+
+type Favorite {
+  id: ID!
+  notice: Notice
+  user: User!
+}
+
+type NotificationSetting {
+  id: ID!
+  name: String!
+  group: String
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
+type NoticeCategories {
+  schema_version: Int!
+  main: Category
+  sub: [Category]!
+}
+
+type Category {
+  id: ID
+  key: String!
+  subCategories: [Category]!
+  parent: Category
+  meta: String
+  themes: [Theme]!
+}
+
+type Theme {
+  id: ID!
+  key: String!
+  image: String
+  imageAsset: Asset
+  created_at: DateTime!
+  updated_at: DateTime!
+  deleted_at: DateTime
+  default_front_page: String!
+  features: [String]!
+  notice_creation_features: [String]!
+  categories: [Category]
+  contents: [ThemeContent]!
+  default: Boolean!
+  country: String @deprecated
+  countries: [String]
+  no_countries: [String]
+  post_rules_raw: String
+  org_types: [String]
+  user_notices_within_period: Int
+  notice_count: Int
+  priority: Int
+  color: String
+}
+
+type ThemeContent {
+  title: String
+  description: String!
+  rules_explanation: String
+  org_only_block_reason: String
+  org_only_cta_text: String
+  org_only_cta_link: String
+  language: String!
+}
+
+enum NoticeSide {
+  GIVE
+  NEED
+}
+
+type NoticeTranslation {
+  title: String!
+  description: String
+  in_return: String
+  language: String!
+}
+
+type NoticePosition {
+  latitude: Float!
+  longitude: Float!
+  level: String!
+}
+
+union NoticeContent = GiveSellContent | GiveTradeContent | NeedBuyContent | NeedTradeContent | OtherContent
+
+type GiveSellContent {
+  price: Float!
+  id: ID!
+  notice: Notice!
+}
+
+type GiveTradeContent {
+  "What user would prefer to get in return"
+  preferred: String
+
+  notice: Notice!
+  id: ID!
+}
+
+type NeedBuyContent {
+  "Estimation about how much user is willing to pay"
+  price_estimation: Float!
+
+  "+- value, if user prefers to display a price range"
+  range: Float
+
+  notice: Notice!
+  id: ID!
+}
+
+type NeedTradeContent {
+  "What user prefers to give in return"
+  offers: String!
+
+  notice: Notice!
+  id: ID!
+}
+
+"This kind of type doesn't have any additional content"
+type OtherContent {
+  empty_description: String
+}
+
+type NoticeMeta {
+  amounts: NoticeMetaAmounts!
+}
+
+type NoticeMetaAmounts {
+  give_sell: Int!
+  give_trade: Int!
+  give_free: Int!
+  give_generic: Int
+  need_buy: Int!
+  need_trade: Int!
+  need_free: Int!
+  need_generic: Int
+}
+
+type UserInvite {
+  invite_id: ID!
+  link: String
+  invite_expiry_date: Date
+  company: Company
+  language: String
+}
+
+scalar Date
