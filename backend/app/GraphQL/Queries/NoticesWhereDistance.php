@@ -12,12 +12,12 @@ final class NoticesWhereDistance
         private readonly NoticeSearchService $noticeSearch,
     ) {}
 
-    /** @param  array{latitude: float, longitude: float, distance: int, first: int, page: int|null}  $args */
+    /** @param  array{lat: float, long: float, distance: int, first: int, page: int|null}  $args */
     public function __invoke(mixed $rootValue, array $args): array
     {
         return $this->noticeSearch->searchNearby(
-            latitude: $args['latitude'],
-            longitude: $args['longitude'],
+            latitude: $args['lat'],
+            longitude: $args['long'],
             distanceMeters: $args['distance'],
             first: $args['first'],
             page: $args['page'] ?? null,

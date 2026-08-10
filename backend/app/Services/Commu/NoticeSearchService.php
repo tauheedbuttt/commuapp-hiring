@@ -20,7 +20,7 @@ use Spawnia\Sailor\Error\ResultErrorsException;
  */
 class NoticeSearchService
 {
-    /** @return array{notices: list<array<string, mixed>>, count: int, currentPage: int, hasMorePages: bool} */
+    /** @return array{paginatorInfo: array{count: int, currentPage: int, hasMorePages: bool}, data: list<array<string, mixed>>} */
     public function searchNearby(float $latitude, float $longitude, int $distanceMeters, int $first, ?int $page): array
     {
         try {
@@ -54,10 +54,12 @@ class NoticeSearchService
         $paginator = $data->noticesWhereDistance;
 
         return [
-            'notices' => array_map($this->mapNotice(...), $paginator->data),
-            'count' => $paginator->paginatorInfo->total,
-            'currentPage' => $paginator->paginatorInfo->currentPage,
-            'hasMorePages' => $paginator->paginatorInfo->hasMorePages,
+            'paginatorInfo' => [
+                'count' => $paginator->paginatorInfo->count,
+                'currentPage' => $paginator->paginatorInfo->currentPage,
+                'hasMorePages' => $paginator->paginatorInfo->hasMorePages,
+            ],
+            'data' => array_map($this->mapNotice(...), $paginator->data),
         ];
     }
 
@@ -70,13 +72,13 @@ class NoticeSearchService
             'description' => $notice->description,
             'type' => $notice->type,
             'side' => $notice->side,
-            'createdAt' => $notice->created_at,
-            'distanceMeters' => $notice->distance_to_user,
+            'created_at' => $notice->created_at,
+            'distance_to_user' => $notice->distance_to_user,
             'position' => [
                 'latitude' => $notice->position->latitude,
                 'longitude' => $notice->position->longitude,
             ],
-            'category' => [
+            'categories' => [
                 'main' => $notice->categories->main === null ? null : [
                     'id' => $notice->categories->main->id,
                     'key' => $notice->categories->main->key,

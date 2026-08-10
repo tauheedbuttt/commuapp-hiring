@@ -63,7 +63,7 @@ class NoticesWhereDistance extends \Spawnia\Sailor\Operation
             __typename
             paginatorInfo {
               __typename
-              total
+              count
               currentPage
               hasMorePages
             }

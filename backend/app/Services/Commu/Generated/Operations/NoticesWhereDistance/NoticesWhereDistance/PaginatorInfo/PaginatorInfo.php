@@ -3,7 +3,7 @@
 namespace App\Services\Commu\Generated\Operations\NoticesWhereDistance\NoticesWhereDistance\PaginatorInfo;
 
 /**
- * @property int $total
+ * @property int $count
  * @property int $currentPage
  * @property bool $hasMorePages
  * @property string $__typename
@@ -11,16 +11,16 @@ namespace App\Services\Commu\Generated\Operations\NoticesWhereDistance\NoticesWh
 class PaginatorInfo extends \Spawnia\Sailor\ObjectLike
 {
     /**
-     * @param int $total
+     * @param int $count
      * @param int $currentPage
      * @param bool $hasMorePages
      */
-    public static function make($total, $currentPage, $hasMorePages): self
+    public static function make($count, $currentPage, $hasMorePages): self
     {
         $instance = new self;
 
-        if ($total !== self::UNDEFINED) {
-            $instance->__set('total', $total);
+        if ($count !== self::UNDEFINED) {
+            $instance->__set('count', $count);
         }
         if ($currentPage !== self::UNDEFINED) {
             $instance->__set('currentPage', $currentPage);
@@ -39,7 +39,7 @@ class PaginatorInfo extends \Spawnia\Sailor\ObjectLike
         static $converters;
 
         return $converters ??= [
-            'total' => new \Spawnia\Sailor\Convert\NonNullConverter(new \Spawnia\Sailor\Convert\IntConverter),
+            'count' => new \Spawnia\Sailor\Convert\NonNullConverter(new \Spawnia\Sailor\Convert\IntConverter),
             'currentPage' => new \Spawnia\Sailor\Convert\NonNullConverter(new \Spawnia\Sailor\Convert\IntConverter),
             'hasMorePages' => new \Spawnia\Sailor\Convert\NonNullConverter(new \Spawnia\Sailor\Convert\BooleanConverter),
             '__typename' => new \Spawnia\Sailor\Convert\NonNullConverter(new \Spawnia\Sailor\Convert\StringConverter),

@@ -55,24 +55,26 @@ query ($town: String!) {
 ```
 
 ```graphql
-query ($latitude: Float!, $longitude: Float!) {
-  noticesWhereDistance(latitude: $latitude, longitude: $longitude) {
-    count
-    currentPage
-    hasMorePages
-    notices {
+query ($lat: Float!, $long: Float!) {
+  noticesWhereDistance(lat: $lat, long: $long) {
+    paginatorInfo {
+      count
+      currentPage
+      hasMorePages
+    }
+    data {
       id
       title
       description
       type
       side
-      createdAt
-      distanceMeters
+      created_at
+      distance_to_user
       position {
         latitude
         longitude
       }
-      category {
+      categories {
         main {
           key
         }
@@ -85,17 +87,22 @@ query ($latitude: Float!, $longitude: Float!) {
 }
 ```
 
+Args and response shape (`paginatorInfo`/`data`, `created_at`, `distance_to_user`,
+`categories`) deliberately mirror the upstream Commu `noticesWhereDistance` query
+field-for-field, rather than being reshaped into this project's own naming
+conventions — see `docs/brainstorming/notes.md`.
+
 ## Errors
 
 Neither query ever returns a null result — a failure is a distinct error, not
 an empty or null payload. Error categories surface in `extensions`:
 
-- `extensions.validation` — blank/whitespace-only `town`, or an out-of-range `latitude`/`longitude` (Lighthouse's `@rules`)
+- `extensions.validation` — blank/whitespace-only `town`, or an out-of-range `lat`/`long` (Lighthouse's `@rules`)
 - `extensions.category: "not_found"` — `geocodeTown`: no Nominatim match
 - `extensions.category: "upstream"` — Nominatim or Commu timeout, non-200/GraphQL error, or connection failure
 
 A location with zero nearby notices is **not** an error — `noticesWhereDistance`
-returns a normal result with an empty `notices` list and `count: 0`.
+returns a normal result with an empty `data` list and `paginatorInfo.count: 0`.
 
 ## Notes
 

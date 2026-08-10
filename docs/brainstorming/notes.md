@@ -43,3 +43,6 @@
 - issue #3: switched cache store from file to Redis (predis client, no compiled extension)
   - geocoding now actually cached: key = trimmed+lowercased town name, long TTL (30d)
   - fail-open implemented once (App\Services\Cache\FailOpenCache) — Redis down = log + fall through to live path, not a failed request. reused as-is when notice-batch/summary caching lands
+- issue #3, revised after review: noticesWhereDistance args and response shape mirror upstream Commu field names verbatim (lat/long not latitude/longitude, paginatorInfo+data not flattened notices/count, created_at/distance_to_user/categories not createdAt/distanceMeters/category)
+  - reason: keep the mapping between our API and upstream obvious/low-friction, same intent as user story #1, just carried further than the initial camelCase pass did
+  - paginatorInfo.count mirrors upstream's per-page item count (not overall total) — upstream itself doesn't expose an "overall count" field we selected

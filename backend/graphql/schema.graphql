@@ -9,10 +9,10 @@ type Query {
     "Fetch help posts near a coordinate from the upstream Commu API, most recent first."
     noticesWhereDistance(
         "Latitude of the search point."
-        latitude: Float! @rules(apply: ["required", "numeric", "between:-90,90"])
+        lat: Float! @rules(apply: ["required", "numeric", "between:-90,90"])
 
         "Longitude of the search point."
-        longitude: Float! @rules(apply: ["required", "numeric", "between:-180,180"])
+        long: Float! @rules(apply: ["required", "numeric", "between:-180,180"])
 
         "Search radius in meters."
         distance: Int! = 15000
@@ -22,7 +22,7 @@ type Query {
 
         "Page number, 1-indexed. Defaults to the first page."
         page: Int
-    ): NoticeSearchResult!
+    ): NoticePaginator!
 }
 
 "A town resolved to a single geographic point."
@@ -37,12 +37,18 @@ type TownLocation {
     longitude: Float!
 }
 
-"A page of nearby help posts, most recent first."
-type NoticeSearchResult {
-    "Help posts on the current page."
-    notices: [Notice!]!
+"A page of nearby help posts, most recent first. Mirrors the upstream Commu paginator shape."
+type NoticePaginator {
+    "Pagination metadata for the current page."
+    paginatorInfo: PaginatorInfo!
 
-    "Total number of matching help posts across all pages."
+    "Help posts on the current page."
+    data: [Notice!]!
+}
+
+"Pagination metadata, mirroring the upstream Commu paginator."
+type PaginatorInfo {
+    "Number of help posts on the current page."
     count: Int!
 
     "The current page number."
@@ -70,20 +76,20 @@ type Notice {
     side: NoticeSide
 
     "Main and sub category the post is filed under."
-    category: NoticeCategory!
+    categories: NoticeCategories!
 
     "When the help post was created, as an ISO 8601 timestamp."
-    createdAt: String!
+    created_at: String!
 
     "Where the help post is located."
     position: NoticePosition!
 
     "Distance from the search point, in meters."
-    distanceMeters: Float
+    distance_to_user: Float
 }
 
 "Main and sub category a help post is filed under."
-type NoticeCategory {
+type NoticeCategories {
     "The post's primary category, if categorized."
     main: Category
 

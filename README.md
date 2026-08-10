@@ -49,6 +49,8 @@ Nominatim (OpenStreetMap): `https://nominatim.openstreetmap.org/search`. No auth
 
 Identity, title, description, notice type, give/need side, category (main + sub), creation timestamp, geographic position, and distance from the search point. Fields tied to notice hierarchy (parent/child/level), engagement counts (likes, views), deal/invite data, and org-level aggregates are excluded — not relevant to a "what's being asked for nearby" list view.
 
+Argument names (`lat`/`long`) and the response field names (`paginatorInfo`/`data`, `created_at`, `distance_to_user`, `categories`) deliberately mirror the upstream Commu query verbatim, rather than being reshaped into this project's own naming conventions — keeps the mapping between our API and the upstream one obvious.
+
 Sort order is hardcoded server-side to most-recent-first (`CREATED_AT DESC`) rather than exposed as a caller option — the upstream query only ever supports that one sort column, so there's nothing to choose between. Notice type/category/theme filter arguments aren't exposed either, since no preferences/filtering UI exists in this task's scope.
 
 ### Caching approach
