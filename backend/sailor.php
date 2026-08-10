@@ -15,11 +15,18 @@ return [
     {
         public function makeClient(): Sailor\Client
         {
+            $graphqlUrl = getenv('COMMU_GRAPHQL_URL') ?: null;
+            $bearerToken = getenv('COMMU_BEARER_TOKEN') ?: null;
+
+            if ($graphqlUrl === null || $bearerToken === null) {
+                throw new RuntimeException('COMMU_GRAPHQL_URL and COMMU_BEARER_TOKEN must both be set.');
+            }
+
             return new Sailor\Client\Guzzle(
-                $_ENV['COMMU_GRAPHQL_URL'],
+                $graphqlUrl,
                 [
                     'headers' => [
-                        'Authorization' => 'Bearer '.$_ENV['COMMU_BEARER_TOKEN'],
+                        'Authorization' => 'Bearer '.$bearerToken,
                     ],
                 ]
             );

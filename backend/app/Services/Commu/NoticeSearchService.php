@@ -11,6 +11,7 @@ use App\Services\Commu\Generated\Operations\NoticesWhereDistance\NoticesWhereDis
 use App\Services\Commu\Generated\Types\QueryNoticesWhereDistanceOrderByColumn;
 use App\Services\Commu\Generated\Types\QueryNoticesWhereDistanceOrderByOrderByClause;
 use App\Services\Commu\Generated\Types\SortOrder;
+use Illuminate\Support\Facades\Log;
 use Spawnia\Sailor\Error\ResultErrorsException;
 
 /**
@@ -35,7 +36,9 @@ class NoticeSearchService
                     order: SortOrder::DESC,
                 )],
             );
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            Log::error('Commu noticesWhereDistance request failed.', ['exception' => $e]);
+
             throw new GraphQLClientException(
                 'Could not reach the Commu service.',
                 ErrorCategory::Upstream,
@@ -47,6 +50,13 @@ class NoticeSearchService
         } catch (ResultErrorsException) {
             throw new GraphQLClientException(
                 'The Commu service returned an error.',
+                ErrorCategory::Upstream,
+            );
+        }
+
+        if ($data === null) {
+            throw new GraphQLClientException(
+                'The Commu service returned an empty response.',
                 ErrorCategory::Upstream,
             );
         }

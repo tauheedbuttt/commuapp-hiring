@@ -15,9 +15,9 @@
 - cache: geocoding results, generated summaries
   - seperate keys for each
   - avoid fetching nearby notice in cache. reason: want real-time feel. can implement with pull down to refresh UX and then cache gets invalidated at backend. but will decide later
-  - long TTL for geoencoding, since same results always, but removing to avoid costs
-- after reconsidreation i notice these can only be implemented if user has given onboarding details since our task doesnt require this from use, we will not have an order by preference
-- "recent" = fixed `first: N` ordered CREATED_AT DESC, no local-storage/seen-tracking (device-local, unbounded growth, arbitrary daily-reset boundary, solves "what's new" not "how many recent") — same fetched batch feeds both list + Bedrock summary, single fetch, no separate summary-only query. seperate calls would indicate we need to feed data from list for bedrock summary for no reason.
+  - long TTL for geocoding because town coordinates change infrequently
+- after reconsideration, these features require onboarding details. This task does not require onboarding details, so preference-based ordering is out of scope.
+- "recent" = fixed `first: N` ordered `CREATED_AT DESC`, with no local-storage/seen-tracking. The posts list remains paginated and uncached. The summary endpoint fetches and caches its own notice batch.
 - use GraphQL as backend, because a lot of APIs in CommuApp are using graphql. makes sense to implement it and learn as well once real job i get.
   - CommuAPI is graphql. My backend is graphql. less translation needed between both. same types fields can be used.
   - easy to explore API due to schema by default.
@@ -46,3 +46,5 @@
 - issue #3, revised after review: noticesWhereDistance args and response shape mirror upstream Commu field names verbatim (lat/long not latitude/longitude, paginatorInfo+data not flattened notices/count, created_at/distance_to_user/categories not createdAt/distanceMeters/category)
   - reason: keep the mapping between our API and upstream obvious/low-friction, same intent as user story #1, just carried further than the initial camelCase pass did
   - paginatorInfo.count mirrors upstream's per-page item count (not overall total) — upstream itself doesn't expose an "overall count" field we selected
+- issue #3, addressed CodeRabbit review: bound `distance`/`first`/`page` with `@rules` (previously only `lat`/`long` were validated), log the Commu transport exception before converting it to `GraphQLClientException` (was silently discarded), guard against a null `data` payload on an HTTP-200-with-no-errors response, fix geocode cache returning the first-seen `town` casing/whitespace on a cache hit, and make `sailor.php` fail fast on missing `COMMU_GRAPHQL_URL`/`COMMU_BEARER_TOKEN` instead of building a client with a null URL
+  - skipped: setting a non-blank example TTL in `.env.example` — contradicts this project's explicit no-default-env-values policy (every other key in that file is blank too, by design)

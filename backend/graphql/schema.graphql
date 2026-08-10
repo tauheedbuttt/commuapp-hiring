@@ -15,13 +15,13 @@ type Query {
         long: Float! @rules(apply: ["required", "numeric", "between:-180,180"])
 
         "Search radius in meters."
-        distance: Int! = 15000
+        distance: Int! = 15000 @rules(apply: ["integer", "between:1,100000"])
 
         "Page size."
-        first: Int! = 20
+        first: Int! = 20 @rules(apply: ["integer", "between:1,50"])
 
         "Page number, 1-indexed. Defaults to the first page."
-        page: Int
+        page: Int @rules(apply: ["integer", "min:1"])
     ): NoticePaginator!
 }
 

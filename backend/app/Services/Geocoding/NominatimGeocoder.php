@@ -30,7 +30,10 @@ class NominatimGeocoder
         $key = 'geocode:'.Str::lower(trim($town));
         $ttl = (int) config('services.geocode_cache.ttl_seconds');
 
-        return $this->cache->remember($key, $ttl, fn () => $this->fetch($town));
+        $result = $this->cache->remember($key, $ttl, fn () => $this->fetch($town));
+        $result['town'] = $town;
+
+        return $result;
     }
 
     /** @return array{town: string, latitude: float, longitude: float} */

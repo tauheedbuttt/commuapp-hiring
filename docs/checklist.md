@@ -32,7 +32,7 @@ _Last reviewed: 2026-08-10._
 
 ## README (root)
 
-All sections currently `_TBD_` in `README.md` — fill in as decisions land:
+The following README sections track completed and pending decisions:
 
 - [ ] Mobile setup & run instructions (backend section already written)
 - [x] API format choice (GraphQL) + why
@@ -61,3 +61,9 @@ All sections currently `_TBD_` in `README.md` — fill in as decisions land:
 - [x] Vantaa
 - [x] Tampere
 - [x] Turku
+- [x] Pagination returns correct counts and page metadata
+- [x] Zero-notice locations return a valid empty result
+- [x] Upstream authentication, network, and server failures map to the upstream error category
+- [x] Redis cache hits avoid duplicate live geocoding requests
+- [x] Case and whitespace normalization reuse the same geocoding cache entry
+- [x] Redis outages log a warning and fall back to live geocoding
