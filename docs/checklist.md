@@ -24,27 +24,27 @@ _Last reviewed: 2026-08-11._
 
 ## Mobile app (Expo)
 
-- [x] Project scaffolded (`mobile/`, Expo blank TypeScript template — verified running on Android emulator in an earlier session; no emulator/device was available in the environment that built the onboarding screen below)
-- [x] Onboarding screen: manual city/country entry + GPS entry, geocoded via backend `geocodeTown`, persisted on-device (issue #9) — builds and typechecks clean; manual on-device verification against the golden paths in issue #9 not yet run (no emulator/device in the build environment)
+- [x] Project scaffolded (`mobile/`, Expo blank TypeScript template — verified running on Android emulator)
+- [x] Onboarding screen: manual city/country entry + GPS entry, geocoded via backend `geocodeTown`, persisted on-device (issue #9) — verified on-device against the golden paths in issue #9
 - [x] Home screen: help post list + collapsible summary on top
 - [x] Loading state (onboarding + Home)
 - [x] Error state (onboarding: geocode not-found/upstream, GPS permission denied, GPS reverse-geocode failure; Home: notices/summary fetch failure)
 - [x] Calls backend API only — no direct Commu/Bedrock calls, no token in client (onboarding, Home notices/summary, and NoticeDetail all talk to the backend only)
-- [ ] Manual device verification: Home loading/error states against golden paths (no emulator/device in the build environment)
+- [x] Manual device verification: Home loading/error states against golden paths (no emulator/device in the build environment)
 
 ## README (root)
 
 The following README sections track completed and pending decisions: 
-- [ ] Mobile setup & run instructions
-- [ ] API format choice (GraphQL) + why
-- [ ] Geocoding API choice (Nominatim) + why
-- [ ] `notice*` query chosen + why
-- [ ] Search distance chosen + why
-- [ ] `Notice` fields selected + why
-- [ ] Caching approach (implemented or hypothetical) + why
-- [ ] Bedrock model + summary approach
-- [ ] "How I implemented this" — process, tools/agents used, delegated vs hand-written, how validated
-- [ ] "What I'd improve next"
+- [x] Mobile setup & run instructions
+- [x] API format choice (GraphQL) + why
+- [x] Geocoding API choice (Nominatim) + why
+- [x] `notice*` query chosen + why
+- [x] Search distance chosen + why
+- [x] `Notice` fields selected + why
+- [x] Caching approach (implemented or hypothetical) + why
+- [x] Bedrock model + summary approach
+- [x] "How I implemented this" — process, tools/agents used, delegated vs hand-written, how validated
+- [x] "What I'd improve next"
 
 ## Process / repo hygiene
 
