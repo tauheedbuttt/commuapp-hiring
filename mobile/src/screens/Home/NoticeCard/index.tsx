@@ -5,6 +5,8 @@ import { colors } from '../../../theme/colors';
 import { formatDistance, noticeTypeTag, titleCase } from '../../../utils/notice';
 import { styles } from './styles';
 
+const NOTICE_PLACEHOLDER_IMAGE = require('../../../../assets/notice-placeholder.png');
+
 export type NoticeListItem = NoticesWhereDistanceQuery['noticesWhereDistance']['data'][number];
 
 type Props = {
@@ -26,9 +28,11 @@ export function NoticeCard({ notice, onPress }: Props) {
   return (
     <Pressable style={styles.card} onPress={() => onPress(notice.id)}>
       <View style={styles.photo}>
-        {notice.image?.url ? (
-          <Image source={{ uri: notice.image.url }} style={styles.photoImage} />
-        ) : null}
+        <Image
+          source={notice.image?.url ? { uri: notice.image.url } : NOTICE_PLACEHOLDER_IMAGE}
+          style={styles.photoImage}
+          resizeMode="cover"
+        />
         <View style={styles.photoShade} />
 
         {notice.distance_to_user != null ? (
