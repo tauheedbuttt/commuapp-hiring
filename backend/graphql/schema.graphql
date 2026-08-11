@@ -42,7 +42,7 @@ type Query {
 
 "A generated summary of nearby help-post activity."
 type AreaSummary {
-    "2-4 sentences of plain prose describing the kinds of help typically requested or offered nearby. A canned message if too few nearby posts exist to summarize."
+    "A concise 2-sentence plain-prose description of the kinds of help typically requested or offered nearby. A canned message if too few nearby posts exist to summarize."
     summary: String!
 }
 

@@ -61,7 +61,7 @@ class BedrockSummaryGenerator
             Posts (JSON):
             {$notices}
 
-            Write a 2-4 sentence plain-prose summary of the kinds of help typically requested or offered in this area, based only on these posts. Mention "{$town}" by name. Do not use bullet points or markdown. Return only the summary text.
+            Write a concise 2-sentence plain-prose summary of the kinds of help typically requested or offered in this area, based only on these posts. Mention "{$town}" by name. No filler, no bullet points, no markdown. Return only the summary text.
             PROMPT;
     }
 }
