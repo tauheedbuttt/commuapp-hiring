@@ -2,6 +2,32 @@
 
 Laravel backend + Expo mobile app. User enters a home town, sees nearby help posts plus a generated area summary.
 
+## Table of contents
+
+- [Prerequisites](#prerequisites)
+- [Setup](#setup)
+  - [Backend](#backend)
+  - [Mobile app (Expo)](#mobile-app-expo)
+- [Decisions](#decisions)
+  - [API format (REST vs GraphQL vs other)](#api-format-rest-vs-graphql-vs-other)
+  - [Geocoding API](#geocoding-api)
+  - [`notice*` query chosen](#notice-query-chosen)
+  - [Search distance](#search-distance)
+  - [`Notice` fields selected](#notice-fields-selected)
+  - [Caching approach](#caching-approach)
+  - [Bedrock model & summary approach](#bedrock-model--summary-approach)
+- [How I implemented this](#how-i-implemented-this)
+- [What I'd improve next](#what-id-improve-next)
+
+## Prerequisites
+
+- PHP 8.3+ and Composer
+- A local Redis instance running (caching, see [Caching approach](#caching-approach))
+- Node.js and npm, for the Expo app
+- The Expo Go app on a phone, or an Android/iOS emulator, to run the mobile app
+- A Commu bearer token, copied from a logged-in session at app.commuapp.fi (see `backend/README.md` for how)
+- An AWS account with Bedrock access, for the area summary (see `backend/README.md` for model access setup)
+
 ## Setup
 
 ### Backend
@@ -11,8 +37,6 @@ cd backend
 composer install
 cp .env.example .env
 php artisan key:generate
-touch database/database.sqlite
-php artisan migrate
 ```
 
 Run:
@@ -48,52 +72,173 @@ Then scan the QR code with Expo Go, or `npm run android` / `npm run ios`. See
 
 ### API format (REST vs GraphQL vs other)
 
-GraphQL, via Laravel Lighthouse. The upstream Commu API is GraphQL, so a GraphQL backend needs less translation between the two — types and fields largely carry straight through instead of being reshaped into a REST DTO. It's also schema-explorable by default (GraphiQL), and interfaces/types generated from the schema make it easy to generate TS types for the mobile app later.
+GraphQL, via Laravel Lighthouse.
+
+- Upstream Commu API is GraphQL too. Same format, less translation, fields carry through instead of reshaping into REST DTOs.
+- Schema-explorable by default via GraphiQL. No separate docs tool needed.
+- Schema-generated types make TS codegen for mobile easy, no hand-maintained types.
+- Commu leans GraphQL. Building this way meant actually learning it, useful past this task.
 
 ### Geocoding API
 
-Nominatim (OpenStreetMap): `https://nominatim.openstreetmap.org/search`. No auth, no key management, one HTTP call, and easy to swap later if needed.
+Nominatim (OpenStreetMap): `https://nominatim.openstreetmap.org/search`.
+
+- No auth.
+- No key management.
+- One HTTP call.
+- Easy to swap later if needed.
 
 ### `notice*` query chosen
 
-`noticesWhereDistance`. It's the one built specifically for "what's near this point": takes `lat`/`long`/`distance` directly (no bounding-box math like `noticesWhereLocation`) and returns a real paginator (`paginatorInfo` + `data`), so a caller can tell whether more results exist. Our own backend exposes a query of the same name, mirroring the upstream coordinate/radius/pagination input shape, mapped through a schema-driven, code-generated PHP GraphQL client ([Sailor](https://github.com/spawnia/sailor)) rather than hand-built query strings.
+`noticesWhereDistance`.
+
+- Built for "what's near this point." Takes `lat`/`long`/`distance` directly, no bounding-box math like `noticesWhereLocation`.
+- Real paginator (`paginatorInfo` + `data`), caller knows if more pages exist.
+- Our backend exposes the same query name, mirroring upstream's coordinate/radius/pagination shape.
+- Mapped through [Sailor](https://github.com/spawnia/sailor), a schema-driven, code-generated PHP GraphQL client. No hand-built query strings.
 
 ### Search distance
 
-15 km default (`distance: Int! = 15000`, meters — caller can override). Covers a city plus its immediate surroundings for the four test towns (Helsinki, Vantaa, Tampere, Turku) without pulling in results from an unrelated neighboring city.
+15 km default, caller can override.
+
+- Backend schema default: `distance: Int! = 15000` (meters).
+- Mobile settings store default: `DEFAULT_DISTANCE_METERS = 15000`. Same value, kept in sync by hand on both sides.
+- Doesn't pull in results from an unrelated neighboring city.
+- User can adjust it in Settings, 1 to 100 km.
+
+How I picked 15: fetched real coordinates for the four test towns from my own `geocodeTown` endpoint, then plugged each pair into [freemaptools.com/radius-around-point.htm](https://www.freemaptools.com/radius-around-point.htm) and eyeballed how much of the city a circle at different radii actually covered. Using the coordinates my own API returns, not ones looked up separately, kept the check honest to what the app actually sees.
+
+Best-fit radius per city:
+
+- Helsinki: 20 km
+- Tampere: 10 km
+- Turku: 15 km
+- Vantaa: 10 km
+
+Averages out to 15, so that's the default.
 
 ### `Notice` fields selected
 
-Identity, title, description, notice type, give/need side, category (main + sub), creation timestamp, geographic position, and distance from the search point. Fields tied to notice hierarchy (parent/child/level), engagement counts (likes, views), deal/invite data, and org-level aggregates are excluded — not relevant to a "what's being asked for nearby" list view.
+Two separate types, `Notice` for the list and `NoticeDetail` for the detail screen. Reason: a list card and a full detail page need different fields, forcing one shared type would either bloat the card or starve the detail page.
 
-Argument names (`lat`/`long`) and the response field names (`paginatorInfo`/`data`, `created_at`, `distance_to_user`, `categories`) deliberately mirror the upstream Commu query verbatim, rather than being reshaped into this project's own naming conventions — keeps the mapping between our API and the upstream one obvious.
+General rule behind both: replicate the real Commu app's UI as the target, then keep only the fields that UI and this task actually need. Fields the real app shows but this task doesn't require, or can't support, were left out.
 
-Sort order is hardcoded server-side to most-recent-first (`CREATED_AT DESC`) rather than exposed as a caller option — the upstream query only ever supports that one sort column, so there's nothing to choose between. Notice type/category/theme filter arguments aren't exposed either, since no preferences/filtering UI exists in this task's scope.
+**List (`Notice`, via `noticesWhereDistance`):**
+- `id`, `title`, `description`
+- `type` (give/need/collector)
+- `created_at`, `distance_to_user`
+- `categories.main.key`
+- `image.url`
+- `owner` (`id`, `name`, `avatar_url`)
+- `company` (`id`, `name`, `logo_url`), shown instead of `owner` when a post was made by an org
+
+**Detail (`NoticeDetail`, via `notice(id, lat, long)`):**
+- everything the list has, plus:
+- `in_return`, `side`, `expires_at`, `likes`
+- `position` (for the map preview)
+- `categories.sub` (list card omits sub-category, detail has room for it)
+
+**Left out, and why:**
+- `trust_level` — raw int, no documented range (e.g. is 80 "Awesome"? out of what, 100?) or label mapping upstream, so skipped it rather than guess
+- `accountVerifications` — no verified badge shown anywhere else in the app, dropped for consistency
+- `notice_language_versions` — no translation feature built, would be dead data with nothing to render it
+- notice hierarchy (parent/child/level), deal/invite data, org-level aggregates — not relevant to a "what's nearby" list or detail view
+
+**Type and category chips (list card and detail):**
+- List card shows two chips: the `type` chip and the main-category chip
+- Detail screen adds a third: the sub-category chip, since the detail page has room for it
+- Type chip is color-coded by notice type (give/need/collector); category chips always use one neutral color
+- `categories.sub` is only added to the mobile `notice(id)` query, not `noticesWhereDistance` — keeps the list query minimal
+
+- Arg/field names (`lat`/`long`, `paginatorInfo`/`data`, `created_at`, `distance_to_user`, `categories`) mirror upstream verbatim, not reshaped. Keeps mapping to upstream obvious.
+- Sort hardcoded server-side, `CREATED_AT DESC`. Upstream only supports one sort column, nothing to expose.
+- No type/category/theme filter args. No preferences/filtering UI in scope.
 
 ### Caching approach
 
-Redis-backed (`predis/predis`, no compiled extension, low local-setup friction).
+Redis, through `predis/predis`.
 
-**Implemented:** geocoding results. Key is a trimmed, lowercased town name (`geocode:{town}`); TTL is long (30 days, `GEOCODE_CACHE_TTL_SECONDS`) since a town's coordinates are effectively static. Cache operations fail open — if Redis is unreachable, the operation falls through to the live path (and logs a warning) instead of failing the request. This fail-open logic lives in one shared helper (`App\Services\Cache\FailOpenCache`) so the caching planned for notice-batches and generated summaries can reuse it rather than re-deriving the fallback.
+Idea going in: use a good, well-known cache, keep setup as light as possible. Redis fit that. Client choice came down to this:
 
-**Not implemented (by design):** the `noticesWhereDistance` list itself stays uncached — it's meant to feel real-time, and caching a paginated live feed adds staleness for little benefit at this scale.
+| | predis | phpredis |
+|---|---|---|
+| setup | `composer require`, pure PHP | needs compiled PHP extension |
+| speed | slower | faster |
+| local dev friction | none | install/build step per machine |
 
-**Implemented:** the `areaSummary` query owns its own short-TTL (~30 min, `SUMMARY_CACHE_TTL_SECONDS`) cache of the generated summary, plus a short-TTL (~5 min, `NOTICE_BATCH_CACHE_TTL_SECONDS`) cache of the notice batch that feeds it — separate from, and decoupled from, the posts list's pagination, so a page fetch never triggers a summary regeneration. Both keys are `{town}:{distance}` (same trim/lowercase normalization as geocode) so different search radii for the same town don't collide. Same `FailOpenCache` fail-open behavior as geocoding.
+Went with predis. Speed edge from phpredis wasn't worth the extra setup step for a task this size.
+
+What's cached:
+
+- Geocoding results. Key `geocode:{town}` (trimmed, lowercased).
+  - TTL 30 days (`GEOCODE_CACHE_TTL_SECONDS`): town coords don't move.
+- Area summary. `areaSummary` caches the generated summary.
+  - TTL ~30 min (`SUMMARY_CACHE_TTL_SECONDS`): new posts in 30 min rarely shift theme, summary stays same anyway.
+- Notice batch behind the summary. Cached separately from the summary.
+  - TTL ~5 min (`NOTICE_BATCH_CACHE_TTL_SECONDS`): short, kept apart from summary TTL, page fetch never triggers regen, next regen gets near-fresh data.
+- Summary/batch keys: `{town}:{distance}`, same normalization as geocoding.
+  - no collision across radii, same town.
+
+Left out on purpose:
+
+- `noticesWhereDistance` list itself. Supposed to feel live. Caching a paginated feed adds staleness for little benefit at this scale.
+
+Fail-open behavior:
+
+- Redis down shouldn't take the app down. Every cache read/write fails open, if Redis unreachable, falls through to live path, logs a warning, request still succeeds.
+- Logic lives in one place, `App\Services\Cache\FailOpenCache`. Geocoding, summary cache, batch cache all share it, no reinventing the fallback three times.
 
 ### Bedrock model & summary approach
 
-Amazon Nova Lite (`eu.amazon.nova-2-lite-v1:0` inference profile, `eu-north-1`) via the raw `aws/aws-sdk-php` Converse API — chosen over a Claude-on-Bedrock model specifically to avoid the one-time Anthropic model-access request, not a quality judgment.
+Amazon Nova Lite, via the raw `aws/aws-sdk-php` Converse API.
 
-`AreaSummaryService` orchestrates the flow: check the summary cache, then the notice-batch cache, then fetch a fresh batch (`SUMMARY_NOTICE_BATCH_COUNT` posts, `CREATED_AT DESC`, reusing `NoticeSearchService::searchNearby` as-is — no new Commu query). If the batch has fewer than `SUMMARY_MIN_NOTICES` posts, a canned "not enough data near {town}" summary is returned (and cached, same TTL as a real summary) instead of calling Bedrock. Otherwise each notice is trimmed to the fields relevant to a thematic summary (`title`, `description`, `type`, `side`, `categories`) — identity, position, distance, and timestamps are stripped before prompting — and `BedrockSummaryGenerator` asks for a concise 2-sentence plain-prose summary naming the town, no markdown.
+- Model: `eu.amazon.nova-2-lite-v1:0` inference profile, region `eu-north-1`.
+  - picked over Claude-on-Bedrock to skip the one-time Anthropic access request, not a quality call.
 
-Bedrock/notice-fetch failures are caught, logged, and rethrown as the same `GraphQLClientException`/`ErrorCategory::Upstream` pattern already used for Commu failures — no bespoke retry/timeout logic beyond the AWS SDK's own defaults.
+Flow, owned by `AreaSummaryService`:
 
-AWS credentials are read by the SDK's default provider chain directly from `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` in env — no Laravel-side credential config. Model id and region are config/env-backed (`BEDROCK_MODEL_ID`, `BEDROCK_AWS_REGION`) so the model can be swapped without a code change.
+- check summary cache first.
+- miss: check notice-batch cache.
+- miss: fetch a fresh batch (`SUMMARY_NOTICE_BATCH_COUNT` posts, `CREATED_AT DESC`), reuses `NoticeSearchService::searchNearby`, no new Commu query.
+  - N=30, measured not guessed. Swept N against live Bedrock across all four task towns, summary substance stabilizes at N=30 and stays the same through N=100, just at higher token cost. Full sweep in `docs/bedrock-batch-size-eval.md`.
+- batch under `SUMMARY_MIN_NOTICES` posts: skip Bedrock, return canned "not enough data near {town}", cache it same TTL as a real summary.
+- enough data: trim each notice to `title`, `description`, `type`, `side`, `categories` before prompting.
+  - identity, position, distance, timestamps stripped, only theme-relevant fields reach the model.
+- `BedrockSummaryGenerator` asks for 2-sentence plain prose, names the town, no markdown.
 
-## How this was implemented
+Failure handling:
 
-The GraphQL surface is a single query, `areaSummary(town, lat, long, distance)`, mirroring `noticesWhereDistance`'s coordinate/distance shape so a caller never needs a second geocoding round-trip just for the summary; `town` is carried separately since it's echoed verbatim in the generated text and isn't derivable from coordinates. The resolver (`App\GraphQL\Queries\AreaSummary`) is a thin adapter onto `AreaSummaryService`, which is the only class that knows about caching, the notice-batch/summary split, and the not-enough-data threshold. `BedrockSummaryGenerator` knows only how to turn a town + trimmed notices into a prompt and back into text — no caching or GraphQL knowledge, swappable independently.
+- Bedrock/notice-fetch failures caught, logged, rethrown as `GraphQLClientException` / `ErrorCategory::Upstream`, same pattern as Commu failures.
+- no bespoke retry/timeout logic, AWS SDK defaults only.
+
+Credentials and config:
+
+- AWS creds read by the SDK's default provider chain, `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` from env, no Laravel-side credential config.
+- model id and region env-backed (`BEDROCK_MODEL_ID`, `BEDROCK_AWS_REGION`), swap model without touching code.
+
+## How I implemented this
+
+Before any technical work, I went through the real Commu app myself, screen by screen, to find the ones that matched this task: location entry, the nearby-posts feed, a help post's detail page. I saved screenshots of those in `docs/brainstorming/` (`Location Selection.png`, `Exploring nearby posts.png`, `Preferences.png`, `help-detail-page-*.png`, `Logo.png`) and built the mobile screens to match them. Commu's web app and mobile app share the same React Native code, so I pulled a lot of actual assets (logo, icons) straight from there instead of recreating them. The engineering manager reviewing this already knows the real app, so a UI that looks like it should be easier to read at a glance than something built from scratch.
+
+I worked issue by issue. Every slice of work started as a GitHub issue with a written spec: the problem it solves, the decisions behind it, what's deliberately left out, how I'd check it worked. Nothing got built without a spec first.
+
+Cross-cutting decisions, GraphQL vs REST, which geocoder, the caching shape, the search radius, which fields to expose, I worked out myself and logged in `docs/brainstorming/notes.md` as I went. `docs/brainstorming/steps.md` has the raw, chronological list of what I actually did, in order.
+
+Before writing any spec I gave Claude Code the full Commu schema and had it work out which queries fit the task, rather than reading the whole schema myself. I checked its picks by calling the queries directly in Postman.
+
+Build order: backend scaffold plus `geocodeTown` first. I'd never touched Laravel or Lighthouse, so I put real time into learning how a Laravel project is actually laid out before writing anything task-specific. I stripped the parts of the default scaffold I didn't need, then set up a Controller/Service split similar to what I'm used to in NestJS, resolver stays thin, a service class owns the actual logic. `geocodeTown` was the example that proved that structure out, before I reused the same shape for every query after it. Then `noticesWhereDistance` and Redis caching. Then the Bedrock summary. Then the notice-by-id query. Then the three mobile screens, onboarding, home, and notice detail, in that order.
+
+Tools: Claude Code wrote the actual code, backend PHP and mobile TypeScript both. I didn't hand-type production code. I used [mattpocock/skills](https://github.com/mattpocock/skills) for the workflow, `/grill-me` to brainstorm with the agent on what to build and how, `/to-spec` to turn that into the actual GitHub issue as the source of truth, then `/implement` in a fresh session so the agent builds from the spec with clear context, then reviews its own work against that spec and the repo's standards. That's how every feature in this repo got built. After that, I verified the result myself, manually, against real cases.
+
+Validation: no automated tests, that's project policy here. Every backend slice got hit directly against live dependencies, real Nominatim, the real Commu API, real Bedrock, local Redis, for all four towns in the task (Helsinki, Vantaa, Tampere, Turku), plus the failure cases: blank input, a town that doesn't exist, a bad token, Redis switched off. Mobile slices went through the same kind of pass on a real device/emulator via Expo Go, against the golden paths in each issue's spec.
 
 ## What I'd improve next
 
-_TBD_
+- **phpredis + proper Redis hosting.** Went with predis and local Redis for low setup friction, see [Caching approach](#caching-approach). Next step for real speed: phpredis extension plus a hosted Redis (Elasticache, Upstash, etc) instead of a local instance.
+- **Monorepo.** I split backend and mobile into two plain folders with no shared tooling. Didn't know better going in. A monorepo would let both sides share the GraphQL schema and generated types directly, instead of the mobile app keeping its own copy of things the backend already defines.
+- **Clear the summary cache on pull-to-refresh.** Right now pulling to refresh reloads the post list fresh but can still hand back a cached summary if it's within its TTL. That's correct behavior for the size of this task, but a real product would probably want refresh to mean refresh, summary included.
+- **City/country autocomplete.** Store known cities and countries in the database, so typing in onboarding surfaces suggestions instead of a blind free-text field. Easier to enter, fewer typos, fewer failed geocodes.
+- **Geocode city and country separately.** I currently concatenate them into one `"City, Country"` string and send that as a single `town` argument to Nominatim. Sending them as two separate fields would be more precise and less dependent on Nominatim parsing a combined string correctly.
+- **More error categories.** The backend only has two of its own, `not_found` and `upstream`, plus Lighthouse's built-in `validation`. Upstream in particular is doing double duty for Commu failures and Bedrock failures. Splitting it by source would make failures easier to tell apart on the client.
+- **A general-purpose Bedrock service.** `BedrockSummaryGenerator` as it stands is named and logged specifically for area summaries. I'd pull the actual Converse API call into a base service with no opinion about what it's being used for, so future features that need an LLM call don't have to route through something named for summaries.
+- **Structured summary output.** The summary comes back as plain prose right now. If it came back as JSON instead, title, themes, rough category breakdown, the app could render it as chips or a small breakdown instead of a paragraph, which reads better on a small screen.

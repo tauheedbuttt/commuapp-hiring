@@ -37,3 +37,5 @@
   - reason: card is a compact summary, sub-categories are secondary detail — matches list-vs-detail density elsewhere in this app
   - category chips (main + sub) always same neutral color; only the type chip is colored, keyed off notice type (give/need/collector)
   - added `sub { id key }` to the mobile `notice(id,lat,long)` query only, not `noticesWhereDistance` — list query intentionally stays minimal
+- ran a live eval sweeping SUMMARY_NOTICE_BATCH_COUNT (5/10/20/30/50/100) against Bedrock across all 4 task towns, kept N=30
+  - summary theme stabilizes at N=30 and doesn't change through N=100, just more input tokens and latency for no new substance. data in docs/bedrock-batch-size-eval.md
