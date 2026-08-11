@@ -17,13 +17,8 @@ export const styles = StyleSheet.create({
     lineHeight: 24,
     color: colors.text,
   },
-  actions: {
+  form: {
     marginTop: 40,
-    gap: 10,
-  },
-  fields: {
-    marginTop: 24,
-    gap: 20,
   },
   footer: {
     flex: 1,

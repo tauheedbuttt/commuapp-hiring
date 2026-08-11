@@ -14,6 +14,15 @@ export const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
   },
+  cardSpacing: {
+    marginTop: 20,
+  },
+  locationForm: {
+    marginTop: 16,
+  },
+  saveLocationButton: {
+    marginTop: 16,
+  },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
