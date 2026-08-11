@@ -55,13 +55,6 @@ class NoticeService
             );
         }
 
-        if ($data === null) {
-            throw new GraphQLClientException(
-                'The Commu service returned an empty response.',
-                ErrorCategory::Upstream,
-            );
-        }
-
         $paginator = $data->noticesWhereDistance;
 
         return [
