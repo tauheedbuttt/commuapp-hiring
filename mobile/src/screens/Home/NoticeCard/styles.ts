@@ -79,23 +79,6 @@ export const styles = StyleSheet.create({
   },
   ownerRow: {
     marginTop: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-    backgroundColor: colors.cardBackground,
-  },
-  ownerName: {
-    flex: 1,
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.text,
   },
   description: {
     marginTop: 10,

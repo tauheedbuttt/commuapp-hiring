@@ -1,9 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
+import { OwnerRow } from "../../../components/OwnerRow/OwnerRow";
 import type { NoticesWhereDistanceQuery } from "../../../api/generated/graphql";
 import { colors } from "../../../theme/colors";
 import {
+  formatDate,
   formatDistance,
   noticeTypeTag,
   titleCase,
@@ -11,7 +13,6 @@ import {
 import { styles } from "./styles";
 
 const NOTICE_PLACEHOLDER_IMAGE = require("../../../../assets/notice-placeholder.png");
-const AVATAR_PLACEHOLDER_IMAGE = require("../../../../assets/avatar-placeholder.png");
 
 export type NoticeListItem =
   NoticesWhereDistanceQuery["noticesWhereDistance"]["data"][number];
@@ -21,27 +22,15 @@ type Props = {
   onPress: (id: string) => void;
 };
 
-function formatDate(isoDate: string): string {
-  const date = new Date(isoDate);
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  return `${day}.${month}.${date.getFullYear()}`;
-}
-
 export function NoticeCard({ notice, onPress }: Props) {
   const typeTag = noticeTypeTag(notice.type);
   const categoryKey = notice.categories.main?.key;
 
   const [photoLoadFailed, setPhotoLoadFailed] = useState(false);
-  const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
 
   useEffect(() => {
     setPhotoLoadFailed(false);
   }, [notice.image?.url]);
-
-  useEffect(() => {
-    setAvatarLoadFailed(false);
-  }, [notice.owner?.avatar_url]);
 
   return (
     <Pressable style={styles.card} onPress={() => onPress(notice.id)}>
@@ -90,20 +79,12 @@ export function NoticeCard({ notice, onPress }: Props) {
 
         <Text style={styles.date}>{formatDate(notice.created_at)}</Text>
 
-        <View style={styles.ownerRow}>
-          <Image
-            source={
-              notice.owner?.avatar_url && !avatarLoadFailed
-                ? { uri: notice.owner.avatar_url }
-                : AVATAR_PLACEHOLDER_IMAGE
-            }
-            onError={() => setAvatarLoadFailed(true)}
-            style={styles.avatar}
-          />
-          <Text style={styles.ownerName} numberOfLines={1}>
-            {notice.owner?.name ?? "Someone"}
-          </Text>
-        </View>
+        <OwnerRow
+          owner={notice.owner}
+          company={notice.company}
+          avatarSize={32}
+          style={styles.ownerRow}
+        />
 
         {notice.description ? (
           <Text style={styles.description} numberOfLines={3}>

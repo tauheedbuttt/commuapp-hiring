@@ -125,6 +125,9 @@ type Notice {
 
     "The user who posted the help post."
     owner: NoticeOwner
+
+    "The company/organization the post belongs to, if posted by one rather than an individual."
+    company: NoticeCompany
 }
 
 "Main and sub category a help post is filed under."
@@ -195,6 +198,9 @@ type NoticeDetail {
 
     "When the help post was created, as an ISO 8601 timestamp."
     created_at: String!
+
+    "When the help post stops being valid, as an ISO 8601 timestamp. Null if the post has no expiry."
+    expires_at: String
 
     "Distance from the viewer's position, in meters. Null unless lat/long were provided."
     distance_to_user: Float

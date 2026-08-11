@@ -33,3 +33,13 @@
     - posts list stays uncached, real-time, own pagination — untouched
     - CommuAPI double-hit only possible on cold cache, not per page. rejected piggyback-on-list-fetch (endpoint ordering coupling, fragile) and background-job-seed (queue machinery, overkill for task size)
 - i would write monorepo if done again, to share graphql files across apps. didnt know this before
+- notice detail screen (#13): map lib = react-native-maps
+  - reason: renders static/non-interactive marker from lat/long, works in Expo Go, no custom dev client needed
+- notice detail: expires_at typed as String not DateTime scalar on our schema
+  - reason: app schema has no DateTime scalar defined anywhere (created_at is String too), stayed consistent with existing convention instead of introducing one for a single field
+- extended Notice (list) type with company, not just NoticeDetail
+  - reason: spec wants same owner/company fallback on list cards too, list card had no company field to fall back to
+- owner-row (avatar+name+company fallback) factored into shared OwnerRow component, used by both NoticeCard and NoticeDetailUI
+  - reason: spec explicitly calls out avoiding duplicated fallback branching
+- date formatter (formatDate) moved from NoticeCard into utils/notice.ts
+  - reason: spec wants list card and detail screen sharing one formatter, not two copies
