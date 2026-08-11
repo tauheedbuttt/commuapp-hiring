@@ -1,10 +1,14 @@
 import { Text } from 'react-native';
 import { ScreenContainer } from '../../components/ScreenContainer/ScreenContainer';
-import type { HomeUIProps } from '../../types';
+import type { Location } from '../../types';
 import { styles } from './HomeUI.styles';
 
+type Props = {
+  location: Location | null;
+};
+
 /** Placeholder — help post list + area summary land in a later issue. */
-export function HomeUI({ location }: HomeUIProps) {
+export function HomeUI({ location }: Props) {
   return (
     <ScreenContainer>
       <Text style={styles.text}>Home</Text>

@@ -1,7 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import type { LocationStoreState } from '../types';
+import type { Location } from '../types';
+
+type LocationStoreState = {
+  location: Location | null;
+  setLocation: (location: Location) => void;
+};
 
 export const useLocationStore = create<LocationStoreState>()(
   persist(

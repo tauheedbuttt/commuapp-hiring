@@ -1,9 +1,12 @@
-import { Text, TextInput, View } from 'react-native';
+import { Text, TextInput, TextInputProps, View } from 'react-native';
 import { colors } from '../../theme/colors';
-import type { TextFieldProps } from '../../types';
 import { styles } from './TextField.styles';
 
-export function TextField({ label, ...inputProps }: TextFieldProps) {
+type Props = {
+  label: string;
+} & TextInputProps;
+
+export function TextField({ label, ...inputProps }: Props) {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>

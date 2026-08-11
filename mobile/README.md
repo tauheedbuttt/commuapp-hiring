@@ -54,9 +54,9 @@ components rules, and the types rule below — this section is just the map.
 - `components/` — shared, presentational-only components (no state/API calls
   beyond local UI-only state like a modal's open/closed flag), each with a
   colocated `*.styles.ts` file
-- `types/` — every type/interface in the app, one file per module/feature,
-  re-exported from `types/index.ts`; nothing declares its own inline type
-  elsewhere (generated codegen output is exempt)
+- `types/` — shared domain types only (route params, entities like
+  `Location`), one file per concept, re-exported from `types/index.ts`.
+  Props types stay inline in the component/screen file that uses them.
 - `theme/` — colors, sampled from the reference screenshot
 - `data/` — small static datasets (country name list)
 

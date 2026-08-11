@@ -5,8 +5,22 @@ import { Logo } from '../../components/Logo/Logo';
 import { Picker } from '../../components/Picker/Picker';
 import { ScreenContainer } from '../../components/ScreenContainer/ScreenContainer';
 import { TextField } from '../../components/TextField/TextField';
-import type { OnboardingUIProps } from '../../types';
 import { styles } from './OnboardingUI.styles';
+
+type Props = {
+  country: string;
+  city: string;
+  countryOptions: readonly string[];
+  onCityChange: (text: string) => void;
+  onCountryChange: (country: string) => void;
+  onGetCurrentLocation: () => void;
+  onSubmit: () => void;
+  gpsLoading: boolean;
+  gpsError: string | null;
+  submitError: string | null;
+  isSubmitting: boolean;
+  isNextDisabled: boolean;
+};
 
 export function OnboardingUI({
   country,
@@ -21,7 +35,7 @@ export function OnboardingUI({
   submitError,
   isSubmitting,
   isNextDisabled,
-}: OnboardingUIProps) {
+}: Props) {
   return (
     <ScreenContainer>
       <Logo />

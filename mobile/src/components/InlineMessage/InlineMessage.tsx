@@ -1,7 +1,10 @@
 import { Text } from 'react-native';
-import type { InlineMessageProps } from '../../types';
 import { styles } from './InlineMessage.styles';
 
-export function InlineMessage({ children }: InlineMessageProps) {
+type Props = {
+  children: string;
+};
+
+export function InlineMessage({ children }: Props) {
   return <Text style={styles.text}>{children}</Text>;
 }

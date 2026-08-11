@@ -4,17 +4,21 @@ Conventions for this app, beyond what `mobile/README.md` documents about
 structure. Applies to all new mobile code, not just the onboarding screen it
 was written for.
 
-## Types live in `src/types/`
+## `src/types/` is for shared domain types only
 
-Every type/interface definition lives under `src/types/`, one file per
-module/feature (`navigation.ts`, `location.ts`, `components.ts`, `screens.ts`,
-...), re-exported from `src/types/index.ts`. No `type`/`interface`
-declarations anywhere else in the codebase — components, screens, stores, and
-hooks import what they need from `../types` (or `../../types`) instead of
-declaring their own `Props` type inline.
+Types that describe a concept used across multiple files — a route param list
+(`navigation.ts`), a domain entity like `Location` (`location.ts`) — live
+under `src/types/`, one file per concept, re-exported from
+`src/types/index.ts`.
 
-Exception: generated code (`src/api/generated/`) is exempt — it's not
-hand-written, and its types are already centralized by codegen itself.
+Props types do **not** go there. A component or screen's `Props` (or
+`<Name>UIProps`) is declared inline, right in that file, next to the
+component that uses it — it's not a shared concept, so it doesn't need a
+shared home. Same for any other type that's only ever used in one file (e.g.
+`OnboardingScreen`'s local `GpsCoords`).
+
+Exception: generated code (`src/api/generated/`) is exempt either way — it's
+not hand-written, and its types are already centralized by codegen itself.
 
 ## Screens vs. components split
 

@@ -6,10 +6,12 @@ import { useState } from 'react';
 import { GeocodeTownDocument } from '../../api/generated/graphql';
 import { COUNTRY_NAMES, DEFAULT_COUNTRY } from '../../data/countries';
 import { useLocationStore } from '../../store/locationStore';
-import type { GpsCoords, RootStackParamList } from '../../types';
+import type { RootStackParamList } from '../../types';
 import { OnboardingUI } from './OnboardingUI';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Onboarding'>;
+
+type GpsCoords = { latitude: number; longitude: number } | null;
 
 export function OnboardingScreen({ navigation }: Props) {
   const setLocation = useLocationStore((state) => state.setLocation);

@@ -1,10 +1,18 @@
 import { Ionicons } from '@expo/vector-icons';
 import { ActivityIndicator, Pressable, Text } from 'react-native';
 import { colors } from '../../theme/colors';
-import type { ButtonProps } from '../../types';
 import { styles } from './Button.styles';
 
-export function Button({ label, onPress, variant = 'primary', icon, disabled, loading }: ButtonProps) {
+type Props = {
+  label: string;
+  onPress: () => void;
+  variant?: 'primary' | 'outline';
+  icon?: keyof typeof Ionicons.glyphMap;
+  disabled?: boolean;
+  loading?: boolean;
+};
+
+export function Button({ label, onPress, variant = 'primary', icon, disabled, loading }: Props) {
   const isDisabled = disabled || loading;
   const isOutline = variant === 'outline';
 
