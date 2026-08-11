@@ -2,6 +2,10 @@
 
 Laravel backend + Expo mobile app. User enters a home town, sees nearby help posts plus a generated area summary.
 
+<p align="center">
+  <img src="docs/demo/demo.gif" alt="Demo: entering a home town and browsing nearby help posts with an AI-generated area summary" width="300" />
+</p>
+
 ## Table of contents
 
 - [Prerequisites](#prerequisites)
@@ -79,6 +83,15 @@ GraphQL, via Laravel Lighthouse.
 - Schema-generated types make TS codegen for mobile easy, no hand-maintained types.
 - Commu leans GraphQL. Building this way meant actually learning it, useful past this task.
 
+**Call flow: 3 calls, not 1 combined.**
+
+- Task doc's flow (town in, backend geocodes, fetches notices, generates summary) describes the product flow, not a single-call contract.
+- `geocodeTown` runs once, on submit.
+- App caches the returned lat/long client-side.
+- `noticesWhereDistance` and `areaSummary` both reuse those cached coords.
+- Pagination and refresh never re-geocode.
+- Pagination never regenerates the summary either. A combined endpoint would re-run Bedrock on every page fetch, wasted cost and latency for no new summary.
+
 ### Geocoding API
 
 Nominatim (OpenStreetMap): `https://nominatim.openstreetmap.org/search`.
@@ -92,10 +105,17 @@ Nominatim (OpenStreetMap): `https://nominatim.openstreetmap.org/search`.
 
 `noticesWhereDistance`.
 
-- Built for "what's near this point." Takes `lat`/`long`/`distance` directly, no bounding-box math like `noticesWhereLocation`.
-- Real paginator (`paginatorInfo` + `data`), caller knows if more pages exist.
-- Our backend exposes the same query name, mirroring upstream's coordinate/radius/pagination shape.
-- Mapped through [Sailor](https://github.com/spawnia/sailor), a schema-driven, code-generated PHP GraphQL client. No hand-built query strings.
+| query | shape | why (not) chosen |
+|---|---|---|
+| `noticesWhereDistance` | radius from a point (`lat`/`long`/`distance`), real paginator | **Chosen.** Built for "what's near this point," radius is a first-class arg, no box math needed. `paginatorInfo` + `data` means caller knows if more pages exist. |
+| `noticesWhereLocation` | bounding box (`latMax`/`latMin`/`longMax`/`longMin`) | Same job, wrong shape. Would need to hand-convert center + radius into a box on every call. Plain list, no paginator. |
+| `noticesWhereLocationFiltered` | same bounding box, structured `NoticeSearch` filter | Same box-math problem as above. No auth required, but that's not a deciding factor here. |
+| `noticesByQueryWord` | keyword search, cursor pagination | Built for text search, not proximity. No radius/distance arg at all. |
+| `popularNotices` | popularity-ranked near a point | Ranks by popularity, not recency, task wants "recent." Plain list, no paginator, no radius control. |
+
+`noticesWhereParent` left out of the table entirely. Schema's own doc comment says it's hierarchical (parent/child notices), not a location search, despite the `notices*` name.
+
+Our backend exposes the same query name, mirroring upstream's coordinate/radius/pagination shape. Mapped through [Sailor](https://github.com/spawnia/sailor), a schema-driven, code-generated PHP GraphQL client. No hand-built query strings.
 
 ### Search distance
 
@@ -182,6 +202,12 @@ What's cached:
 Left out on purpose:
 
 - `noticesWhereDistance` list itself. Supposed to feel live. Caching a paginated feed adds staleness for little benefit at this scale.
+
+Invalidation:
+
+- None manual. TTL expiry is the only invalidation, each key resets itself once its window passes.
+- This use case doesn't call for anything more. Summary and notice-batch TTLs are already short (30 min, 5 min), stale data clears itself out fast on its own.
+- One case where manual invalidation would earn its keep: a hard refresh (pull-to-refresh) forcing a fresh summary instead of waiting out the TTL. Not implemented, see [What I'd improve next](#what-id-improve-next).
 
 Fail-open behavior:
 
