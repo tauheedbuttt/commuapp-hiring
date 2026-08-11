@@ -1,0 +1,51 @@
+query Notice($id: ID!, $distanceToPoint: LocationUserPoint) {
+    notice(id: $id, distanceToPoint: $distanceToPoint) {
+        id
+        title
+        description
+        in_return
+        type
+        side
+        created_at
+        distance_to_user
+        likes
+        image {
+            url
+        }
+        position {
+            latitude
+            longitude
+        }
+        categories {
+            main {
+                id
+                key
+            }
+            sub {
+                id
+                key
+            }
+        }
+        owner {
+            id
+            name
+            avatar_url
+            trust_level
+            accountVerifications {
+                type
+                completed_at
+            }
+        }
+        company {
+            id
+            name
+            logo_url
+        }
+        notice_language_versions {
+            title
+            description
+            in_return
+            language
+        }
+    }
+}

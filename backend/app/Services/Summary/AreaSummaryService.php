@@ -7,7 +7,7 @@ namespace App\Services\Summary;
 use App\Enums\CacheKeysEnum;
 use App\Services\Bedrock\BedrockSummaryGenerator;
 use App\Services\Cache\FailOpenCache;
-use App\Services\Commu\NoticeSearchService;
+use App\Services\Commu\NoticeService;
 
 /**
  * Orchestrates the area-summary flow: cached summary → cached notice batch
@@ -18,7 +18,7 @@ class AreaSummaryService
 {
     public function __construct(
         private readonly FailOpenCache $cache,
-        private readonly NoticeSearchService $noticeSearch,
+        private readonly NoticeService $notices,
         private readonly BedrockSummaryGenerator $generator,
     ) {}
 
@@ -51,7 +51,7 @@ class AreaSummaryService
             return $cached;
         }
 
-        $notices = $this->noticeSearch->searchNearby(
+        $notices = $this->notices->searchNearby(
             latitude: $latitude,
             longitude: $longitude,
             distanceMeters: $distanceMeters,
