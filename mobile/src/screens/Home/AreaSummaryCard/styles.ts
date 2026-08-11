@@ -13,18 +13,15 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   title: {
     fontSize: 17,
     fontWeight: '700',
     color: colors.text,
-  },
-  body: {
-    marginTop: 12,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 10,
   },
   aiIcon: {
     width: 24,
@@ -32,11 +29,12 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 2,
     backgroundColor: colors.primaryGreen,
   },
+  body: {
+    marginTop: 12,
+  },
   summaryText: {
-    flex: 1,
     fontSize: 14,
     lineHeight: 20,
     color: colors.text,

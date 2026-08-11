@@ -1,8 +1,8 @@
-import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
-import { colors } from '../../../theme/colors';
-import { styles } from './styles';
+import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { colors } from "../../../theme/colors";
+import { styles } from "./styles";
 
 type Props = {
   loading: boolean;
@@ -15,9 +15,19 @@ export function AreaSummaryCard({ loading, error, summary }: Props) {
 
   return (
     <View style={styles.card}>
-      <Pressable style={styles.header} onPress={() => setCollapsed((prev) => !prev)}>
-        <Text style={styles.title}>Area summary</Text>
-        <Ionicons name={collapsed ? 'chevron-down' : 'chevron-up'} size={18} color={colors.text} />
+      <Pressable
+        style={styles.header}
+        onPress={() => setCollapsed((prev) => !prev)}
+      >
+        <View style={styles.titleRow}>
+          <Ionicons name="sparkles" size={14} color={colors.white} />
+          <Text style={styles.title}>Summary</Text>
+        </View>
+        <Ionicons
+          name={collapsed ? "chevron-down" : "chevron-up"}
+          size={18}
+          color={colors.text}
+        />
       </Pressable>
 
       {collapsed ? null : (
@@ -28,14 +38,11 @@ export function AreaSummaryCard({ loading, error, summary }: Props) {
               <Text style={styles.loadingText}>Generating summary...</Text>
             </View>
           ) : error ? (
-            <Text style={styles.errorText}>Couldn't load the area summary.</Text>
+            <Text style={styles.errorText}>
+              Couldn't load the area summary.
+            </Text>
           ) : (
-            <View style={styles.summaryRow}>
-              <View style={styles.aiIcon}>
-                <Ionicons name="sparkles" size={14} color={colors.white} />
-              </View>
-              <Text style={styles.summaryText}>{summary}</Text>
-            </View>
+            <Text style={styles.summaryText}>{summary}</Text>
           )}
         </View>
       )}
