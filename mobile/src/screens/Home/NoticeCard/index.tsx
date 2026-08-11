@@ -6,6 +6,7 @@ import { formatDistance, noticeTypeTag, titleCase } from '../../../utils/notice'
 import { styles } from './styles';
 
 const NOTICE_PLACEHOLDER_IMAGE = require('../../../../assets/notice-placeholder.png');
+const AVATAR_PLACEHOLDER_IMAGE = require('../../../../assets/avatar-placeholder.png');
 
 export type NoticeListItem = NoticesWhereDistanceQuery['noticesWhereDistance']['data'][number];
 
@@ -64,11 +65,10 @@ export function NoticeCard({ notice, onPress }: Props) {
         <Text style={styles.date}>{formatDate(notice.created_at)}</Text>
 
         <View style={styles.ownerRow}>
-          {notice.owner?.avatar_url ? (
-            <Image source={{ uri: notice.owner.avatar_url }} style={styles.avatar} />
-          ) : (
-            <View style={styles.avatar} />
-          )}
+          <Image
+            source={notice.owner?.avatar_url ? { uri: notice.owner.avatar_url } : AVATAR_PLACEHOLDER_IMAGE}
+            style={styles.avatar}
+          />
           <Text style={styles.ownerName} numberOfLines={1}>
             {notice.owner?.name ?? 'Someone'}
           </Text>
