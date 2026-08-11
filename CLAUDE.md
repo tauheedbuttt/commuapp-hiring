@@ -20,7 +20,7 @@ Do not write tests — no unit, integration, or feature tests — even if an inv
 
 ## Env variable policy
 
-Never write a default value for an env variable — not in code, not in `.env.example`, not in specs/docs. Every env var must be set explicitly in `.env`; `.env.example` lists keys blank.
+Never write a default value for an env variable in code or in specs/docs. `.env.example` is the one exception: non-secret keys with one correct value for every clone (e.g. `COMMU_GRAPHQL_URL`, cache TTLs, `BEDROCK_MODEL_ID`) may carry that real value there. Secret or per-cloner keys (tokens, AWS creds, anything identifying the individual clone) stay blank in `.env.example`, filled only in each person's own `.env`.
 
 ## Branch & PR policy
 

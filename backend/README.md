@@ -14,7 +14,16 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-`.env.example` lists every key blank on purpose. Project policy: no default values for env vars, anywhere. Fill in `.env` before running, per the keys listed there.
+`.env.example` already carries the values that are the same for every clone (Redis config, cache TTLs, the Commu/Bedrock endpoints). The keys below are the only ones left blank — each is either a secret or specific to you, so `.env.example` can't carry a value for it:
+
+| key | what it is | where to get it |
+|---|---|---|
+| `COMMU_BEARER_TOKEN` | auth token for the upstream Commu API | log in at [app.commuapp.fi](https://app.commuapp.fi), open devtools → Network, copy the `Authorization: Bearer …` header off any API request. Expires; re-copy if requests start failing with an auth error. |
+| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | AWS credentials for Bedrock | your own AWS account → IAM → create an access key. The account needs Bedrock model access for `eu.amazon.nova-2-lite-v1:0` in `eu-north-1` enabled first, under Bedrock → Model access in the AWS console. |
+| `NOMINATIM_USER_AGENT` | identifies this app to the Nominatim geocoding API | [Nominatim's usage policy](https://operations.osmfoundation.org/policies/nominatim/) requires a descriptive user agent identifying the app and a contact, e.g. `"your-app-name (you@example.com)"`. Requests with a generic/missing one can get rate-limited or blocked. |
+| `APP_KEY` | Laravel app encryption key | generated for you by `php artisan key:generate` below, not something to source yourself. |
+
+Everything else in `.env.example` already has the value this app needs — copy it as-is.
 
 ## Run
 
