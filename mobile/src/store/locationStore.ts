@@ -6,6 +6,7 @@ import type { Location } from '../types';
 type LocationStoreState = {
   location: Location | null;
   setLocation: (location: Location) => void;
+  clearLocation: () => void;
 };
 
 export const useLocationStore = create<LocationStoreState>()(
@@ -13,6 +14,7 @@ export const useLocationStore = create<LocationStoreState>()(
     (set) => ({
       location: null,
       setLocation: (location) => set({ location }),
+      clearLocation: () => set({ location: null }),
     }),
     {
       name: 'commu-location',

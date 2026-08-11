@@ -18,8 +18,13 @@ php artisan migrate
 Run:
 
 ```bash
-php artisan serve
+php artisan serve --host=0.0.0.0 --port=8000
 ```
+
+`--host=0.0.0.0` is required, not optional — `php artisan serve`'s default
+(`127.0.0.1`) only accepts connections from the same machine. The mobile app
+needs the backend reachable from a phone/emulator on the same network, which
+`127.0.0.1` cannot do (see `mobile/README.md`'s Notes section for why).
 
 GraphQL endpoint: `POST http://127.0.0.1:8000/graphql`. See `backend/README.md` for query examples and error shape.
 

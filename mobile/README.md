@@ -16,9 +16,10 @@ One screen so far:
 npm install
 ```
 
-No `.env` — the backend GraphQL URL is a hardcoded local dev URL in
-`src/api/client.ts` (Android emulator vs. everything else, see Notes below).
-There's nothing else this app currently needs to configure per-environment.
+No `.env` — the backend GraphQL URL is derived at runtime in
+`src/api/client.ts` from Expo's dev-server host (see Notes below), not an
+env var. There's nothing else this app currently needs to configure
+per-environment.
 
 ## Run
 
@@ -97,9 +98,16 @@ if a location is already saved — onboarding only ever runs once per install.
   `label`/`value`/`options`/`onChange` — not a bundled picker component, to
   stay visually consistent with the rest of the screen. Onboarding passes it
   the country list and defaults to `Finland` — commu is a Finnish product.
-- **Backend URL**: hardcoded per-platform in `src/api/client.ts`, since
-  Android emulators resolve `localhost` to the emulator itself rather than the
-  host machine (`10.0.2.2` is the documented alias for the host loopback).
+- **Backend URL**: derived in `src/api/client.ts` from
+  `Constants.expoConfig.hostUri` — the LAN IP Metro is bound to, i.e. the same
+  IP the device already used to load the JS bundle. `localhost` only resolves
+  to the backend on the iOS simulator (shares the Mac's network namespace);
+  Android emulators and physical devices are separate machines on the
+  network and need the real LAN IP instead. That LAN IP is only reachable if
+  the backend was started with `php artisan serve --host=0.0.0.0` — the
+  default (`127.0.0.1`) rejects connections from anything but the backend's
+  own machine, which silently hangs every request from a phone/emulator (see
+  root README).
 - **Errors surfaced on-screen**: `geocodeTown`'s `extensions.category` —
   `not_found` and `upstream` map to distinct messages; GPS permission denial
   and reverse-geocode failure (no address for the coordinates) each get their

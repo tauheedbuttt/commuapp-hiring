@@ -19,4 +19,8 @@ export const styles = StyleSheet.create({
     fontFamily: 'monospace',
     fontSize: 13,
   },
+  clearButton: {
+    marginTop: 24,
+    marginHorizontal: 24,
+  },
 });
