@@ -1,4 +1,6 @@
+import { useRef } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, View } from 'react-native';
+import { useScrollToTop } from '@react-navigation/native';
 import { Button } from '../../components/Button/Button';
 import { InlineMessage } from '../../components/InlineMessage/InlineMessage';
 import { ScreenContainer } from '../../components/ScreenContainer/ScreenContainer';
@@ -40,6 +42,9 @@ export function HomeUI({
   onRetry,
   onNoticePress,
 }: Props) {
+  const listRef = useRef<FlatList<NoticeListItem>>(null);
+  useScrollToTop(listRef);
+
   if (isInitialLoading) {
     return (
       <ScreenContainer edges={["top"]}>
@@ -68,6 +73,7 @@ export function HomeUI({
   return (
     <ScreenContainer scrollable={false} edges={["top"]}>
       <FlatList
+        ref={listRef}
         data={notices}
         keyExtractor={(notice) => notice.id}
         contentContainerStyle={styles.listContent}

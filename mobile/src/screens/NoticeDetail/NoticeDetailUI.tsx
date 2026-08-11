@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
-import { Image, Pressable, Text, View } from 'react-native';
+import { Image, Linking, Platform, Pressable, Text, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { Button } from '../../components/Button/Button';
 import { InlineMessage } from '../../components/InlineMessage/InlineMessage';
@@ -15,6 +15,19 @@ import { styles } from './NoticeDetailUI.styles';
 const NOTICE_PLACEHOLDER_IMAGE = require('../../../assets/notice-placeholder.png');
 
 const MAP_DELTA = 0.01;
+
+function openInMapsApp(latitude: number, longitude: number, label: string) {
+  const query = `${latitude},${longitude}`;
+  const encodedLabel = encodeURIComponent(label);
+
+  const url = Platform.select({
+    ios: `maps:0,0?q=${encodedLabel}@${query}`,
+    android: `geo:${query}?q=${query}(${encodedLabel})`,
+    default: `https://www.google.com/maps/search/?api=1&query=${query}`,
+  });
+
+  Linking.openURL(url);
+}
 
 type Notice = NonNullable<NoticeQuery['notice']>;
 
@@ -146,9 +159,15 @@ export function NoticeDetailUI({ notice, loading, onRetry, onBack }: Props) {
       ) : null}
 
       <Text style={styles.sectionLabel}>Location:</Text>
-      <View style={styles.mapWrapper} pointerEvents="none">
+      <Pressable
+        style={styles.mapWrapper}
+        onPress={() => openInMapsApp(notice.position.latitude, notice.position.longitude, notice.title)}
+        accessibilityRole="button"
+        accessibilityLabel="Open location in maps app"
+      >
         <MapView
           style={styles.map}
+          pointerEvents="none"
           scrollEnabled={false}
           zoomEnabled={false}
           rotateEnabled={false}
@@ -168,7 +187,7 @@ export function NoticeDetailUI({ notice, loading, onRetry, onBack }: Props) {
             }}
           />
         </MapView>
-      </View>
+      </Pressable>
     </ScreenContainer>
   );
 }
