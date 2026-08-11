@@ -1,0 +1,37 @@
+query Notice($id: ID!, $lat: Float, $long: Float) {
+  notice(id: $id, lat: $lat, long: $long) {
+    id
+    title
+    description
+    in_return
+    type
+    side
+    created_at
+    expires_at
+    distance_to_user
+    likes
+    image {
+      url
+    }
+    position {
+      latitude
+      longitude
+    }
+    categories {
+      main {
+        id
+        key
+      }
+    }
+    owner {
+      id
+      name
+      avatar_url
+    }
+    company {
+      id
+      name
+      logo_url
+    }
+  }
+}

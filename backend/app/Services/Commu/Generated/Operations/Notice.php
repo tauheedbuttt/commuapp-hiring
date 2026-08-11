@@ -45,6 +45,7 @@ class Notice extends \Spawnia\Sailor\Operation
             type
             side
             created_at
+            expires_at
             distance_to_user
             likes
             image {

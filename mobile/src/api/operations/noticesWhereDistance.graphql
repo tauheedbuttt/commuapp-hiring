@@ -25,6 +25,11 @@ query NoticesWhereDistance($lat: Float!, $long: Float!, $distance: Int!, $first:
         name
         avatar_url
       }
+      company {
+        id
+        name
+        logo_url
+      }
     }
   }
 }

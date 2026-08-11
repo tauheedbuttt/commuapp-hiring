@@ -104,6 +104,12 @@ class NoticesWhereDistance extends \Spawnia\Sailor\Operation
                 name
                 avatar_url
               }
+              company {
+                __typename
+                id
+                name
+                logo_url
+              }
             }
           }
         }';

@@ -49,6 +49,11 @@ query NoticesWhereDistance(
                 name
                 avatar_url
             }
+            company {
+                id
+                name
+                logo_url
+            }
         }
     }
 }

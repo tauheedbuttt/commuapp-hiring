@@ -13,6 +13,7 @@ namespace App\Services\Commu\Generated\Operations\Notice\Notice;
  * @property string|null $description
  * @property string|null $in_return
  * @property string|null $side
+ * @property mixed|null $expires_at
  * @property float|null $distance_to_user
  * @property int|null $likes
  * @property \App\Services\Commu\Generated\Operations\Notice\Notice\Image\Asset|null $image
@@ -32,6 +33,7 @@ class Notice extends \Spawnia\Sailor\ObjectLike
      * @param string|null $description
      * @param string|null $in_return
      * @param string|null $side
+     * @param mixed|null $expires_at
      * @param float|null $distance_to_user
      * @param int|null $likes
      * @param \App\Services\Commu\Generated\Operations\Notice\Notice\Image\Asset|null $image
@@ -49,6 +51,7 @@ class Notice extends \Spawnia\Sailor\ObjectLike
         $description = 'Special default value that allows Sailor to differentiate between explicitly passing null and not passing a value at all.',
         $in_return = 'Special default value that allows Sailor to differentiate between explicitly passing null and not passing a value at all.',
         $side = 'Special default value that allows Sailor to differentiate between explicitly passing null and not passing a value at all.',
+        $expires_at = 'Special default value that allows Sailor to differentiate between explicitly passing null and not passing a value at all.',
         $distance_to_user = 'Special default value that allows Sailor to differentiate between explicitly passing null and not passing a value at all.',
         $likes = 'Special default value that allows Sailor to differentiate between explicitly passing null and not passing a value at all.',
         $image = 'Special default value that allows Sailor to differentiate between explicitly passing null and not passing a value at all.',
@@ -85,6 +88,9 @@ class Notice extends \Spawnia\Sailor\ObjectLike
         }
         if ($side !== self::UNDEFINED) {
             $instance->__set('side', $side);
+        }
+        if ($expires_at !== self::UNDEFINED) {
+            $instance->__set('expires_at', $expires_at);
         }
         if ($distance_to_user !== self::UNDEFINED) {
             $instance->__set('distance_to_user', $distance_to_user);
@@ -124,6 +130,7 @@ class Notice extends \Spawnia\Sailor\ObjectLike
             'description' => new \Spawnia\Sailor\Convert\NullConverter(new \Spawnia\Sailor\Convert\StringConverter),
             'in_return' => new \Spawnia\Sailor\Convert\NullConverter(new \Spawnia\Sailor\Convert\StringConverter),
             'side' => new \Spawnia\Sailor\Convert\NullConverter(new \Spawnia\Sailor\Convert\EnumConverter),
+            'expires_at' => new \Spawnia\Sailor\Convert\NullConverter(new \Spawnia\Sailor\Convert\ScalarConverter),
             'distance_to_user' => new \Spawnia\Sailor\Convert\NullConverter(new \Spawnia\Sailor\Convert\FloatConverter),
             'likes' => new \Spawnia\Sailor\Convert\NullConverter(new \Spawnia\Sailor\Convert\IntConverter),
             'image' => new \Spawnia\Sailor\Convert\NullConverter(new \App\Services\Commu\Generated\Operations\Notice\Notice\Image\Asset),
