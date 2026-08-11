@@ -23,6 +23,27 @@ type Query {
         "Page number, 1-indexed. Defaults to the first page."
         page: Int @rules(apply: ["integer", "min:1"])
     ): NoticePaginator!
+
+    "Generate a short natural-language summary of what kinds of help are typically requested or offered near a town, grounded in its recent nearby help posts."
+    areaSummary(
+        "The town name, echoed verbatim in the generated summary text."
+        town: String! @rules(apply: ["required", "regex:/\\S/"])
+
+        "Latitude of the search point."
+        lat: Float! @rules(apply: ["required", "numeric", "between:-90,90"])
+
+        "Longitude of the search point."
+        long: Float! @rules(apply: ["required", "numeric", "between:-180,180"])
+
+        "Search radius in meters."
+        distance: Int! = 15000 @rules(apply: ["integer", "between:1,100000"])
+    ): AreaSummary!
+}
+
+"A generated summary of nearby help-post activity."
+type AreaSummary {
+    "2-4 sentences of plain prose describing the kinds of help typically requested or offered nearby. A canned message if too few nearby posts exist to summarize."
+    summary: String!
 }
 
 "A town resolved to a single geographic point."

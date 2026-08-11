@@ -30,6 +30,14 @@ class FailOpenCache
                 'key' => fn (string $town): string => 'geocode:'.Str::lower(trim($town)),
                 'ttl' => fn (): int => (int) config('services.geocode_cache.ttl_seconds'),
             ],
+            CacheKeysEnum::AreaSummary->value => [
+                'key' => fn (string $town, int $distance): string => 'summary:'.Str::lower(trim($town)).':'.$distance,
+                'ttl' => fn (): int => (int) config('services.summary.cache_ttl_seconds'),
+            ],
+            CacheKeysEnum::AreaSummaryNoticeBatch->value => [
+                'key' => fn (string $town, int $distance): string => 'notice_batch:'.Str::lower(trim($town)).':'.$distance,
+                'ttl' => fn (): int => (int) config('services.summary.notice_batch_cache_ttl_seconds'),
+            ],
         ];
     }
 

@@ -32,3 +32,11 @@
     - notice batch itself also cached short (~5min), just to survive summary cache regen without extra CommuAPI hit
     - posts list stays uncached, real-time, own pagination — untouched
     - CommuAPI double-hit only possible on cold cache, not per page. rejected piggyback-on-list-fetch (endpoint ordering coupling, fragile) and background-job-seed (queue machinery, overkill for task size)
+- Bedrock: Amazon Nova Lite (`eu.amazon.nova-2-lite-v1:0`, `eu-north-1`), raw `aws/aws-sdk-php` Converse API
+  - Nova over Claude-on-Bedrock purely to dodge the one-time Anthropic model-access request — friction/speed tradeoff, not a quality call
+  - prose output (2-4 sentences), not bullet list — matches task's own example format, no client-side markdown parsing needed
+  - AWS creds read by SDK's default provider chain straight from env (`AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`) — no Laravel-side credential config
+- `BedrockRuntimeClient` bound as a singleton in `AppServiceProvider` (region from config) — container can't auto-resolve it otherwise, and both `AreaSummaryService`'s generator and `app:test-bedrock` need the same instance
+- notice batch fed to Bedrock trimmed to `title`/`description`/`type`/`side`/`categories` — id/position/distance/timestamps stripped, irrelevant to a thematic summary and just extra prompt tokens
+- min-notices threshold (`SUMMARY_MIN_NOTICES`) picked as 3, batch size (`SUMMARY_NOTICE_BATCH_COUNT`) as 30 — no signal in the task doc either way, both env-tunable so this is a starting guess, not a hard constraint
+- canned "not enough data" message cached at the same TTL as a real summary — sparse areas shouldn't re-hit Commu every request just because there's nothing to say
