@@ -75,40 +75,20 @@ Then scan the QR code with Expo Go, or `npm run android` / `npm run ios`. See
 
 ## Environment variables
 
-`.env.example` lists every key blank on purpose, per this repo's env var policy — no defaults committed anywhere, fill each one by hand.
+Each `.env.example` (`backend/.env.example`, `mobile/.env.example`) already carries the values that are the same for every clone. The tables below list only the keys left blank — each one is either a secret or specific to you, per this repo's env var policy.
 
 ### Backend (`backend/.env`)
 
-| Key | What it's for |
-|---|---|
-| `APP_NAME` | Laravel app name |
-| `APP_ENV` | Laravel environment (`local`, `production`, etc.) |
-| `APP_KEY` | Laravel encryption key, set via `php artisan key:generate` |
-| `APP_DEBUG` | Laravel debug mode |
-| `APP_URL` | Base URL Laravel assumes for itself |
-| `LOG_CHANNEL` | Laravel log channel |
-| `LOG_LEVEL` | Laravel log verbosity |
-| `CACHE_STORE` | Laravel cache driver (`redis` here) |
-| `LIGHTHOUSE_QUERY_CACHE_MODE` | Lighthouse's parsed-query cache mode, see `backend/README.md` |
-| `NOMINATIM_BASE_URL` | Geocoding endpoint, see [Geocoding API](#geocoding-api) |
-| `NOMINATIM_USER_AGENT` | User-Agent Nominatim requires on requests |
-| `REDIS_CLIENT` | Redis PHP client (`predis`), see [Caching approach](#caching-approach) |
-| `REDIS_HOST` | Redis host |
-| `REDIS_PASSWORD` | Redis auth password |
-| `REDIS_PORT` | Redis port |
-| `REDIS_CACHE_DB` | Redis logical DB index used for caching |
-| `REDIS_CACHE_CONNECTION` | Named Redis connection backing the cache store |
-| `GEOCODE_CACHE_TTL_SECONDS` | Geocoding cache TTL |
-| `SUMMARY_CACHE_TTL_SECONDS` | Area-summary cache TTL |
-| `NOTICE_BATCH_CACHE_TTL_SECONDS` | Notice-batch-behind-the-summary cache TTL |
-| `COMMU_GRAPHQL_URL` | Upstream Commu GraphQL endpoint |
-| `COMMU_BEARER_TOKEN` | Upstream Commu bearer token — see [Prerequisites](#prerequisites) for how to get one; never sent to the mobile app |
-| `AWS_ACCESS_KEY_ID` | AWS credential for Bedrock |
-| `AWS_SECRET_ACCESS_KEY` | AWS credential for Bedrock |
-| `BEDROCK_MODEL_ID` | Bedrock inference profile ID, see [Bedrock model & summary approach](#bedrock-model--summary-approach) |
-| `BEDROCK_AWS_REGION` | AWS region for the Bedrock inference profile |
-| `SUMMARY_NOTICE_BATCH_COUNT` | How many recent notices feed the summary prompt |
-| `SUMMARY_MIN_NOTICES` | Minimum notices required before generating a summary; below this returns "not enough data" |
+`backend/.env.example` already carries the values that are the same for every clone (Redis config, cache TTLs, the Commu/Bedrock endpoints). The keys below are the only ones left blank — each is either a secret or specific to you, so `.env.example` can't carry a value for it:
+
+| key | what it is | where to get it |
+|---|---|---|
+| `COMMU_BEARER_TOKEN` | auth token for the upstream Commu API | log in at [app.commuapp.fi](https://app.commuapp.fi), open devtools → Network, copy the `Authorization: Bearer …` header off any API request. Expires; re-copy if requests start failing with an auth error. |
+| `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | AWS credentials for Bedrock | your own AWS account → IAM → create an access key. The account needs Bedrock model access for `eu.amazon.nova-2-lite-v1:0` in `eu-north-1` enabled first, under Bedrock → Model access in the AWS console. |
+| `NOMINATIM_USER_AGENT` | identifies this app to the Nominatim geocoding API | [Nominatim's usage policy](https://operations.osmfoundation.org/policies/nominatim/) requires a descriptive user agent identifying the app and a contact, e.g. `"your-app-name (you@example.com)"`. Requests with a generic/missing one can get rate-limited or blocked. |
+| `APP_KEY` | Laravel app encryption key | generated for you by `php artisan key:generate`, not something to source yourself. |
+
+Everything else in `backend/.env.example` already has the value this app needs — copy it as-is.
 
 ### Mobile (`mobile/.env`)
 
