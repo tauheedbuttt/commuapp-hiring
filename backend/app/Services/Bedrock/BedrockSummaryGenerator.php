@@ -44,19 +44,6 @@ class BedrockSummaryGenerator
             );
         }
 
-        return self::extractText($result);
-    }
-
-    /**
-     * Pulls the plain-text reply out of a raw Bedrock `converse()` response.
-     * Shared with `app:test-bedrock`, which calls the SDK directly and needs
-     * the same extraction without pulling in this class's caching/prompt
-     * concerns.
-     *
-     * @param  array<string, mixed>  $result
-     */
-    public static function extractText(array $result): string
-    {
         return collect($result['output']['message']['content'])
             ->pluck('text')
             ->implode('');

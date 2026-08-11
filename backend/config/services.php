@@ -30,9 +30,12 @@ return [
 
     'summary' => [
         'cache_ttl_seconds' => env('SUMMARY_CACHE_TTL_SECONDS'),
-        'notice_batch_cache_ttl_seconds' => env('NOTICE_BATCH_CACHE_TTL_SECONDS'),
-        'notice_batch_count' => env('SUMMARY_NOTICE_BATCH_COUNT'),
         'min_notices' => env('SUMMARY_MIN_NOTICES'),
+    ],
+
+    'notice_batch' => [
+        'cache_ttl_seconds' => env('NOTICE_BATCH_CACHE_TTL_SECONDS'),
+        'count' => env('SUMMARY_NOTICE_BATCH_COUNT'),
     ],
 
 ];

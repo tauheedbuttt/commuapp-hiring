@@ -34,9 +34,9 @@ class FailOpenCache
                 'key' => fn (string $town, int $distance): string => 'summary:'.Str::lower(trim($town)).':'.$distance,
                 'ttl' => fn (): int => (int) config('services.summary.cache_ttl_seconds'),
             ],
-            CacheKeysEnum::AreaSummaryNoticeBatch->value => [
+            CacheKeysEnum::NoticeBatch->value => [
                 'key' => fn (string $town, int $distance): string => 'notice_batch:'.Str::lower(trim($town)).':'.$distance,
-                'ttl' => fn (): int => (int) config('services.summary.notice_batch_cache_ttl_seconds'),
+                'ttl' => fn (): int => (int) config('services.notice_batch.cache_ttl_seconds'),
             ],
         ];
     }

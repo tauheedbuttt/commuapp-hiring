@@ -75,8 +75,6 @@ AWS credentials are read by the SDK's default provider chain directly from `AWS_
 
 ## How this was implemented
 
-`app/Console/Commands/TestBedrock.php` (`app:test-bedrock`) is a direct, cache-free Converse API smoke check — mirrors `testing/test.php`, useful for isolating "is Bedrock reachable at all" from the caching/orchestration layers above it.
-
 The GraphQL surface is a single query, `areaSummary(town, lat, long, distance)`, mirroring `noticesWhereDistance`'s coordinate/distance shape so a caller never needs a second geocoding round-trip just for the summary; `town` is carried separately since it's echoed verbatim in the generated text and isn't derivable from coordinates. The resolver (`App\GraphQL\Queries\AreaSummary`) is a thin adapter onto `AreaSummaryService`, which is the only class that knows about caching, the notice-batch/summary split, and the not-enough-data threshold. `BedrockSummaryGenerator` knows only how to turn a town + trimmed notices into a prompt and back into text — no caching or GraphQL knowledge, swappable independently.
 
 ## What I'd improve next

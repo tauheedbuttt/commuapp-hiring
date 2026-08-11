@@ -12,5 +12,5 @@ enum CacheKeysEnum: string
 {
     case Geocode = 'geocode';
     case AreaSummary = 'area_summary';
-    case AreaSummaryNoticeBatch = 'area_summary_notice_batch';
+    case NoticeBatch = 'notice_batch';
 }

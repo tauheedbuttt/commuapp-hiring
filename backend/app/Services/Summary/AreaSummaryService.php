@@ -45,7 +45,7 @@ class AreaSummaryService
     /** @return list<array<string, mixed>> */
     private function noticeBatch(string $town, float $latitude, float $longitude, int $distanceMeters): array
     {
-        $cached = $this->cache->get(CacheKeysEnum::AreaSummaryNoticeBatch, $town, $distanceMeters);
+        $cached = $this->cache->get(CacheKeysEnum::NoticeBatch, $town, $distanceMeters);
 
         if ($cached !== null) {
             return $cached;
@@ -55,11 +55,11 @@ class AreaSummaryService
             latitude: $latitude,
             longitude: $longitude,
             distanceMeters: $distanceMeters,
-            first: (int) config('services.summary.notice_batch_count'),
+            first: (int) config('services.notice_batch.count'),
             page: 1,
         )['data'];
 
-        $this->cache->remember(CacheKeysEnum::AreaSummaryNoticeBatch, $notices, $town, $distanceMeters);
+        $this->cache->remember(CacheKeysEnum::NoticeBatch, $notices, $town, $distanceMeters);
 
         return $notices;
     }
