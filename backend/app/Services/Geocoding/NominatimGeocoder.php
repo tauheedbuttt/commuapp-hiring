@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services\Geocoding;
 
+use App\Enums\CacheKeysEnum;
 use App\Enums\ErrorCategory;
 use App\Exceptions\GraphQLClientException;
 use App\Services\Cache\FailOpenCache;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
 
 /**
  * Resolves a town name to coordinates via the Nominatim (OpenStreetMap)
@@ -27,10 +27,16 @@ class NominatimGeocoder
     /** @return array{town: string, latitude: float, longitude: float} */
     public function geocode(string $town): array
     {
-        $key = 'geocode:'.Str::lower(trim($town));
-        $ttl = (int) config('services.geocode_cache.ttl_seconds');
+        $cached = $this->cache->get(CacheKeysEnum::Geocode, $town);
 
-        $result = $this->cache->remember($key, $ttl, fn () => $this->fetch($town));
+        if ($cached !== null) {
+            $cached['town'] = $town;
+
+            return $cached;
+        }
+
+        $result = $this->fetch($town);
+        $this->cache->remember(CacheKeysEnum::Geocode, $result, $town);
         $result['town'] = $town;
 
         return $result;

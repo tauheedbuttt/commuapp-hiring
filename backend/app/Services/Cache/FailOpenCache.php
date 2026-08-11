@@ -4,44 +4,72 @@ declare(strict_types=1);
 
 namespace App\Services\Cache;
 
+use App\Enums\CacheKeysEnum;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 /**
  * Wraps the cache store so a Redis outage degrades performance, not
- * availability: a read or write failure logs and falls through to the
- * live path instead of failing the caller's request.
+ * availability: a read or write failure logs and returns as if the entry
+ * were simply absent, so callers fall through to their live path.
+ *
+ * Callers never build key strings or look up TTLs themselves — each
+ * `CacheKeysEnum` case is registered once below with its key-gen function
+ * and TTL, keyed off config.
  */
 class FailOpenCache
 {
-    public function remember(string $key, int $ttlSeconds, \Closure $resolve): mixed
+    /** @var array<string, array{key: \Closure, ttl: \Closure}> */
+    private readonly array $registry;
+
+    public function __construct()
     {
+        $this->registry = [
+            CacheKeysEnum::Geocode->value => [
+                'key' => fn (string $town): string => 'geocode:'.Str::lower(trim($town)),
+                'ttl' => fn (): int => (int) config('services.geocode_cache.ttl_seconds'),
+            ],
+        ];
+    }
+
+    public function get(CacheKeysEnum $key, mixed ...$params): mixed
+    {
+        $cacheKey = $this->buildKey($key, $params);
+
         try {
-            $cached = Cache::get($key);
+            return Cache::get($cacheKey);
         } catch (\Throwable $e) {
             Log::warning('Cache read failed, falling back to live path.', [
-                'key' => $key,
+                'key' => $key->value,
                 'exception' => $e->getMessage(),
             ]);
 
-            return $resolve();
+            return null;
         }
+    }
 
-        if ($cached !== null) {
-            return $cached;
-        }
-
-        $value = $resolve();
+    public function remember(CacheKeysEnum $key, mixed $value, mixed ...$params): void
+    {
+        $cacheKey = $this->buildKey($key, $params);
+        $ttlFn = $this->registry[$key->value]['ttl'];
+        $ttl = $ttlFn();
 
         try {
-            Cache::put($key, $value, $ttlSeconds);
+            Cache::put($cacheKey, $value, $ttl);
         } catch (\Throwable $e) {
             Log::warning('Cache write failed, continuing without caching this result.', [
-                'key' => $key,
+                'key' => $key->value,
                 'exception' => $e->getMessage(),
             ]);
         }
+    }
 
-        return $value;
+    /** @param list<mixed> $params */
+    private function buildKey(CacheKeysEnum $key, array $params): string
+    {
+        $keyFn = $this->registry[$key->value]['key'];
+
+        return $keyFn(...$params);
     }
 }
