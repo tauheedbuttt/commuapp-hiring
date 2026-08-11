@@ -12,14 +12,15 @@ _Last reviewed: 2026-08-10._
 - [x] Commu GraphQL client: fetch nearby notices using resolved coordinates (`noticesWhereDistance`, issue #3, schema-driven Sailor client)
 - [x] Bearer token (`COMMU_BEARER_TOKEN`) read from env, never sent to mobile app
 - [x] Pick + document `notice*` query, radius, fields, pagination approach for the list (issue #3)
-- [ ] "Recent" window definition + Bedrock summary generation (Converse API, chosen model, grounded in fetched notices) — separate, later issue
+- [x] "Recent" window definition + Bedrock summary generation (Converse API, chosen model, grounded in fetched notices) — separate, later issue
 - [x] Own API surface: posts list and summary are separate queries, not combined (decision reversed — see `docs/brainstorming/notes.md`). List query (`noticesWhereDistance`) done; summary query is later work
 - [x] Error handling for notices: empty input, no geocoding result, no notices returned (non-error empty result), upstream failure surfaced via `extensions.category`
-- [ ] Error handling for Bedrock upstream failure — later issue
+- [x] Error handling for Bedrock upstream failure — later issue
 - [x] Caching implemented: geocoding (Redis, long TTL, fail-open) — issue #3
-- [ ] Caching implemented: generated summaries + notice-batch (short TTL, per `docs/brainstorming/notes.md`) — later issue
+- [x] Caching implemented: generated summaries + notice-batch (short TTL, per `docs/brainstorming/notes.md`) — later issue
 - [x] `.env.example` has all new Commu/Redis/geocode-cache keys blank
-- [ ] `.env.example` has Bedrock/AWS keys blank — later issue
+- [x] `.env.example` has Bedrock/AWS keys blank — later issue
+- [x] Notice-by-id query for the help-post detail screen (`notice`, dedicated `NoticeDetail` type, issue #7)
 
 ## Mobile app (Expo)
 

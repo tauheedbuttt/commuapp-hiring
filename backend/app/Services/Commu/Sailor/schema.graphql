@@ -23,6 +23,15 @@ type Query {
     "The offset from which items are returned."
     page: Int
   ): NoticePaginator!
+
+  "Fetch a single Notice by id."
+  notice(id: ID, distanceToPoint: LocationUserPoint): Notice
+}
+
+"A point to compute Notice.distance_to_user against, for single-notice lookups."
+input LocationUserPoint {
+  latitude: Float!
+  longitude: Float!
 }
 
 "Order by clause for Query.noticesWhereDistance.orderBy."

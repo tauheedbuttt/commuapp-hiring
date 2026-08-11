@@ -38,6 +38,18 @@ type Query {
         "Search radius in meters."
         distance: Int! = 15000 @rules(apply: ["integer", "between:1,100000"])
     ): AreaSummary!
+
+    "Fetch a single help post by id, with the fields the help-post detail screen needs."
+    notice(
+        "Identity of the help post to fetch."
+        id: ID! @rules(apply: ["required"])
+
+        "Latitude of the viewer's current position, to populate distance_to_user. Optional; omit to leave it null."
+        lat: Float @rules(apply: ["numeric", "between:-90,90", "required_with:long"])
+
+        "Longitude of the viewer's current position, to populate distance_to_user. Optional; omit to leave it null."
+        long: Float @rules(apply: ["numeric", "between:-180,180", "required_with:lat"])
+    ): NoticeDetail!
 }
 
 "A generated summary of nearby help-post activity."
@@ -153,4 +165,112 @@ enum NoticeType {
 enum NoticeSide {
     GIVE
     NEED
+}
+
+"A single help post with the fields the help-post detail screen needs."
+type NoticeDetail {
+    "Identity of the help post."
+    id: ID!
+
+    "Title of the help post."
+    title: String!
+
+    "Description of the help post, if provided."
+    description: String
+
+    "What the poster is asking for in return, if anything. Null/empty means nothing was asked in return."
+    in_return: String
+
+    "Whether the post is offering (GIVE) or requesting (NEED) help, and of what kind."
+    type: NoticeType!
+
+    "Whether the post is on the giving or needing side."
+    side: NoticeSide
+
+    "When the help post was created, as an ISO 8601 timestamp."
+    created_at: String!
+
+    "Distance from the viewer's position, in meters. Null unless lat/long were provided."
+    distance_to_user: Float
+
+    "Number of likes the help post has."
+    likes: Int
+
+    "Main image of the help post, if any."
+    image: NoticeImage
+
+    "Where the help post is located."
+    position: NoticePosition!
+
+    "Main and sub category the post is filed under."
+    categories: NoticeCategories!
+
+    "The user who posted the help post."
+    owner: NoticeOwner
+
+    "The company/organization the post belongs to, if posted by one rather than an individual."
+    company: NoticeCompany
+
+    "Author-provided translations of this post, if any. Empty when the author didn't provide any."
+    notice_language_versions: [NoticeTranslation!]!
+}
+
+"The main image attached to a help post."
+type NoticeImage {
+    "URL of the image."
+    url: String
+}
+
+"The user who posted a help post."
+type NoticeOwner {
+    "Identity of the user."
+    id: ID!
+
+    "Display name of the user."
+    name: String!
+
+    "Avatar image URL, if set."
+    avatar_url: String
+
+    "Raw upstream trust score. No documented mapping to a UI trust label yet."
+    trust_level: Int
+
+    "Verifications completed by the user, if any."
+    accountVerifications: [AccountVerification!]!
+}
+
+"A completed (or in-progress) account verification."
+type AccountVerification {
+    "Type of verification, e.g. identity or phone."
+    type: String!
+
+    "When the verification completed, as an ISO 8601 timestamp. Null if not yet completed."
+    completed_at: String
+}
+
+"The company/organization that posted a help post."
+type NoticeCompany {
+    "Identity of the company."
+    id: ID!
+
+    "Name of the company."
+    name: String!
+
+    "Logo image URL, if set."
+    logo_url: String
+}
+
+"An author-provided translation of a help post's text."
+type NoticeTranslation {
+    "Translated title."
+    title: String!
+
+    "Translated description, if provided."
+    description: String
+
+    "Translated 'asked in return' text, if provided."
+    in_return: String
+
+    "Language code this translation is in."
+    language: String!
 }
