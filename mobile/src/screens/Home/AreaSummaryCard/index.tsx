@@ -1,7 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
+import { Pulse } from "../../../components/Pulse/Pulse";
 import { colors } from "../../../theme/colors";
+import { styles as skeletonStyles } from "../Skeleton.styles";
 import { styles } from "./styles";
 
 type Props = {
@@ -33,10 +35,11 @@ export function AreaSummaryCard({ loading, error, summary }: Props) {
       {collapsed ? null : (
         <View style={styles.body}>
           {loading ? (
-            <View style={styles.loadingRow}>
-              <ActivityIndicator size="small" color={colors.primaryGreen} />
-              <Text style={styles.loadingText}>Generating summary...</Text>
-            </View>
+            <Pulse style={styles.loadingLines}>
+              <View style={[skeletonStyles.lineBlock, { width: "100%" }]} />
+              <View style={[skeletonStyles.lineBlock, { width: "90%" }]} />
+              <View style={[skeletonStyles.lineBlock, { width: "60%" }]} />
+            </Pulse>
           ) : error ? (
             <Text style={styles.errorText}>
               Couldn't load the area summary.

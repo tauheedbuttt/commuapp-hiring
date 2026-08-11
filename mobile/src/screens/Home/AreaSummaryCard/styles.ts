@@ -23,14 +23,6 @@ export const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.text,
   },
-  aiIcon: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.primaryGreen,
-  },
   body: {
     marginTop: 12,
   },
@@ -39,14 +31,8 @@ export const styles = StyleSheet.create({
     lineHeight: 20,
     color: colors.text,
   },
-  loadingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  loadingLines: {
     gap: 8,
-  },
-  loadingText: {
-    fontSize: 14,
-    color: colors.textMuted,
   },
   errorText: {
     fontSize: 14,
