@@ -42,11 +42,13 @@ class NoticeDetailService
         // Upstream returns a generic "Internal server error" alongside a null `notice` field
         // for an unknown id, rather than a clean not-found response. errorFree() would treat
         // that as a hard failure, so check the (possibly error-accompanied) data directly:
-        // a present-but-null `notice` field means not-found, regardless of accompanying errors.
+        // a present-but-null `notice` field usually means not-found. But an expired/invalid
+        // bearer token *also* leaves `notice` null, tagged with a distinct "Unauthenticated."
+        // error — that must stay Upstream, not get misreported as a 404 for a real post.
         $notice = $result->data?->notice;
 
         if ($notice === null) {
-            if ($result->data === null) {
+            if ($result->data === null || self::hasAuthError($result->errors)) {
                 Log::error('Commu notice request returned an error.', ['errors' => $result->errors]);
 
                 throw new GraphQLClientException(
@@ -61,7 +63,28 @@ class NoticeDetailService
             );
         }
 
+        if ($result->errors !== null) {
+            // A notice came back despite accompanying errors — don't fail the request over it
+            // (the caller got a usable result), but don't drop the errors silently either.
+            Log::warning('Commu notice request returned partial errors alongside a result.', [
+                'id' => $id,
+                'errors' => $result->errors,
+            ]);
+        }
+
         return $this->mapNotice($notice);
+    }
+
+    /** @param  array<int, \Spawnia\Sailor\Error\Error>|null  $errors */
+    private static function hasAuthError(?array $errors): bool
+    {
+        foreach ($errors ?? [] as $error) {
+            if ($error->message === 'Unauthenticated.') {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /** @return array<string, mixed> */
@@ -80,47 +103,29 @@ class NoticeDetailService
             'image' => $notice->image === null ? null : [
                 'url' => $notice->image->url,
             ],
-            'position' => [
-                'latitude' => $notice->position->latitude,
-                'longitude' => $notice->position->longitude,
-            ],
-            'categories' => [
-                'main' => $notice->categories->main === null ? null : [
-                    'id' => $notice->categories->main->id,
-                    'key' => $notice->categories->main->key,
-                ],
-                'sub' => array_values(array_map(
-                    static fn ($category) => ['id' => $category->id, 'key' => $category->key],
-                    array_filter($notice->categories->sub, static fn ($category) => $category !== null),
-                )),
-            ],
+            'position' => NoticeFieldMapper::position($notice->position),
+            'categories' => NoticeFieldMapper::categories($notice->categories),
             'owner' => $notice->owner === null ? null : [
                 'id' => $notice->owner->id,
                 'name' => $notice->owner->name,
                 'avatar_url' => $notice->owner->avatar_url,
                 'trust_level' => $notice->owner->trust_level,
-                'accountVerifications' => array_values(array_map(
-                    static fn ($verification) => [
-                        'type' => $verification->type,
-                        'completed_at' => $verification->completed_at,
-                    ],
-                    array_filter($notice->owner->accountVerifications, static fn ($verification) => $verification !== null),
-                )),
+                'accountVerifications' => NoticeFieldMapper::nonNullList($notice->owner->accountVerifications, static fn ($verification) => [
+                    'type' => $verification->type,
+                    'completed_at' => $verification->completed_at,
+                ]),
             ],
             'company' => $notice->company === null ? null : [
                 'id' => $notice->company->id,
                 'name' => $notice->company->name,
                 'logo_url' => $notice->company->logo_url,
             ],
-            'notice_language_versions' => $notice->notice_language_versions === null ? [] : array_values(array_map(
-                static fn ($translation) => [
-                    'title' => $translation->title,
-                    'description' => $translation->description,
-                    'in_return' => $translation->in_return,
-                    'language' => $translation->language,
-                ],
-                array_filter($notice->notice_language_versions, static fn ($translation) => $translation !== null),
-            )),
+            'notice_language_versions' => NoticeFieldMapper::nonNullList($notice->notice_language_versions, static fn ($translation) => [
+                'title' => $translation->title,
+                'description' => $translation->description,
+                'in_return' => $translation->in_return,
+                'language' => $translation->language,
+            ]),
         ];
     }
 }

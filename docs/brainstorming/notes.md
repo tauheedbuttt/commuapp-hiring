@@ -40,3 +40,7 @@
   - upstream returns a generic "Internal server error" alongside `notice: null` for an unknown id, not a clean null-only response — `errorFree()` would misclassify that as a hard upstream failure instead of not-found
 - notice-by-id: `owner.trust_level` / `accountVerifications` exposed raw, no label mapping
   - no documented threshold for "Awesome" or which verification `type` lights the shield badge — that's a FE/product call, not a reason to withhold the field
+- notice-by-id: not-found check also excludes upstream auth errors, checked by exact `"Unauthenticated."` message
+  - found live: an expired bearer token leaves `notice: null` too, same shape as an unknown id — without this check, a mid-session token expiry silently reports every lookup as a 404 instead of the real upstream-auth problem
+- notice-by-id + list query: shared `NoticeFieldMapper` for position/categories/null-filtered-list mapping
+  - both services had the same mapping blocks duplicated verbatim; extracted rather than left to drift

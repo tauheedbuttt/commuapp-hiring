@@ -84,20 +84,8 @@ class NoticeSearchService
             'side' => $notice->side,
             'created_at' => $notice->created_at,
             'distance_to_user' => $notice->distance_to_user,
-            'position' => [
-                'latitude' => $notice->position->latitude,
-                'longitude' => $notice->position->longitude,
-            ],
-            'categories' => [
-                'main' => $notice->categories->main === null ? null : [
-                    'id' => $notice->categories->main->id,
-                    'key' => $notice->categories->main->key,
-                ],
-                'sub' => array_values(array_map(
-                    static fn ($category) => ['id' => $category->id, 'key' => $category->key],
-                    array_filter($notice->categories->sub, static fn ($category) => $category !== null),
-                )),
-            ],
+            'position' => NoticeFieldMapper::position($notice->position),
+            'categories' => NoticeFieldMapper::categories($notice->categories),
         ];
     }
 }
