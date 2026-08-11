@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native';
-import { colors } from '../theme/colors';
+import { StyleSheet } from "react-native";
+import { colors } from "../theme/colors";
 
 export const styles = StyleSheet.create({
   tabBar: {
@@ -14,15 +14,15 @@ export const styles = StyleSheet.create({
   },
   tabBarLabel: {
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: "700",
     marginTop: 2,
   },
   activeIcon: {
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
     borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: colors.primaryGreen,
   },
 });

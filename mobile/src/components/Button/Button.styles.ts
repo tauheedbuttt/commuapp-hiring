@@ -40,6 +40,26 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "600",
   },
+  dangerOutline: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    borderWidth: 1,
+    borderColor: colors.errorRed,
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    backgroundColor: colors.white,
+  },
+  dangerOutlinePressed: {
+    backgroundColor: colors.white,
+  },
+  dangerOutlineLabel: {
+    color: colors.errorRed,
+    fontSize: 15,
+    fontWeight: "600",
+  },
   disabled: {
     opacity: 0.4,
   },

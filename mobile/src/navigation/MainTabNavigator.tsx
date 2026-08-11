@@ -1,17 +1,20 @@
-import { Ionicons } from '@expo/vector-icons';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View } from 'react-native';
-import { HomeScreen } from '../screens/Home/HomeScreen';
-import { SettingsScreen } from '../screens/Settings/SettingsScreen';
-import { colors } from '../theme/colors';
-import type { MainTabParamList } from '../types';
-import { styles } from './MainTabNavigator.styles';
+import { Ionicons } from "@expo/vector-icons";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { View } from "react-native";
+import { HomeScreen } from "../screens/Home/HomeScreen";
+import { SettingsScreen } from "../screens/Settings/SettingsScreen";
+import { colors } from "../theme/colors";
+import type { MainTabParamList } from "../types";
+import { styles } from "./MainTabNavigator.styles";
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
-const TAB_ICONS: Record<keyof MainTabParamList, keyof typeof Ionicons.glyphMap> = {
-  Home: 'home',
-  Settings: 'settings',
+const TAB_ICONS: Record<
+  keyof MainTabParamList,
+  keyof typeof Ionicons.glyphMap
+> = {
+  Home: "home",
+  Settings: "settings",
 };
 
 export function MainTabNavigator() {
@@ -27,7 +30,11 @@ export function MainTabNavigator() {
         tabBarIcon: ({ focused, color, size }) =>
           focused ? (
             <View style={styles.activeIcon}>
-              <Ionicons name={TAB_ICONS[route.name]} size={size} color={colors.white} />
+              <Ionicons
+                name={TAB_ICONS[route.name]}
+                size={size}
+                color={colors.white}
+              />
             </View>
           ) : (
             <Ionicons name={TAB_ICONS[route.name]} size={size} color={color} />

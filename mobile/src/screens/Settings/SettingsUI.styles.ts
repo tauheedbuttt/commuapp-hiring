@@ -23,6 +23,9 @@ export const styles = StyleSheet.create({
   saveLocationButton: {
     marginTop: 16,
   },
+  clearLocationButton: {
+    marginTop: 10,
+  },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',

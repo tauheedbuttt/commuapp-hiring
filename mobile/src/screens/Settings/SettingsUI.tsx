@@ -1,6 +1,7 @@
 import Slider from "@react-native-community/slider";
 import { Text, View } from "react-native";
 import { Button } from "../../components/Button/Button";
+import { ConfirmModal } from "../../components/ConfirmModal/ConfirmModal";
 import { InlineMessage } from "../../components/InlineMessage/InlineMessage";
 import { LocationForm } from "../../components/LocationForm/LocationForm";
 import { ScreenContainer } from "../../components/ScreenContainer/ScreenContainer";
@@ -26,6 +27,10 @@ type Props = {
   isSaveLocationDisabled: boolean;
   justSavedLocation: boolean;
   onSaveLocation: () => void;
+  isClearConfirmVisible: boolean;
+  onRequestClearLocation: () => void;
+  onCancelClearLocation: () => void;
+  onConfirmClearLocation: () => void;
 };
 
 export function SettingsUI({
@@ -44,6 +49,10 @@ export function SettingsUI({
   isSaveLocationDisabled,
   justSavedLocation,
   onSaveLocation,
+  isClearConfirmVisible,
+  onRequestClearLocation,
+  onCancelClearLocation,
+  onConfirmClearLocation,
 }: Props) {
   return (
     <ScreenContainer>
@@ -107,7 +116,21 @@ export function SettingsUI({
             loading={isSavingLocation}
           />
         </View>
+
+        <View style={styles.clearLocationButton}>
+          <Button label="Clear location" variant="danger-outline" onPress={onRequestClearLocation} />
+        </View>
       </View>
+
+      <ConfirmModal
+        visible={isClearConfirmVisible}
+        title="Clear your location?"
+        message="This clears your saved home location and signs you out back to onboarding. You'll need to set your location again to use the app."
+        confirmLabel="Clear location"
+        danger
+        onConfirm={onConfirmClearLocation}
+        onCancel={onCancelClearLocation}
+      />
     </ScreenContainer>
   );
 }
