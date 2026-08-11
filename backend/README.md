@@ -2,10 +2,7 @@
 
 Laravel + [Lighthouse](https://lighthouse-php.com) GraphQL API. Plain `composer create-project`, no Docker/Sail. No SQL database, nothing here needs one.
 
-Two queries so far:
-
-- `geocodeTown`: resolves a town name to coordinates via [Nominatim](https://nominatim.org), Redis-cached.
-- `noticesWhereDistance`: fetches nearby help posts from the upstream Commu API for a coordinate, via a schema-driven, code-generated PHP GraphQL client ([Sailor](https://github.com/spawnia/sailor)).
+Full API surface lives in `graphql/schema.graphql`, resolvers under `app/GraphQL/Queries/`.
 
 ## Setup
 
@@ -17,21 +14,7 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-`.env.example` lists every key blank on purpose. Project policy: no default values for env vars, anywhere. Fill in `.env` after copying it:
-
-- `APP_NAME=Laravel`, `APP_ENV=local`, `APP_DEBUG=true`, `APP_URL=http://localhost`
-- `LOG_CHANNEL=stack`, `LOG_LEVEL=debug`
-- `CACHE_STORE=redis`
-- `LIGHTHOUSE_QUERY_CACHE_MODE=opcache`: required, see Notes below for why
-- `NOMINATIM_BASE_URL`: e.g. `https://nominatim.openstreetmap.org/search`
-- `NOMINATIM_USER_AGENT`: a real identifying string (e.g. `your-app (you@example.com)`). Nominatim's usage policy blocks generic/unidentified User-Agents
-- `GEOCODE_CACHE_TTL_SECONDS`: seconds, long (a town's coordinates don't change)
-- `REDIS_CLIENT`: `predis` (no compiled-extension dependency)
-- `REDIS_HOST`, `REDIS_PASSWORD`, `REDIS_PORT`: your local/hosted Redis connection details
-- `REDIS_CACHE_DB`: which Redis logical DB the cache store uses
-- `REDIS_CACHE_CONNECTION`: which `database.redis` connection the `redis` cache store uses (see `config/database.php` and `config/cache.php`)
-- `COMMU_GRAPHQL_URL`: the upstream Commu GraphQL endpoint
-- `COMMU_BEARER_TOKEN`: see root README's authentication section for how to get one. Expires roughly hourly, re-copy it from DevTools when requests start 401ing
+`.env.example` lists every key blank on purpose. Project policy: no default values for env vars, anywhere. Fill in `.env` before running, per the keys listed there.
 
 ## Run
 
@@ -43,62 +26,17 @@ php artisan serve --host=0.0.0.0 --port=8000
 
 GraphQL endpoint: `POST http://127.0.0.1:8000/graphql`
 
-```graphql
-query ($town: String!) {
-  geocodeTown(town: $town) {
-    town
-    latitude
-    longitude
-  }
-}
-```
-
-```graphql
-query ($lat: Float!, $long: Float!) {
-  noticesWhereDistance(lat: $lat, long: $long) {
-    paginatorInfo {
-      count
-      currentPage
-      hasMorePages
-    }
-    data {
-      id
-      title
-      description
-      type
-      side
-      created_at
-      distance_to_user
-      position {
-        latitude
-        longitude
-      }
-      categories {
-        main {
-          key
-        }
-        sub {
-          key
-        }
-      }
-    }
-  }
-}
-```
-
-Args and response shape (`paginatorInfo`/`data`, `created_at`, `distance_to_user`, `categories`) deliberately mirror the upstream Commu `noticesWhereDistance` query field-for-field, instead of getting reshaped into this project's own naming conventions. See `docs/brainstorming/notes.md`.
-
 ## Errors
 
-Neither query ever returns a null result. A failure is a distinct error, not an empty or null payload.
+No resolver ever returns a null result on failure. A failure is a distinct error, not an empty or null payload.
 
 Error categories surface in `extensions`:
 
-- `extensions.validation`: blank/whitespace-only `town`, or an out-of-range `lat`/`long` (Lighthouse's `@rules`)
-- `extensions.category: "not_found"`: `geocodeTown`, no Nominatim match
-- `extensions.category: "upstream"`: Nominatim or Commu timeout, non-200/GraphQL error, or connection failure
+- `extensions.validation`: request-level validation failures (Lighthouse's `@rules`)
+- `extensions.category: "not_found"`: nothing matched the request (a town, a help post)
+- `extensions.category: "upstream"`: a downstream service (geocoding, the summary model, or the upstream Commu API) timed out, errored, or refused the connection
 
-A location with zero nearby notices is **not** an error. `noticesWhereDistance` returns a normal result, with an empty `data` list and `paginatorInfo.count: 0`.
+A search with zero matching results is **not** an error. It comes back as a normal result with an empty list.
 
 ## Notes
 
@@ -108,15 +46,23 @@ A location with zero nearby notices is **not** an error. `noticesWhereDistance` 
 - **Empty string vs null**
   - `bootstrap/app.php` excludes the `/graphql` route from Laravel's default `TrimStrings`/`ConvertEmptyStringsToNull` middleware
   - GraphQL distinguishes `""` from `null`
-  - without this exclusion, that middleware would collapse an empty `town` string to `null` before it ever reached our `@rules` validation
+  - without this exclusion, that middleware would collapse an empty string argument to `null` before it ever reached `@rules` validation
 - **Redis-only config**
   - `config/database.php` holds only the `redis` connection
   - Laravel's `RedisManager` reads `config('database.redis')` unconditionally, so the file has to exist and keep that name, even with no SQL database
+- **Fail-open caching**
+  - `App\Services\Cache\FailOpenCache` wraps the cache store, one shared place, not reinvented per caller
+  - a Redis outage degrades performance, not availability: a read/write failure logs a warning and falls through to the live path, same as a plain cache miss
+- **AI-generated area summaries**
+  - `App\Services\Summary\AreaSummaryService` orchestrates the flow: cached summary, then cached notice batch, then a live upstream fetch, then generation, short-circuiting as soon as a cache hit or a "not enough data" verdict is reached
+  - text generation itself is `App\Services\Bedrock\BedrockSummaryGenerator`, AWS Bedrock's Converse API (Amazon Nova Lite)
+  - the notice batch size going into generation was tuned against a live eval across Bedrock, not guessed, see `docs/bedrock-batch-size-eval.md` and `docs/brainstorming/notes.md`
 - **Sorting and caching**
-  - `noticesWhereDistance` sorts most-recent-first server-side, no caller-supplied sort order
-  - the list itself is not cached, see the root README's caching section for why, and for what's cached (geocoding) vs. planned (notice-batch/summary, later work)
+  - the nearby-posts list sorts most-recent-first server-side, no caller-supplied sort order
+  - the list itself is not cached, only the area-summary flow caches (the summary result, plus its own notice batch, each on a short TTL)
+  - see the root README's [Caching approach](../README.md#caching-approach) section for the full picture
 - **Upstream Commu client**
-  - generated from `app/Services/Commu/Sailor/schema.graphql` (a trimmed SDL, only `Query.noticesWhereDistance` and its transitively reachable types, not the full upstream schema)
+  - generated from `app/Services/Commu/Sailor/schema.graphql` (a trimmed SDL, only the types this app actually touches, not the full upstream schema)
   - plus the operation files under `app/Services/Commu/Sailor/operations/`
   - regenerate with `vendor/bin/sailor` after editing either
-  - `sailor.php` at the repo root is the codegen + runtime client config (endpoint URL, auth header)
+  - `sailor.php` at the repo root is the codegen + runtime client config (endpoint, auth header)
