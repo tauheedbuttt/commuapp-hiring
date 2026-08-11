@@ -7,17 +7,73 @@ namespace App\Services\Commu;
 use App\Enums\ErrorCategory;
 use App\Exceptions\GraphQLClientException;
 use App\Services\Commu\Generated\Operations\Notice as NoticeOperation;
-use App\Services\Commu\Generated\Operations\Notice\Notice\Notice;
+use App\Services\Commu\Generated\Operations\NoticesWhereDistance as NoticesWhereDistanceOperation;
 use App\Services\Commu\Generated\Types\LocationUserPoint;
+use App\Services\Commu\Generated\Types\QueryNoticesWhereDistanceOrderByColumn;
+use App\Services\Commu\Generated\Types\QueryNoticesWhereDistanceOrderByOrderByClause;
+use App\Services\Commu\Generated\Types\SortOrder;
 use Illuminate\Support\Facades\Log;
+use Spawnia\Sailor\Error\ResultErrorsException;
 
 /**
- * Fetches a single help post by id from the upstream Commu API via the
- * schema-generated Sailor client. Returns only the fields the help-post
- * detail screen needs, trimmed down from the full upstream Notice type.
+ * All calls to the upstream Commu API's notice* queries, via the
+ * schema-generated Sailor client. Returns plain arrays trimmed to the
+ * fields this app needs — field mapping itself lives in NoticeFieldMapper.
  */
-class NoticeDetailService
+class NoticeService
 {
+    /** @return array{paginatorInfo: array{count: int, currentPage: int, hasMorePages: bool}, data: list<array<string, mixed>>} */
+    public function searchNearby(float $latitude, float $longitude, int $distanceMeters, int $first, ?int $page): array
+    {
+        try {
+            $result = NoticesWhereDistanceOperation::execute(
+                lat: $latitude,
+                long: $longitude,
+                distance: $distanceMeters,
+                first: $first,
+                page: $page,
+                orderBy: [QueryNoticesWhereDistanceOrderByOrderByClause::make(
+                    column: QueryNoticesWhereDistanceOrderByColumn::CREATED_AT,
+                    order: SortOrder::DESC,
+                )],
+            );
+        } catch (\Throwable $e) {
+            Log::error('Commu noticesWhereDistance request failed.', ['exception' => $e]);
+
+            throw new GraphQLClientException(
+                'Could not reach the Commu service.',
+                ErrorCategory::Upstream,
+            );
+        }
+
+        try {
+            $data = $result->errorFree()->data;
+        } catch (ResultErrorsException) {
+            throw new GraphQLClientException(
+                'The Commu service returned an error.',
+                ErrorCategory::Upstream,
+            );
+        }
+
+        if ($data === null) {
+            throw new GraphQLClientException(
+                'The Commu service returned an empty response.',
+                ErrorCategory::Upstream,
+            );
+        }
+
+        $paginator = $data->noticesWhereDistance;
+
+        return [
+            'paginatorInfo' => [
+                'count' => $paginator->paginatorInfo->count,
+                'currentPage' => $paginator->paginatorInfo->currentPage,
+                'hasMorePages' => $paginator->paginatorInfo->hasMorePages,
+            ],
+            'data' => array_map(NoticeFieldMapper::searchListItem(...), $paginator->data),
+        ];
+    }
+
     /** @return array<string, mixed> */
     public function find(string $id, ?float $latitude, ?float $longitude): array
     {
@@ -72,7 +128,7 @@ class NoticeDetailService
             ]);
         }
 
-        return $this->mapNotice($notice);
+        return NoticeFieldMapper::detail($notice);
     }
 
     /** @param  array<int, \Spawnia\Sailor\Error\Error>|null  $errors */
@@ -85,47 +141,5 @@ class NoticeDetailService
         }
 
         return false;
-    }
-
-    /** @return array<string, mixed> */
-    private function mapNotice(Notice $notice): array
-    {
-        return [
-            'id' => $notice->id,
-            'title' => $notice->title,
-            'description' => $notice->description,
-            'in_return' => $notice->in_return,
-            'type' => $notice->type,
-            'side' => $notice->side,
-            'created_at' => $notice->created_at,
-            'distance_to_user' => $notice->distance_to_user,
-            'likes' => $notice->likes,
-            'image' => $notice->image === null ? null : [
-                'url' => $notice->image->url,
-            ],
-            'position' => NoticeFieldMapper::position($notice->position),
-            'categories' => NoticeFieldMapper::categories($notice->categories),
-            'owner' => $notice->owner === null ? null : [
-                'id' => $notice->owner->id,
-                'name' => $notice->owner->name,
-                'avatar_url' => $notice->owner->avatar_url,
-                'trust_level' => $notice->owner->trust_level,
-                'accountVerifications' => NoticeFieldMapper::nonNullList($notice->owner->accountVerifications, static fn ($verification) => [
-                    'type' => $verification->type,
-                    'completed_at' => $verification->completed_at,
-                ]),
-            ],
-            'company' => $notice->company === null ? null : [
-                'id' => $notice->company->id,
-                'name' => $notice->company->name,
-                'logo_url' => $notice->company->logo_url,
-            ],
-            'notice_language_versions' => NoticeFieldMapper::nonNullList($notice->notice_language_versions, static fn ($translation) => [
-                'title' => $translation->title,
-                'description' => $translation->description,
-                'in_return' => $translation->in_return,
-                'language' => $translation->language,
-            ]),
-        ];
     }
 }

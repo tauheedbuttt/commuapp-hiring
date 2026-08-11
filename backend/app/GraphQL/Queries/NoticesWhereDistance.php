@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Queries;
 
-use App\Services\Commu\NoticeSearchService;
+use App\Services\Commu\NoticeService;
 
 final class NoticesWhereDistance
 {
     public function __construct(
-        private readonly NoticeSearchService $noticeSearch,
+        private readonly NoticeService $notices,
     ) {}
 
     /** @param  array{lat: float, long: float, distance: int, first: int, page: int|null}  $args */
     public function __invoke(mixed $rootValue, array $args): array
     {
-        return $this->noticeSearch->searchNearby(
+        return $this->notices->searchNearby(
             latitude: $args['lat'],
             longitude: $args['long'],
             distanceMeters: $args['distance'],
