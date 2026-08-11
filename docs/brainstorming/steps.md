@@ -15,3 +15,4 @@ This doc covers the step i take to solve the assignment. Agents can add here ste
 9. build newarby notices api
 10. build bedrock integration
 11. build notice by id 
+12. build location input for mobile
