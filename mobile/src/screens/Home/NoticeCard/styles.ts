@@ -5,6 +5,8 @@ export const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.white,
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
     overflow: 'hidden',
     marginBottom: 16,
   },
@@ -18,8 +20,32 @@ export const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  photoShade: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(20, 20, 20, 0.35)',
+  },
+  distanceBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: colors.white,
+    borderRadius: 999,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+  },
+  distanceBadgeText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: colors.text,
+  },
   photoOverlay: {
-    backgroundColor: 'rgba(20, 20, 20, 0.55)',
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
@@ -61,6 +87,8 @@ export const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
     backgroundColor: colors.cardBackground,
   },
   ownerName: {
@@ -68,10 +96,6 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     color: colors.text,
-  },
-  distance: {
-    fontSize: 13,
-    color: colors.textMuted,
   },
   description: {
     marginTop: 10,

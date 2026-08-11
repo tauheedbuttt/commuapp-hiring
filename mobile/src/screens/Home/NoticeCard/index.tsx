@@ -1,6 +1,8 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Image, Pressable, Text, View } from 'react-native';
 import type { NoticesWhereDistanceQuery } from '../../../api/generated/graphql';
-import { formatDistanceAway, noticeTypeTag, titleCase } from '../../../utils/notice';
+import { colors } from '../../../theme/colors';
+import { formatDistance, noticeTypeTag, titleCase } from '../../../utils/notice';
 import { styles } from './styles';
 
 export type NoticeListItem = NoticesWhereDistanceQuery['noticesWhereDistance']['data'][number];
@@ -27,6 +29,15 @@ export function NoticeCard({ notice, onPress }: Props) {
         {notice.image?.url ? (
           <Image source={{ uri: notice.image.url }} style={styles.photoImage} />
         ) : null}
+        <View style={styles.photoShade} />
+
+        {notice.distance_to_user != null ? (
+          <View style={styles.distanceBadge}>
+            <Ionicons name="location" size={14} color={colors.text} />
+            <Text style={styles.distanceBadgeText}>{formatDistance(notice.distance_to_user)}</Text>
+          </View>
+        ) : null}
+
         <View style={styles.photoOverlay}>
           <Text style={styles.title} numberOfLines={2}>
             {notice.title}
@@ -57,9 +68,6 @@ export function NoticeCard({ notice, onPress }: Props) {
           <Text style={styles.ownerName} numberOfLines={1}>
             {notice.owner?.name ?? 'Someone'}
           </Text>
-          {notice.distance_to_user != null ? (
-            <Text style={styles.distance}>{formatDistanceAway(notice.distance_to_user)}</Text>
-          ) : null}
         </View>
 
         {notice.description ? (

@@ -10,6 +10,7 @@ export const colors = {
   white: '#FFFFFF',
   errorRed: '#B3261E',
   cardBackground: '#F1EDDC',
+  cardBorder: '#E5DFC7',
   skeletonBase: '#E7E2CE',
   tagGiveBackground: '#DCF0E3',
   tagGiveText: '#0C7A49',

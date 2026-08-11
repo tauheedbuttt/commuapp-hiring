@@ -27,8 +27,8 @@ export function titleCase(key: string): string {
   return key.replace(/[_-]+/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
-export function formatDistanceAway(distanceMeters: number): string {
+export function formatDistance(distanceMeters: number): string {
   const km = distanceMeters / 1000;
   const rounded = km < 10 ? Math.round(km * 10) / 10 : Math.round(km);
-  return `${rounded} km away`;
+  return `${rounded} km`;
 }
