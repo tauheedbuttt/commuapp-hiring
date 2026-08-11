@@ -78,8 +78,6 @@ class NoticeService
     public function find(string $id, ?float $latitude, ?float $longitude): array
     {
         try {
-            // Upstream 500s if distanceToPoint is sent as an explicit `null` variable, so
-            // the argument must be omitted entirely (not passed) rather than passed as null.
             $result = $latitude !== null && $longitude !== null
                 ? NoticeOperation::execute(
                     id: $id,
@@ -95,12 +93,6 @@ class NoticeService
             );
         }
 
-        // Upstream returns a generic "Internal server error" alongside a null `notice` field
-        // for an unknown id, rather than a clean not-found response. errorFree() would treat
-        // that as a hard failure, so check the (possibly error-accompanied) data directly:
-        // a present-but-null `notice` field usually means not-found. But an expired/invalid
-        // bearer token *also* leaves `notice` null, tagged with a distinct "Unauthenticated."
-        // error — that must stay Upstream, not get misreported as a 404 for a real post.
         $notice = $result->data?->notice;
 
         if ($notice === null) {
@@ -120,8 +112,6 @@ class NoticeService
         }
 
         if ($result->errors !== null) {
-            // A notice came back despite accompanying errors — don't fail the request over it
-            // (the caller got a usable result), but don't drop the errors silently either.
             Log::warning('Commu notice request returned partial errors alongside a result.', [
                 'id' => $id,
                 'errors' => $result->errors,
