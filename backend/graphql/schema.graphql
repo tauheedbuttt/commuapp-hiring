@@ -119,6 +119,12 @@ type Notice {
 
     "Distance from the search point, in meters."
     distance_to_user: Float
+
+    "Main image of the help post, if any."
+    image: NoticeImage
+
+    "The user who posted the help post."
+    owner: NoticeOwner
 }
 
 "Main and sub category a help post is filed under."

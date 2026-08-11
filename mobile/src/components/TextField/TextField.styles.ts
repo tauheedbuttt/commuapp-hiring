@@ -20,4 +20,11 @@ export const styles = StyleSheet.create({
     color: colors.text,
     backgroundColor: colors.white,
   },
+  inputError: {
+    borderColor: colors.errorRed,
+  },
+  errorText: {
+    fontSize: 13,
+    color: colors.errorRed,
+  },
 });

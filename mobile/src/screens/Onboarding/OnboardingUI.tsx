@@ -1,15 +1,15 @@
 import { Text, View } from 'react-native';
 import { Button } from '../../components/Button/Button';
 import { InlineMessage } from '../../components/InlineMessage/InlineMessage';
+import { LocationForm } from '../../components/LocationForm/LocationForm';
 import { Logo } from '../../components/Logo/Logo';
-import { Picker } from '../../components/Picker/Picker';
 import { ScreenContainer } from '../../components/ScreenContainer/ScreenContainer';
-import { TextField } from '../../components/TextField/TextField';
 import { styles } from './OnboardingUI.styles';
 
 type Props = {
   country: string;
   city: string;
+  cityError?: string;
   countryOptions: readonly string[];
   onCityChange: (text: string) => void;
   onCountryChange: (country: string) => void;
@@ -25,6 +25,7 @@ type Props = {
 export function OnboardingUI({
   country,
   city,
+  cityError,
   countryOptions,
   onCityChange,
   onCountryChange,
@@ -49,26 +50,17 @@ export function OnboardingUI({
         </Text>
       </View>
 
-      <View style={styles.actions}>
-        <Button
-          label="Get current location"
-          variant="outline"
-          icon="location"
-          onPress={onGetCurrentLocation}
-          loading={gpsLoading}
-        />
-        {gpsError ? <InlineMessage>{gpsError}</InlineMessage> : null}
-      </View>
-
-      <View style={styles.fields}>
-        <Picker label="Country" value={country} options={countryOptions} onChange={onCountryChange} />
-        <TextField
-          label="City"
-          value={city}
-          onChangeText={onCityChange}
-          placeholder="Enter your city"
-          autoCapitalize="words"
-          autoCorrect={false}
+      <View style={styles.form}>
+        <LocationForm
+          country={country}
+          city={city}
+          cityError={cityError}
+          countryOptions={countryOptions}
+          onCityChange={onCityChange}
+          onCountryChange={onCountryChange}
+          onGetCurrentLocation={onGetCurrentLocation}
+          gpsLoading={gpsLoading}
+          gpsError={gpsError}
         />
       </View>
 

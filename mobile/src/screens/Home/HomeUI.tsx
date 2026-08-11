@@ -1,28 +1,98 @@
-import { Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, RefreshControl, View } from 'react-native';
 import { Button } from '../../components/Button/Button';
+import { InlineMessage } from '../../components/InlineMessage/InlineMessage';
 import { ScreenContainer } from '../../components/ScreenContainer/ScreenContainer';
-import type { Location } from '../../types';
+import { colors } from '../../theme/colors';
+import { AreaSummaryCard } from './AreaSummaryCard';
+import { AreaSummaryCardSkeleton } from './AreaSummaryCard/skeleton';
+import { NoticeCard, type NoticeListItem } from './NoticeCard';
+import { NoticeCardSkeleton } from './NoticeCard/skeleton';
 import { styles } from './HomeUI.styles';
 
+const INITIAL_SKELETON_COUNT = 2;
+
 type Props = {
-  location: Location | null;
-  onClearStorage: () => void;
+  notices: NoticeListItem[];
+  isInitialLoading: boolean;
+  listError: boolean;
+  isLoadingMore: boolean;
+  isRefreshing: boolean;
+  summaryLoading: boolean;
+  summaryError: boolean;
+  summary: string | null;
+  onRefresh: () => void;
+  onEndReached: () => void;
+  onRetry: () => void;
+  onNoticePress: (id: string) => void;
 };
 
-/** Placeholder — help post list + area summary land in a later issue. */
-export function HomeUI({ location, onClearStorage }: Props) {
+export function HomeUI({
+  notices,
+  isInitialLoading,
+  listError,
+  isLoadingMore,
+  isRefreshing,
+  summaryLoading,
+  summaryError,
+  summary,
+  onRefresh,
+  onEndReached,
+  onRetry,
+  onNoticePress,
+}: Props) {
+  if (isInitialLoading) {
+    return (
+      <ScreenContainer edges={["top"]}>
+        <AreaSummaryCardSkeleton />
+        {Array.from({ length: INITIAL_SKELETON_COUNT }).map((_, index) => (
+          <NoticeCardSkeleton key={index} />
+        ))}
+      </ScreenContainer>
+    );
+  }
+
+  if (listError && notices.length === 0) {
+    return (
+      <ScreenContainer edges={["top"]}>
+        <AreaSummaryCard loading={summaryLoading} error={summaryError} summary={summary} />
+        <View style={styles.errorState}>
+          <InlineMessage>Couldn't load nearby help posts.</InlineMessage>
+          <View style={styles.retryButton}>
+            <Button label="Retry" variant="outline" onPress={onRetry} />
+          </View>
+        </View>
+      </ScreenContainer>
+    );
+  }
+
   return (
-    <ScreenContainer>
-      <Text style={styles.text}>Home</Text>
-      {/* TEMPORARY: dumps the onboarding-persisted location, plus a button to
-          wipe it, so the full onboarding -> store -> Home flow (and re-running
-          onboarding) is testable without reaching for a device's app settings.
-          Remove both once real Home content (post list, area summary) replaces
-          this screen. */}
-      {location ? <Text style={styles.debug}>{JSON.stringify(location, null, 2)}</Text> : null}
-      <View style={styles.clearButton}>
-        <Button label="Clear storage (temp)" variant="outline" onPress={onClearStorage} />
-      </View>
+    <ScreenContainer scrollable={false} edges={["top"]}>
+      <FlatList
+        data={notices}
+        keyExtractor={(notice) => notice.id}
+        contentContainerStyle={styles.listContent}
+        renderItem={({ item }) => <NoticeCard notice={item} onPress={onNoticePress} />}
+        ListHeaderComponent={
+          <AreaSummaryCard loading={summaryLoading} error={summaryError} summary={summary} />
+        }
+        ListEmptyComponent={
+          <View style={styles.emptyState}>
+            <InlineMessage variant="neutral">No nearby help posts yet. Pull down to check again.</InlineMessage>
+          </View>
+        }
+        ListFooterComponent={
+          isLoadingMore ? (
+            <View style={styles.footer}>
+              <ActivityIndicator color={colors.primaryGreen} />
+            </View>
+          ) : null
+        }
+        refreshControl={
+          <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} tintColor={colors.primaryGreen} />
+        }
+        onEndReachedThreshold={0.5}
+        onEndReached={onEndReached}
+      />
     </ScreenContainer>
   );
 }

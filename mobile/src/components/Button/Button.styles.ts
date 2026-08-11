@@ -1,6 +1,17 @@
 import { StyleSheet } from "react-native";
 import { colors } from "../../theme/colors";
 
+export const VARIANT_STYLES = {
+  primary: { container: "primary", pressed: "primaryPressed", label: "primaryLabel", tint: colors.white },
+  outline: { container: "outline", pressed: "outlinePressed", label: "outlineLabel", tint: colors.primaryGreen },
+  "danger-outline": {
+    container: "dangerOutline",
+    pressed: "dangerOutlinePressed",
+    label: "dangerOutlineLabel",
+    tint: colors.errorRed,
+  },
+} as const;
+
 export const styles = StyleSheet.create({
   primary: {
     flexDirection: "row",
@@ -37,6 +48,26 @@ export const styles = StyleSheet.create({
   },
   outlineLabel: {
     color: colors.text,
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  dangerOutline: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    borderWidth: 1,
+    borderColor: colors.errorRed,
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    backgroundColor: colors.white,
+  },
+  dangerOutlinePressed: {
+    backgroundColor: colors.white,
+  },
+  dangerOutlineLabel: {
+    color: colors.errorRed,
     fontSize: 15,
     fontWeight: "600",
   },

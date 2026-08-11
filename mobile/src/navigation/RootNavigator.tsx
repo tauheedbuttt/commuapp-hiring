@@ -1,8 +1,10 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ActivityIndicator, View } from 'react-native';
-import { useLocationHasHydrated } from '../hooks/useLocationHasHydrated';
+import { useHasHydrated } from '../hooks/useHasHydrated';
+import { useSettingsStore } from '../store/settingsStore';
 import { useLocationStore } from '../store/locationStore';
-import { HomeScreen } from '../screens/Home/HomeScreen';
+import { MainTabNavigator } from './MainTabNavigator';
+import { NoticeDetailScreen } from '../screens/NoticeDetail/NoticeDetailScreen';
 import { OnboardingScreen } from '../screens/Onboarding/OnboardingScreen';
 import { colors } from '../theme/colors';
 import { styles } from './RootNavigator.styles';
@@ -11,10 +13,11 @@ import type { RootStackParamList } from '../types';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function RootNavigator() {
-  const hasHydrated = useLocationHasHydrated();
+  const hasLocationHydrated = useHasHydrated(useLocationStore);
+  const hasSettingsHydrated = useHasHydrated(useSettingsStore);
   const hasSavedLocation = useLocationStore((state) => state.location !== null);
 
-  if (!hasHydrated) {
+  if (!hasLocationHydrated || !hasSettingsHydrated) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator color={colors.primaryGreen} />
@@ -24,11 +27,12 @@ export function RootNavigator() {
 
   return (
     <Stack.Navigator
-      initialRouteName={hasSavedLocation ? 'Home' : 'Onboarding'}
+      initialRouteName={hasSavedLocation ? 'MainTabs' : 'Onboarding'}
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+      <Stack.Screen name="NoticeDetail" component={NoticeDetailScreen} />
     </Stack.Navigator>
   );
 }
