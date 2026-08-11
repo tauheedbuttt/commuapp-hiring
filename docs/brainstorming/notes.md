@@ -15,11 +15,36 @@
 - cache: geocoding results, generated summaries
   - seperate keys for each
   - avoid fetching nearby notice in cache. reason: want real-time feel. can implement with pull down to refresh UX and then cache gets invalidated at backend. but will decide later
-- after reconsidreation i notice these can only be implemented if user has given onboarding details since our task doesnt require this from use, we will not have an order by preference
-- "recent" = fixed `first: N` ordered CREATED_AT DESC, no local-storage/seen-tracking (device-local, unbounded growth, arbitrary daily-reset boundary, solves "what's new" not "how many recent") — same fetched batch feeds both list + Bedrock summary, single fetch, no separate summary-only query. seperate calls would indicate we need to feed data from list for bedrock summary for no reason.
+  - long TTL for geocoding because town coordinates change infrequently
+- after reconsideration, these features require onboarding details. This task does not require onboarding details, so preference-based ordering is out of scope.
+- "recent" = fixed `first: N` ordered `CREATED_AT DESC`, with no local-storage/seen-tracking. The posts list remains paginated and uncached. The summary endpoint fetches and caches its own notice batch.
 - use GraphQL as backend, because a lot of APIs in CommuApp are using graphql. makes sense to implement it and learn as well once real job i get.
   - CommuAPI is graphql. My backend is graphql. less translation needed between both. same types fields can be used.
   - easy to explore API due to schema by default.
   - interfaces and types come with API, easier to generate TS types for mobile app.
   - Natural merge of 2 sources, needed DTO merge in REST
-- own backend API: 2 queries — one returns posts + summary together (single fetch); the other kept separate for detail page so list query doesn't carry unnecessary fields.
+- own backend API: NOT combined posts+summary endpoint. reversed earlier decision.
+  - reason: posts list gets pagination. combined endpoint = summary regenerated every page fetch, wasteful (Bedrock cost + latency)
+  - posts endpoint: paginated, own query
+  - summary endpoint: separate query, own cache/TTL, decoupled from pagination
+  - resolved: summary endpoint owns its own short-TTL notice cache, decoupled from list
+    - summary cache (~30min TTL): check first, miss → fetch own "recent N" batch (CREATED_AT DESC, same window def as list) → gen via Bedrock → cache result
+    - notice batch itself also cached short (~5min), just to survive summary cache regen without extra CommuAPI hit
+    - posts list stays uncached, real-time, own pagination — untouched
+    - CommuAPI double-hit only possible on cold cache, not per page. rejected piggyback-on-list-fetch (endpoint ordering coupling, fragile) and background-job-seed (queue machinery, overkill for task size)
+- issue #3: consume upstream Commu API via schema-driven, code-generated PHP GraphQL client (spawnia/sailor) instead of hand-built query strings + raw JSON parsing
+  - same spirit as a typed frontend client (Apollo codegen) — typed request/response, reused for next Commu query
+  - schema fed to the generator is trimmed to just `noticesWhereDistance` + its transitively reachable types, not the full upstream schema (330+ types) — keeps generated code proportional to what's used
+  - generated code committed to git under app/Services/Commu/Generated, not regenerated at deploy time
+- issue #3: noticesWhereDistance stays a standalone, uncached, paginated query — real-time list, no piggybacking on this for the summary
+  - own field trim: id, title, description, type, side, category (main+sub), created_at, position, distance_to_user
+  - sort hardcoded CREATED_AT DESC server-side, not exposed — upstream only ever supports one sort column
+  - zero-notice location = normal empty result, not an error (distinct from geocoding's not-found, which genuinely blocks the request)
+- issue #3: switched cache store from file to Redis (predis client, no compiled extension)
+  - geocoding now actually cached: key = trimmed+lowercased town name, long TTL (30d)
+  - fail-open implemented once (App\Services\Cache\FailOpenCache) — Redis down = log + fall through to live path, not a failed request. reused as-is when notice-batch/summary caching lands
+- issue #3, revised after review: noticesWhereDistance args and response shape mirror upstream Commu field names verbatim (lat/long not latitude/longitude, paginatorInfo+data not flattened notices/count, created_at/distance_to_user/categories not createdAt/distanceMeters/category)
+  - reason: keep the mapping between our API and upstream obvious/low-friction, same intent as user story #1, just carried further than the initial camelCase pass did
+  - paginatorInfo.count mirrors upstream's per-page item count (not overall total) — upstream itself doesn't expose an "overall count" field we selected
+- issue #3, addressed CodeRabbit review: bound `distance`/`first`/`page` with `@rules` (previously only `lat`/`long` were validated), log the Commu transport exception before converting it to `GraphQLClientException` (was silently discarded), guard against a null `data` payload on an HTTP-200-with-no-errors response, fix geocode cache returning the first-seen `town` casing/whitespace on a cache hit, and make `sailor.php` fail fast on missing `COMMU_GRAPHQL_URL`/`COMMU_BEARER_TOKEN` instead of building a client with a null URL
+  - skipped: setting a non-blank example TTL in `.env.example` — contradicts this project's explicit no-default-env-values policy (every other key in that file is blank too, by design)

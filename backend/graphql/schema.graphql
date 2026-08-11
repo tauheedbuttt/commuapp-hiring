@@ -5,6 +5,24 @@ type Query {
         "The town name to geocode. Must be non-blank."
         town: String! @rules(apply: ["required", "regex:/\\S/"])
     ): TownLocation!
+
+    "Fetch help posts near a coordinate from the upstream Commu API, most recent first."
+    noticesWhereDistance(
+        "Latitude of the search point."
+        lat: Float! @rules(apply: ["required", "numeric", "between:-90,90"])
+
+        "Longitude of the search point."
+        long: Float! @rules(apply: ["required", "numeric", "between:-180,180"])
+
+        "Search radius in meters."
+        distance: Int! = 15000 @rules(apply: ["integer", "between:1,100000"])
+
+        "Page size."
+        first: Int! = 20 @rules(apply: ["integer", "between:1,50"])
+
+        "Page number, 1-indexed. Defaults to the first page."
+        page: Int @rules(apply: ["integer", "min:1"])
+    ): NoticePaginator!
 }
 
 "A town resolved to a single geographic point."
@@ -17,4 +35,101 @@ type TownLocation {
 
     "Longitude of the resolved location."
     longitude: Float!
+}
+
+"A page of nearby help posts, most recent first. Mirrors the upstream Commu paginator shape."
+type NoticePaginator {
+    "Pagination metadata for the current page."
+    paginatorInfo: PaginatorInfo!
+
+    "Help posts on the current page."
+    data: [Notice!]!
+}
+
+"Pagination metadata, mirroring the upstream Commu paginator."
+type PaginatorInfo {
+    "Number of help posts on the current page."
+    count: Int!
+
+    "The current page number."
+    currentPage: Int!
+
+    "Whether another page of results exists beyond this one."
+    hasMorePages: Boolean!
+}
+
+"A help post (Notice in the Commu API, Help Post in the product UI)."
+type Notice {
+    "Identity of the help post."
+    id: ID!
+
+    "Title of the help post."
+    title: String!
+
+    "Description of the help post, if provided."
+    description: String
+
+    "Whether the post is offering (GIVE) or requesting (NEED) help, and of what kind."
+    type: NoticeType!
+
+    "Whether the post is on the giving or needing side."
+    side: NoticeSide
+
+    "Main and sub category the post is filed under."
+    categories: NoticeCategories!
+
+    "When the help post was created, as an ISO 8601 timestamp."
+    created_at: String!
+
+    "Where the help post is located."
+    position: NoticePosition!
+
+    "Distance from the search point, in meters."
+    distance_to_user: Float
+}
+
+"Main and sub category a help post is filed under."
+type NoticeCategories {
+    "The post's primary category, if categorized."
+    main: Category
+
+    "The post's sub-categories, if any."
+    sub: [Category!]!
+}
+
+"A help post category."
+type Category {
+    "Identity of the category."
+    id: ID
+
+    "Machine-readable category name."
+    key: String!
+}
+
+"A geographic point a help post is located at."
+type NoticePosition {
+    "Latitude of the help post."
+    latitude: Float!
+
+    "Longitude of the help post."
+    longitude: Float!
+}
+
+"What kind of help a post is offering or requesting."
+enum NoticeType {
+    GIVE_SELL
+    GIVE_TRADE
+    GIVE_FREE
+    GIVE_GENERIC
+    NEED_BUY
+    NEED_TRADE
+    NEED_FREE
+    NEED_GENERIC
+    COLLECTOR
+}
+
+"Whether a help post is on the giving or needing side."
+enum NoticeSide {
+    GIVE
+    NEED
 }

@@ -39,8 +39,16 @@ Project-wide conventions for this Laravel backend. Not tied to any one feature �
 
 ## Caching
 
-- Lighthouse's parsed-query cache runs in `opcache` mode (`LIGHTHOUSE_QUERY_CACHE_MODE=opcache`), not the default `store` mode backed by Laravel's `database` cache driver. On SQLite, `store` mode mis-serializes the parsed AST and breaks every second-and-later request.
+- Lighthouse's parsed-query cache runs in `opcache` mode (`LIGHTHOUSE_QUERY_CACHE_MODE=opcache`), not the default `store` mode backed by Laravel's `database` cache driver — there's no SQL database in this app for that store to use.
+- The app cache store is Redis-backed (`predis/predis`, no compiled-extension dependency).
 - Any feature-level caching (upstream data, computed results) is a per-slice decision, not a blanket default — document what's cached, the key, the TTL, and the invalidation trigger where it's added.
+- Cache operations fail open: if Redis is unreachable, the operation falls through to its live/uncached path (and logs a warning) rather than failing the request. Implemented once, in `App\Services\Cache\FailOpenCache`, and reused by every feature that caches — not re-derived per slice.
+
+## Upstream GraphQL clients
+
+- A third-party GraphQL API (e.g. Commu) is consumed through a schema-driven, code-generated typed client ([Sailor](https://github.com/spawnia/sailor)), not hand-built query strings with manual JSON parsing. Generated code lives under `app/Services/<Domain>/Generated/`, git-committed (not regenerated in CI/at deploy).
+- The schema fed to the generator is trimmed to the operations actually in use (only the reachable types from the query/mutation fields we call), not the upstream provider's full schema — keeps generated code proportional to what's used.
+- `sailor.php` at the repo root is the single codegen + runtime client config per project (endpoint URL, auth headers, generated-code namespace/path).
 
 ## Branching & PRs
 

@@ -19,4 +19,8 @@ return [
         'user_agent' => env('NOMINATIM_USER_AGENT'),
     ],
 
+    'geocode_cache' => [
+        'ttl_seconds' => env('GEOCODE_CACHE_TTL_SECONDS'),
+    ],
+
 ];
