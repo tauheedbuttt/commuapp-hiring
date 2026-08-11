@@ -1,6 +1,6 @@
 import { View } from 'react-native';
-import { Pulse } from './Pulse';
-import { styles } from './Skeleton.styles';
+import { Pulse } from '../../../components/Pulse/Pulse';
+import { styles } from '../Skeleton.styles';
 
 export function AreaSummaryCardSkeleton() {
   return (

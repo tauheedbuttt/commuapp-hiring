@@ -1,20 +1,24 @@
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useApolloClient, useQuery } from '@apollo/client/react';
-import { useEffect, useRef, useState } from 'react';
-import { AreaSummaryDocument, NoticesWhereDistanceDocument } from '../../api/generated/graphql';
-import { useDistanceStore } from '../../store/distanceStore';
-import { useLocationStore } from '../../store/locationStore';
-import type { RootStackParamList } from '../../types';
-import type { NoticeListItem } from './components/NoticeCard';
-import { HomeUI } from './HomeUI';
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useApolloClient, useQuery } from "@apollo/client/react";
+import { useEffect, useRef, useState } from "react";
+import {
+  AreaSummaryDocument,
+  NoticesWhereDistanceDocument,
+} from "../../api/generated/graphql";
+import { useDistanceStore } from "../../store/distanceStore";
+import { useLocationStore } from "../../store/locationStore";
+import type { RootStackParamList } from "../../types";
+import type { NoticeListItem } from "./NoticeCard";
+import { HomeUI } from "./HomeUI";
 
 const PAGE_SIZE = 20;
 
 export function HomeScreen() {
   const location = useLocationStore((state) => state.location);
   const distanceMeters = useDistanceStore((state) => state.distanceMeters);
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const client = useApolloClient();
 
   const [notices, setNotices] = useState<NoticeListItem[]>([]);
@@ -57,7 +61,7 @@ export function HomeScreen() {
     refetch: refetchSummary,
   } = useQuery(AreaSummaryDocument, {
     variables: {
-      town: location?.city ?? '',
+      town: location?.city ?? "",
       lat: location?.latitude ?? 0,
       long: location?.longitude ?? 0,
       distance: distanceMeters,
@@ -82,7 +86,7 @@ export function HomeScreen() {
           first: PAGE_SIZE,
           page: nextPage,
         },
-        fetchPolicy: 'network-only',
+        fetchPolicy: "network-only",
       });
 
       if (!data) return;
@@ -97,17 +101,23 @@ export function HomeScreen() {
     }
   }
 
+  const handleRetry = async () => {
+    await Promise.allSettled([refetchList(), refetchSummary()]);
+  };
+
   async function handleRefresh() {
     setIsRefreshing(true);
     try {
-      await Promise.allSettled([refetchList(), refetchSummary()]);
+      await handleRetry();
     } finally {
       setIsRefreshing(false);
     }
   }
 
   function handleNoticePress(id: string) {
-    navigation.getParent<NativeStackNavigationProp<RootStackParamList>>()?.navigate('NoticeDetail', { id });
+    navigation
+      .getParent<NativeStackNavigationProp<RootStackParamList>>()
+      ?.navigate("NoticeDetail", { id });
   }
 
   const isInitialLoading = !hasLoadedOnce.current && listLoading;
@@ -124,7 +134,7 @@ export function HomeScreen() {
       summary={summaryData?.areaSummary.summary ?? null}
       onRefresh={handleRefresh}
       onEndReached={handleEndReached}
-      onRetry={() => refetchList()}
+      onRetry={handleRetry}
       onNoticePress={handleNoticePress}
     />
   );

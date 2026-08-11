@@ -3,10 +3,10 @@ import { Button } from '../../components/Button/Button';
 import { InlineMessage } from '../../components/InlineMessage/InlineMessage';
 import { ScreenContainer } from '../../components/ScreenContainer/ScreenContainer';
 import { colors } from '../../theme/colors';
-import { AreaSummaryCard } from './components/AreaSummaryCard';
-import { AreaSummaryCardSkeleton } from './components/AreaSummaryCardSkeleton';
-import { NoticeCard, type NoticeListItem } from './components/NoticeCard';
-import { NoticeCardSkeleton } from './components/NoticeCardSkeleton';
+import { AreaSummaryCard } from './AreaSummaryCard';
+import { AreaSummaryCardSkeleton } from './AreaSummaryCard/skeleton';
+import { NoticeCard, type NoticeListItem } from './NoticeCard';
+import { NoticeCardSkeleton } from './NoticeCard/skeleton';
 import { styles } from './HomeUI.styles';
 
 const INITIAL_SKELETON_COUNT = 2;

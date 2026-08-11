@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 import { colors } from '../../../theme/colors';
-import { styles } from './AreaSummaryCard.styles';
+import { styles } from './styles';
 
 type Props = {
   loading: boolean;
