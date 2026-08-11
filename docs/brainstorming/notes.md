@@ -41,3 +41,4 @@
   - still platform-branches (10.0.2.2 vs localhost) for the Android-emulator loopback quirk
 - mobile: Apollo Client + GraphQL Code Generator's `client-preset` for typed hooks off `backend/graphql/schema.graphql`, Zustand + AsyncStorage `persist` for on-device location, `world-countries` for country names (custom-built picker UI, not a bundled picker lib)
 - mobile: country dropdown defaults to Finland (commu's home market), not a blank/placeholder value — Next only needs City filled to enable
+- mobile: two folders beyond issue #9's mandated `screens/navigation/api/store/ui/theme` list — `hooks/` (developer-directed mid-build: reusable hooks shouldn't live inside `store/`) and `data/` (small static datasets, e.g. the country name list, don't fit any of the six)

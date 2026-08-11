@@ -24,7 +24,7 @@ _Last reviewed: 2026-08-11._
 
 ## Mobile app (Expo)
 
-- [x] Project scaffolded (`mobile/`, Expo blank TypeScript template, verified running on Android emulator)
+- [x] Project scaffolded (`mobile/`, Expo blank TypeScript template — verified running on Android emulator in an earlier session; no emulator/device was available in the environment that built the onboarding screen below)
 - [x] Onboarding screen: manual city/country entry + GPS entry, geocoded via backend `geocodeTown`, persisted on-device (issue #9) — builds and typechecks clean; manual on-device verification against the golden paths in issue #9 not yet run (no emulator/device in the build environment)
 - [ ] Home screen: help post list + collapsible summary on top
 - [ ] Loading state (done for onboarding; home screen pending)

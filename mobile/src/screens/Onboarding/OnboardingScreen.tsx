@@ -133,7 +133,7 @@ export function OnboardingScreen({ navigation }: Props) {
           onPress={handleGetCurrentLocation}
           loading={gpsLoading}
         />
-        {gpsError ? <InlineMessage tone="error">{gpsError}</InlineMessage> : null}
+        {gpsError ? <InlineMessage>{gpsError}</InlineMessage> : null}
       </View>
 
       <View style={styles.fields}>
@@ -148,7 +148,7 @@ export function OnboardingScreen({ navigation }: Props) {
         />
       </View>
 
-      {submitError ? <InlineMessage tone="error">{submitError}</InlineMessage> : null}
+      {submitError ? <InlineMessage>{submitError}</InlineMessage> : null}
 
       <View style={styles.footer}>
         <PrimaryButton
