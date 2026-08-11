@@ -11,4 +11,6 @@ namespace App\Enums;
 enum CacheKeysEnum: string
 {
     case Geocode = 'geocode';
+    case AreaSummary = 'area_summary';
+    case NoticeBatch = 'notice_batch';
 }

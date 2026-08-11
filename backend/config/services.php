@@ -23,4 +23,19 @@ return [
         'ttl_seconds' => env('GEOCODE_CACHE_TTL_SECONDS'),
     ],
 
+    'bedrock' => [
+        'model_id' => env('BEDROCK_MODEL_ID'),
+        'region' => env('BEDROCK_AWS_REGION'),
+    ],
+
+    'summary' => [
+        'cache_ttl_seconds' => env('SUMMARY_CACHE_TTL_SECONDS'),
+        'min_notices' => env('SUMMARY_MIN_NOTICES'),
+    ],
+
+    'notice_batch' => [
+        'cache_ttl_seconds' => env('NOTICE_BATCH_CACHE_TTL_SECONDS'),
+        'count' => env('SUMMARY_NOTICE_BATCH_COUNT'),
+    ],
+
 ];

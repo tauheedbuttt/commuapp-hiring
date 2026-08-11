@@ -61,15 +61,21 @@ Redis-backed (`predis/predis`, no compiled extension, low local-setup friction).
 
 **Not implemented (by design):** the `noticesWhereDistance` list itself stays uncached — it's meant to feel real-time, and caching a paginated live feed adds staleness for little benefit at this scale.
 
-**Hypothetical (deferred to the area-summary work):** the summary endpoint will own its own short-TTL (~30 min) cache of the generated summary, plus a short-TTL (~5 min) cache of the notice batch that feeds it — separate from, and decoupled from, the posts list's pagination, so a page fetch never triggers a summary regeneration.
+**Implemented:** the `areaSummary` query owns its own short-TTL (~30 min, `SUMMARY_CACHE_TTL_SECONDS`) cache of the generated summary, plus a short-TTL (~5 min, `NOTICE_BATCH_CACHE_TTL_SECONDS`) cache of the notice batch that feeds it — separate from, and decoupled from, the posts list's pagination, so a page fetch never triggers a summary regeneration. Both keys are `{town}:{distance}` (same trim/lowercase normalization as geocode) so different search radii for the same town don't collide. Same `FailOpenCache` fail-open behavior as geocoding.
 
 ### Bedrock model & summary approach
 
-_TBD_
+Amazon Nova Lite (`eu.amazon.nova-2-lite-v1:0` inference profile, `eu-north-1`) via the raw `aws/aws-sdk-php` Converse API — chosen over a Claude-on-Bedrock model specifically to avoid the one-time Anthropic model-access request, not a quality judgment.
+
+`AreaSummaryService` orchestrates the flow: check the summary cache, then the notice-batch cache, then fetch a fresh batch (`SUMMARY_NOTICE_BATCH_COUNT` posts, `CREATED_AT DESC`, reusing `NoticeSearchService::searchNearby` as-is — no new Commu query). If the batch has fewer than `SUMMARY_MIN_NOTICES` posts, a canned "not enough data near {town}" summary is returned (and cached, same TTL as a real summary) instead of calling Bedrock. Otherwise each notice is trimmed to the fields relevant to a thematic summary (`title`, `description`, `type`, `side`, `categories`) — identity, position, distance, and timestamps are stripped before prompting — and `BedrockSummaryGenerator` asks for a concise 2-sentence plain-prose summary naming the town, no markdown.
+
+Bedrock/notice-fetch failures are caught, logged, and rethrown as the same `GraphQLClientException`/`ErrorCategory::Upstream` pattern already used for Commu failures — no bespoke retry/timeout logic beyond the AWS SDK's own defaults.
+
+AWS credentials are read by the SDK's default provider chain directly from `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` in env — no Laravel-side credential config. Model id and region are config/env-backed (`BEDROCK_MODEL_ID`, `BEDROCK_AWS_REGION`) so the model can be swapped without a code change.
 
 ## How this was implemented
 
-_TBD_
+The GraphQL surface is a single query, `areaSummary(town, lat, long, distance)`, mirroring `noticesWhereDistance`'s coordinate/distance shape so a caller never needs a second geocoding round-trip just for the summary; `town` is carried separately since it's echoed verbatim in the generated text and isn't derivable from coordinates. The resolver (`App\GraphQL\Queries\AreaSummary`) is a thin adapter onto `AreaSummaryService`, which is the only class that knows about caching, the notice-batch/summary split, and the not-enough-data threshold. `BedrockSummaryGenerator` knows only how to turn a town + trimmed notices into a prompt and back into text — no caching or GraphQL knowledge, swappable independently.
 
 ## What I'd improve next
 

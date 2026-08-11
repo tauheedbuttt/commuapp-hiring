@@ -12,3 +12,5 @@ This doc covers the step i take to solve the assignment. Agents can add here ste
 6. learn php laravel scaffold architecture
 7. setup base laravel+lighthouse project. with example geocoding call. to see how project is setup, what is where.
 8. delete unused files from backend
+9. build newarby notices api
+10. build bedrock integration
