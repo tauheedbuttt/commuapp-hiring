@@ -3,12 +3,16 @@
 Expo (React Native, TypeScript) app. Blank Expo template as the base, no dev
 client / bare workflow needed — runs via Expo Go or an emulator.
 
-One screen so far:
+Screens:
 
 - **Onboarding** — asks for home city/country (manually typed or via device
   GPS), resolves it to coordinates through the backend's `geocodeTown` query,
-  and persists the result on-device. Navigates to a placeholder Home screen
-  on success.
+  and persists the result on-device. Navigates to Home on success.
+- **Home** — nearby notices list with a collapsible area summary on top,
+  fetched from the backend.
+- **NoticeDetail** — full detail view for a single notice.
+- **Settings** — view/change the saved home location, clear it to return to
+  onboarding.
 
 ## Setup
 
@@ -79,8 +83,9 @@ Re-run after editing an operation file or after the backend schema changes.
 
 `store/locationStore.ts` holds `{ city, country, latitude, longitude }` behind
 Zustand's `persist` middleware, backed by AsyncStorage. `RootNavigator` waits
-for hydration (`hooks/useLocationHasHydrated.ts`), then skips straight to Home
-if a location is already saved — onboarding only ever runs once per install.
+for hydration (`hooks/useHasHydrated.ts`), then skips straight to Home if a
+location is already saved — onboarding is skipped whenever a saved location
+exists, and can reappear after Settings clears it.
 
 ## Notes
 
@@ -112,10 +117,8 @@ if a location is already saved — onboarding only ever runs once per install.
   `not_found` and `upstream` map to distinct messages; GPS permission denial
   and reverse-geocode failure (no address for the coordinates) each get their
   own message with a nudge back to manual entry.
-- **Home screen** currently dumps the persisted location as raw JSON
-  (`screens/Home/HomeUI.tsx`) — a temporary stand-in so the onboarding →
-  persistence flow is visible end-to-end before the real Home content (post
-  list, area summary) exists. Remove once that lands.
+- **Home screen** fetches nearby notices and an area summary from the backend,
+  keyed on the persisted location and the search distance set in Settings.
 - No automated tests, per this repo's testing policy. Verification is manual
   (Expo Go / emulator) against the golden paths and error cases listed in the
   originating issue — **not yet run**, since this screen was built in an

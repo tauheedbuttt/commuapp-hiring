@@ -105,6 +105,9 @@ export function useLocationForm() {
 
       if (!data) return false;
 
+      const stillCurrent = formik.values.city === city && formik.values.country === country;
+      if (!stillCurrent) return false;
+
       setLocation({ city, country, latitude: data.geocodeTown.latitude, longitude: data.geocodeTown.longitude });
       return true;
     } catch (error) {
@@ -126,7 +129,7 @@ export function useLocationForm() {
     gpsError,
     submitError,
     isSaving: geocodeLoading,
-    isSaveDisabled: geocodeLoading,
+    isSaveDisabled: geocodeLoading || !formik.values.city.trim(),
     handleCityChange,
     handleCountryChange,
     handleGetCurrentLocation,

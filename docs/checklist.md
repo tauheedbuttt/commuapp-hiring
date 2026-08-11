@@ -27,9 +27,10 @@ _Last reviewed: 2026-08-11._
 - [x] Project scaffolded (`mobile/`, Expo blank TypeScript template — verified running on Android emulator in an earlier session; no emulator/device was available in the environment that built the onboarding screen below)
 - [x] Onboarding screen: manual city/country entry + GPS entry, geocoded via backend `geocodeTown`, persisted on-device (issue #9) — builds and typechecks clean; manual on-device verification against the golden paths in issue #9 not yet run (no emulator/device in the build environment)
 - [x] Home screen: help post list + collapsible summary on top
-- [x] Loading state (done for onboarding; home screen pending)
-- [x] Error state (done for onboarding: geocode not-found/upstream, GPS permission denied, GPS reverse-geocode failure; home screen pending)
-- [x] Calls backend API only — no direct Commu/Bedrock calls, no token in client (onboarding screen only talks to the backend's `geocodeTown`)
+- [x] Loading state (onboarding + Home)
+- [x] Error state (onboarding: geocode not-found/upstream, GPS permission denied, GPS reverse-geocode failure; Home: notices/summary fetch failure)
+- [x] Calls backend API only — no direct Commu/Bedrock calls, no token in client (onboarding, Home notices/summary, and NoticeDetail all talk to the backend only)
+- [ ] Manual device verification: Home loading/error states against golden paths (no emulator/device in the build environment)
 
 ## README (root)
 
