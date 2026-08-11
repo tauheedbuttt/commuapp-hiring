@@ -32,3 +32,4 @@
     - notice batch itself also cached short (~5min), just to survive summary cache regen without extra CommuAPI hit
     - posts list stays uncached, real-time, own pagination — untouched
     - CommuAPI double-hit only possible on cold cache, not per page. rejected piggyback-on-list-fetch (endpoint ordering coupling, fragile) and background-job-seed (queue machinery, overkill for task size)
+- i would write monorepo if done again, to share graphql files across apps. didnt know this before

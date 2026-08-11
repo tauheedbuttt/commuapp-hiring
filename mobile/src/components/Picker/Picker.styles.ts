@@ -44,13 +44,6 @@ export const styles = StyleSheet.create({
   search: {
     marginHorizontal: 20,
     marginBottom: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 10,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    fontSize: 16,
-    color: colors.text,
   },
   option: {
     flexDirection: "row",

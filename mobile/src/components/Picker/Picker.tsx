@@ -1,9 +1,10 @@
-import { Ionicons } from '@expo/vector-icons';
-import { useMemo, useState } from 'react';
-import { FlatList, Modal, Pressable, Text, TextInput, View } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { colors } from '../../theme/colors';
-import { styles } from './Picker.styles';
+import { Ionicons } from "@expo/vector-icons";
+import { useMemo, useState } from "react";
+import { FlatList, Modal, Pressable, Text, View } from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { colors } from "../../theme/colors";
+import { styles } from "./Picker.styles";
+import { TextField } from "../TextField/TextField";
 
 type Props = {
   label: string;
@@ -14,7 +15,7 @@ type Props = {
 
 export function Picker({ label, value, options, onChange }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
 
   const filteredOptions = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -24,7 +25,7 @@ export function Picker({ label, value, options, onChange }: Props) {
 
   function handleSelect(option: string) {
     onChange(option);
-    setSearch('');
+    setSearch("");
     setIsOpen(false);
   }
 
@@ -36,20 +37,26 @@ export function Picker({ label, value, options, onChange }: Props) {
         <Ionicons name="chevron-down" size={18} color={colors.text} />
       </Pressable>
 
-      <Modal visible={isOpen} animationType="slide" onRequestClose={() => setIsOpen(false)}>
+      <Modal
+        visible={isOpen}
+        animationType="slide"
+        onRequestClose={() => setIsOpen(false)}
+      >
         {/* Modal renders in its own native window — the app-level SafeAreaProvider's
             insets don't carry over, so this needs its own nested provider. */}
         <SafeAreaProvider>
           <SafeAreaView style={styles.modal}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Select {label.toLowerCase()}</Text>
+              <Text style={styles.modalTitle}>
+                Select {label.toLowerCase()}
+              </Text>
               <Pressable onPress={() => setIsOpen(false)} hitSlop={12}>
                 <Ionicons name="close" size={24} color={colors.text} />
               </Pressable>
             </View>
-            <TextInput
+            <TextField
               style={styles.search}
-              placeholder="Search"
+              placeholder="Search..."
               placeholderTextColor={colors.textMuted}
               value={search}
               onChangeText={setSearch}
@@ -60,10 +67,17 @@ export function Picker({ label, value, options, onChange }: Props) {
               keyExtractor={(option) => option}
               keyboardShouldPersistTaps="handled"
               renderItem={({ item }) => (
-                <Pressable style={styles.option} onPress={() => handleSelect(item)}>
+                <Pressable
+                  style={styles.option}
+                  onPress={() => handleSelect(item)}
+                >
                   <Text style={styles.optionText}>{item}</Text>
                   {item === value ? (
-                    <Ionicons name="checkmark" size={20} color={colors.primaryGreen} />
+                    <Ionicons
+                      name="checkmark"
+                      size={20}
+                      color={colors.primaryGreen}
+                    />
                   ) : null}
                 </Pressable>
               )}
