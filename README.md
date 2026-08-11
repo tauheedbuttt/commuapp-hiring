@@ -12,6 +12,7 @@ Laravel backend + Expo mobile app. User enters a home town, sees nearby help pos
 - [Setup](#setup)
   - [Backend](#backend)
   - [Mobile app (Expo)](#mobile-app-expo)
+- [Environment variables](#environment-variables)
 - [Decisions](#decisions)
   - [API format (REST vs GraphQL vs other)](#api-format-rest-vs-graphql-vs-other)
   - [Geocoding API](#geocoding-api)
@@ -71,6 +72,49 @@ npm start
 
 Then scan the QR code with Expo Go, or `npm run android` / `npm run ios`. See
 `mobile/README.md` for structure, codegen, and the onboarding-screen flow.
+
+## Environment variables
+
+`.env.example` lists every key blank on purpose, per this repo's env var policy — no defaults committed anywhere, fill each one by hand.
+
+### Backend (`backend/.env`)
+
+| Key | What it's for |
+|---|---|
+| `APP_NAME` | Laravel app name |
+| `APP_ENV` | Laravel environment (`local`, `production`, etc.) |
+| `APP_KEY` | Laravel encryption key, set via `php artisan key:generate` |
+| `APP_DEBUG` | Laravel debug mode |
+| `APP_URL` | Base URL Laravel assumes for itself |
+| `LOG_CHANNEL` | Laravel log channel |
+| `LOG_LEVEL` | Laravel log verbosity |
+| `CACHE_STORE` | Laravel cache driver (`redis` here) |
+| `LIGHTHOUSE_QUERY_CACHE_MODE` | Lighthouse's parsed-query cache mode, see `backend/README.md` |
+| `NOMINATIM_BASE_URL` | Geocoding endpoint, see [Geocoding API](#geocoding-api) |
+| `NOMINATIM_USER_AGENT` | User-Agent Nominatim requires on requests |
+| `REDIS_CLIENT` | Redis PHP client (`predis`), see [Caching approach](#caching-approach) |
+| `REDIS_HOST` | Redis host |
+| `REDIS_PASSWORD` | Redis auth password |
+| `REDIS_PORT` | Redis port |
+| `REDIS_CACHE_DB` | Redis logical DB index used for caching |
+| `REDIS_CACHE_CONNECTION` | Named Redis connection backing the cache store |
+| `GEOCODE_CACHE_TTL_SECONDS` | Geocoding cache TTL |
+| `SUMMARY_CACHE_TTL_SECONDS` | Area-summary cache TTL |
+| `NOTICE_BATCH_CACHE_TTL_SECONDS` | Notice-batch-behind-the-summary cache TTL |
+| `COMMU_GRAPHQL_URL` | Upstream Commu GraphQL endpoint |
+| `COMMU_BEARER_TOKEN` | Upstream Commu bearer token — see [Prerequisites](#prerequisites) for how to get one; never sent to the mobile app |
+| `AWS_ACCESS_KEY_ID` | AWS credential for Bedrock |
+| `AWS_SECRET_ACCESS_KEY` | AWS credential for Bedrock |
+| `BEDROCK_MODEL_ID` | Bedrock inference profile ID, see [Bedrock model & summary approach](#bedrock-model--summary-approach) |
+| `BEDROCK_AWS_REGION` | AWS region for the Bedrock inference profile |
+| `SUMMARY_NOTICE_BATCH_COUNT` | How many recent notices feed the summary prompt |
+| `SUMMARY_MIN_NOTICES` | Minimum notices required before generating a summary; below this returns "not enough data" |
+
+### Mobile (`mobile/.env`)
+
+| Key | What it's for |
+|---|---|
+| `EXPO_PUBLIC_BACKEND_GRAPHQL_URL` | Backend GraphQL URL — only needed when there's no Metro dev-server host to derive it from, see `mobile/README.md` |
 
 ## Decisions
 
