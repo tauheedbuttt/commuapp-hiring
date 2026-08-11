@@ -9,6 +9,7 @@ export const colors = {
   logoPink: '#F2A6C1',
   white: '#FFFFFF',
   errorRed: '#B3261E',
+  tabBarBackground: '#E4F3E9',
   cardBackground: '#F1EDDC',
   cardBorder: '#E5DFC7',
   skeletonBase: '#E7E2CE',
