@@ -42,7 +42,7 @@ export function HomeUI({
 }: Props) {
   if (isInitialLoading) {
     return (
-      <ScreenContainer>
+      <ScreenContainer edges={["top"]}>
         <AreaSummaryCardSkeleton />
         {Array.from({ length: INITIAL_SKELETON_COUNT }).map((_, index) => (
           <NoticeCardSkeleton key={index} />
@@ -53,7 +53,7 @@ export function HomeUI({
 
   if (listError && notices.length === 0) {
     return (
-      <ScreenContainer>
+      <ScreenContainer edges={["top"]}>
         <AreaSummaryCard loading={summaryLoading} error={summaryError} summary={summary} />
         <View style={styles.errorState}>
           <InlineMessage>Couldn't load nearby help posts.</InlineMessage>
@@ -66,7 +66,7 @@ export function HomeUI({
   }
 
   return (
-    <ScreenContainer scrollable={false}>
+    <ScreenContainer scrollable={false} edges={["top"]}>
       <FlatList
         data={notices}
         keyExtractor={(notice) => notice.id}

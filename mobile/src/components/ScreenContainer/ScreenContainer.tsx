@@ -1,17 +1,19 @@
 import { PropsWithChildren } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Edge, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { styles } from './ScreenContainer.styles';
 
 type Props = PropsWithChildren<{
   /** False lets the screen host its own scrollable (e.g. a FlatList) instead of wrapping children in a ScrollView. */
   scrollable?: boolean;
+  /** Which safe-area edges to inset. Defaults to top+bottom; a tab screen should omit 'bottom' since the tab bar already insets it, or double-padding results. */
+  edges?: readonly Edge[];
 }>;
 
-export function ScreenContainer({ children, scrollable = true }: Props) {
+export function ScreenContainer({ children, scrollable = true, edges = ['top', 'bottom'] }: Props) {
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.safeArea} edges={edges}>
       <StatusBar style="dark" />
       <KeyboardAvoidingView
         style={styles.flex}

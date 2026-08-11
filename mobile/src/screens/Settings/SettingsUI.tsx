@@ -55,7 +55,7 @@ export function SettingsUI({
   onConfirmClearLocation,
 }: Props) {
   return (
-    <ScreenContainer>
+    <ScreenContainer edges={["top"]}>
       <Text style={styles.heading}>Settings</Text>
 
       <View style={styles.card}>
