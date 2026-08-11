@@ -14,10 +14,6 @@ return [
     |
     */
 
-    'commu' => [
-        'graphql_url' => env('COMMU_GRAPHQL_URL'),
-    ],
-
     'nominatim' => [
         'base_url' => env('NOMINATIM_BASE_URL'),
         'user_agent' => env('NOMINATIM_USER_AGENT'),
