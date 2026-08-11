@@ -63,10 +63,8 @@ export const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: colors.cardBackground,
   },
-  ownerInfo: {
-    flex: 1,
-  },
   ownerName: {
+    flex: 1,
     fontSize: 15,
     fontWeight: '700',
     color: colors.text,

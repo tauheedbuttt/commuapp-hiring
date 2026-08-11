@@ -1,4 +1,4 @@
-import { ActivityIndicator, FlatList, RefreshControl, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, RefreshControl, View } from 'react-native';
 import { Button } from '../../components/Button/Button';
 import { InlineMessage } from '../../components/InlineMessage/InlineMessage';
 import { ScreenContainer } from '../../components/ScreenContainer/ScreenContainer';
@@ -70,14 +70,14 @@ export function HomeUI({
       <FlatList
         data={notices}
         keyExtractor={(notice) => notice.id}
-        contentContainerStyle={notices.length === 0 ? styles.centeredContent : styles.listContent}
+        contentContainerStyle={styles.listContent}
         renderItem={({ item }) => <NoticeCard notice={item} onPress={onNoticePress} />}
         ListHeaderComponent={
           <AreaSummaryCard loading={summaryLoading} error={summaryError} summary={summary} />
         }
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No nearby help posts yet. Pull down to check again.</Text>
+            <InlineMessage variant="neutral">No nearby help posts yet. Pull down to check again.</InlineMessage>
           </View>
         }
         ListFooterComponent={

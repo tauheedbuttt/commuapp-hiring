@@ -54,12 +54,12 @@ export function NoticeCard({ notice, onPress }: Props) {
           ) : (
             <View style={styles.avatar} />
           )}
-          <View style={styles.ownerInfo}>
-            <Text style={styles.ownerName}>{notice.owner?.name ?? 'Someone'}</Text>
-            {notice.distance_to_user != null ? (
-              <Text style={styles.distance}>{formatDistanceAway(notice.distance_to_user)}</Text>
-            ) : null}
-          </View>
+          <Text style={styles.ownerName} numberOfLines={1}>
+            {notice.owner?.name ?? 'Someone'}
+          </Text>
+          {notice.distance_to_user != null ? (
+            <Text style={styles.distance}>{formatDistanceAway(notice.distance_to_user)}</Text>
+          ) : null}
         </View>
 
         {notice.description ? (
