@@ -32,3 +32,8 @@
     - notice batch itself also cached short (~5min), just to survive summary cache regen without extra CommuAPI hit
     - posts list stays uncached, real-time, own pagination — untouched
     - CommuAPI double-hit only possible on cold cache, not per page. rejected piggyback-on-list-fetch (endpoint ordering coupling, fragile) and background-job-seed (queue machinery, overkill for task size)
+- i would write monorepo if done again, to share graphql files across apps. didnt know this before
+- tag chips: card shows type + main category only, detail screen adds sub-category chips too
+  - reason: card is a compact summary, sub-categories are secondary detail — matches list-vs-detail density elsewhere in this app
+  - category chips (main + sub) always same neutral color; only the type chip is colored, keyed off notice type (give/need/collector)
+  - added `sub { id key }` to the mobile `notice(id,lat,long)` query only, not `noticesWhereDistance` — list query intentionally stays minimal

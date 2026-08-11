@@ -3,7 +3,7 @@
 Tracks completion against `docs/task.md`. Source of truth for "are we done yet."
 Check a box only once the thing actually runs/exists — not once it's planned.
 
-_Last reviewed: 2026-08-10._
+_Last reviewed: 2026-08-11._
 
 ## Backend (Laravel)
 
@@ -24,24 +24,24 @@ _Last reviewed: 2026-08-10._
 
 ## Mobile app (Expo)
 
-- [ ] Project scaffolded — nothing exists yet
-- [ ] Onboarding screen: text input for home town
-- [ ] Home screen: help post list + collapsible summary on top
-- [ ] Loading state
-- [ ] Error state (empty input, no results, upstream failure)
-- [ ] Calls backend API only — no direct Commu/Bedrock calls, no token in client
+- [x] Project scaffolded (`mobile/`, Expo blank TypeScript template — verified running on Android emulator in an earlier session; no emulator/device was available in the environment that built the onboarding screen below)
+- [x] Onboarding screen: manual city/country entry + GPS entry, geocoded via backend `geocodeTown`, persisted on-device (issue #9) — builds and typechecks clean; manual on-device verification against the golden paths in issue #9 not yet run (no emulator/device in the build environment)
+- [x] Home screen: help post list + collapsible summary on top
+- [x] Loading state (onboarding + Home)
+- [x] Error state (onboarding: geocode not-found/upstream, GPS permission denied, GPS reverse-geocode failure; Home: notices/summary fetch failure)
+- [x] Calls backend API only — no direct Commu/Bedrock calls, no token in client (onboarding, Home notices/summary, and NoticeDetail all talk to the backend only)
+- [ ] Manual device verification: Home loading/error states against golden paths (no emulator/device in the build environment)
 
 ## README (root)
 
-The following README sections track completed and pending decisions:
-
-- [ ] Mobile setup & run instructions (backend section already written)
-- [x] API format choice (GraphQL) + why
-- [x] Geocoding API choice (Nominatim) + why
-- [x] `notice*` query chosen + why
-- [x] Search distance chosen + why
-- [x] `Notice` fields selected + why
-- [x] Caching approach (implemented or hypothetical) + why
+The following README sections track completed and pending decisions: 
+- [ ] Mobile setup & run instructions
+- [ ] API format choice (GraphQL) + why
+- [ ] Geocoding API choice (Nominatim) + why
+- [ ] `notice*` query chosen + why
+- [ ] Search distance chosen + why
+- [ ] `Notice` fields selected + why
+- [ ] Caching approach (implemented or hypothetical) + why
 - [ ] Bedrock model + summary approach
 - [ ] "How I implemented this" — process, tools/agents used, delegated vs hand-written, how validated
 - [ ] "What I'd improve next"

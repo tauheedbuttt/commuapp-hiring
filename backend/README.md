@@ -39,8 +39,12 @@ values for env vars anywhere). Fill in `.env` after copying it:
 ## Run
 
 ```bash
-php artisan serve
+php artisan serve --host=0.0.0.0 --port=8000
 ```
+
+`--host=0.0.0.0` is required if the mobile app will hit this backend —
+`php artisan serve`'s default host (`127.0.0.1`) only accepts connections
+from the same machine, not from a phone/emulator on the same network.
 
 GraphQL endpoint: `POST http://127.0.0.1:8000/graphql`
 

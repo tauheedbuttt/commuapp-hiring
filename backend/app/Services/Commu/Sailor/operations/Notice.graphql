@@ -7,6 +7,7 @@ query Notice($id: ID!, $distanceToPoint: LocationUserPoint) {
         type
         side
         created_at
+        expires_at
         distance_to_user
         likes
         image {

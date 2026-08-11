@@ -1,0 +1,22 @@
+/** Palette sampled from docs/brainstorming/Location Selection.png and Logo.png. */
+export const colors = {
+  background: '#FDFBF5',
+  text: '#141414',
+  textMuted: '#5B5B54',
+  border: '#1F1F1F',
+  primaryGreen: '#0C7A49',
+  logoGreen: '#7BB78F',
+  logoPink: '#F2A6C1',
+  white: '#FFFFFF',
+  errorRed: '#B3261E',
+  tabBarBackground: '#E4F3E9',
+  cardBackground: '#F1EDDC',
+  cardBorder: '#E5DFC7',
+  skeletonBase: '#E7E2CE',
+  tagGiveBackground: '#DCF0E3',
+  tagGiveText: '#0C7A49',
+  tagNeedBackground: '#FBEFC9',
+  tagNeedText: '#8A6D1B',
+  tagNeutralBackground: '#E8E4D2',
+  tagNeutralText: '#5B5B54',
+} as const;

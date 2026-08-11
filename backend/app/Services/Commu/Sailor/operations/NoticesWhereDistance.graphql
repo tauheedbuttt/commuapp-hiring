@@ -41,6 +41,19 @@ query NoticesWhereDistance(
                     key
                 }
             }
+            image {
+                url
+            }
+            owner {
+                id
+                name
+                avatar_url
+            }
+            company {
+                id
+                name
+                logo_url
+            }
         }
     }
 }

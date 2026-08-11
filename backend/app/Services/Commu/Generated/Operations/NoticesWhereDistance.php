@@ -94,6 +94,22 @@ class NoticesWhereDistance extends \Spawnia\Sailor\Operation
                   key
                 }
               }
+              image {
+                __typename
+                url
+              }
+              owner {
+                __typename
+                id
+                name
+                avatar_url
+              }
+              company {
+                __typename
+                id
+                name
+                logo_url
+              }
             }
           }
         }';

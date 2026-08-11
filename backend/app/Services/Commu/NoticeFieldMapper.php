@@ -27,6 +27,19 @@ final class NoticeFieldMapper
             'distance_to_user' => $notice->distance_to_user,
             'position' => self::position($notice->position),
             'categories' => self::categories($notice->categories),
+            'image' => $notice->image === null ? null : [
+                'url' => $notice->image->url,
+            ],
+            'owner' => $notice->owner === null ? null : [
+                'id' => $notice->owner->id,
+                'name' => $notice->owner->name,
+                'avatar_url' => $notice->owner->avatar_url,
+            ],
+            'company' => $notice->company === null ? null : [
+                'id' => $notice->company->id,
+                'name' => $notice->company->name,
+                'logo_url' => $notice->company->logo_url,
+            ],
         ];
     }
 
@@ -41,6 +54,7 @@ final class NoticeFieldMapper
             'type' => $notice->type,
             'side' => $notice->side,
             'created_at' => $notice->created_at,
+            'expires_at' => $notice->expires_at,
             'distance_to_user' => $notice->distance_to_user,
             'likes' => $notice->likes,
             'image' => $notice->image === null ? null : [

@@ -13,6 +13,9 @@ namespace App\Services\Commu\Generated\Operations\NoticesWhereDistance\NoticesWh
  * @property string|null $description
  * @property string|null $side
  * @property float|null $distance_to_user
+ * @property \App\Services\Commu\Generated\Operations\NoticesWhereDistance\NoticesWhereDistance\Data\Image\Asset|null $image
+ * @property \App\Services\Commu\Generated\Operations\NoticesWhereDistance\NoticesWhereDistance\Data\Owner\User|null $owner
+ * @property \App\Services\Commu\Generated\Operations\NoticesWhereDistance\NoticesWhereDistance\Data\Company\Company|null $company
  */
 class Notice extends \Spawnia\Sailor\ObjectLike
 {
@@ -26,6 +29,9 @@ class Notice extends \Spawnia\Sailor\ObjectLike
      * @param string|null $description
      * @param string|null $side
      * @param float|null $distance_to_user
+     * @param \App\Services\Commu\Generated\Operations\NoticesWhereDistance\NoticesWhereDistance\Data\Image\Asset|null $image
+     * @param \App\Services\Commu\Generated\Operations\NoticesWhereDistance\NoticesWhereDistance\Data\Owner\User|null $owner
+     * @param \App\Services\Commu\Generated\Operations\NoticesWhereDistance\NoticesWhereDistance\Data\Company\Company|null $company
      */
     public static function make(
         $id,
@@ -37,6 +43,9 @@ class Notice extends \Spawnia\Sailor\ObjectLike
         $description = 'Special default value that allows Sailor to differentiate between explicitly passing null and not passing a value at all.',
         $side = 'Special default value that allows Sailor to differentiate between explicitly passing null and not passing a value at all.',
         $distance_to_user = 'Special default value that allows Sailor to differentiate between explicitly passing null and not passing a value at all.',
+        $image = 'Special default value that allows Sailor to differentiate between explicitly passing null and not passing a value at all.',
+        $owner = 'Special default value that allows Sailor to differentiate between explicitly passing null and not passing a value at all.',
+        $company = 'Special default value that allows Sailor to differentiate between explicitly passing null and not passing a value at all.',
     ): self {
         $instance = new self;
 
@@ -68,6 +77,15 @@ class Notice extends \Spawnia\Sailor\ObjectLike
         if ($distance_to_user !== self::UNDEFINED) {
             $instance->__set('distance_to_user', $distance_to_user);
         }
+        if ($image !== self::UNDEFINED) {
+            $instance->__set('image', $image);
+        }
+        if ($owner !== self::UNDEFINED) {
+            $instance->__set('owner', $owner);
+        }
+        if ($company !== self::UNDEFINED) {
+            $instance->__set('company', $company);
+        }
 
         return $instance;
     }
@@ -88,6 +106,9 @@ class Notice extends \Spawnia\Sailor\ObjectLike
             'description' => new \Spawnia\Sailor\Convert\NullConverter(new \Spawnia\Sailor\Convert\StringConverter),
             'side' => new \Spawnia\Sailor\Convert\NullConverter(new \Spawnia\Sailor\Convert\EnumConverter),
             'distance_to_user' => new \Spawnia\Sailor\Convert\NullConverter(new \Spawnia\Sailor\Convert\FloatConverter),
+            'image' => new \Spawnia\Sailor\Convert\NullConverter(new \App\Services\Commu\Generated\Operations\NoticesWhereDistance\NoticesWhereDistance\Data\Image\Asset),
+            'owner' => new \Spawnia\Sailor\Convert\NullConverter(new \App\Services\Commu\Generated\Operations\NoticesWhereDistance\NoticesWhereDistance\Data\Owner\User),
+            'company' => new \Spawnia\Sailor\Convert\NullConverter(new \App\Services\Commu\Generated\Operations\NoticesWhereDistance\NoticesWhereDistance\Data\Company\Company),
         ];
     }
 
