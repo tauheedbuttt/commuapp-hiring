@@ -6,7 +6,7 @@ import { HomeScreen } from '../screens/Home/HomeScreen';
 import { OnboardingScreen } from '../screens/Onboarding/OnboardingScreen';
 import { colors } from '../theme/colors';
 import { styles } from './RootNavigator.styles';
-import type { RootStackParamList } from './types';
+import type { RootStackParamList } from '../types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 

@@ -1,12 +1,8 @@
-import { Text } from 'react-native';
-import { ScreenContainer } from '../../ui/ScreenContainer/ScreenContainer';
-import { styles } from './HomeScreen.styles';
+import { useLocationStore } from '../../store/locationStore';
+import { HomeUI } from './HomeUI';
 
-/** Placeholder — help post list + area summary land in a later issue. */
 export function HomeScreen() {
-  return (
-    <ScreenContainer>
-      <Text style={styles.text}>Home</Text>
-    </ScreenContainer>
-  );
+  const location = useLocationStore((state) => state.location);
+
+  return <HomeUI location={location} />;
 }

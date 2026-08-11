@@ -1,25 +1,15 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { CombinedGraphQLErrors } from '@apollo/client/errors';
+import { useLazyQuery } from '@apollo/client/react';
 import * as Location from 'expo-location';
 import { useState } from 'react';
-import { Text, View } from 'react-native';
-import { useLazyQuery } from '@apollo/client/react';
-import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import { GeocodeTownDocument } from '../../api/generated/graphql';
-import { DEFAULT_COUNTRY } from '../../data/countries';
+import { COUNTRY_NAMES, DEFAULT_COUNTRY } from '../../data/countries';
 import { useLocationStore } from '../../store/locationStore';
-import type { RootStackParamList } from '../../navigation/types';
-import { CountryPicker } from '../../ui/CountryPicker/CountryPicker';
-import { InlineMessage } from '../../ui/InlineMessage/InlineMessage';
-import { Logo } from '../../ui/Logo/Logo';
-import { OutlineButton } from '../../ui/OutlineButton/OutlineButton';
-import { PrimaryButton } from '../../ui/PrimaryButton/PrimaryButton';
-import { ScreenContainer } from '../../ui/ScreenContainer/ScreenContainer';
-import { TextField } from '../../ui/TextField/TextField';
-import { styles } from './OnboardingScreen.styles';
+import type { GpsCoords, RootStackParamList } from '../../types';
+import { OnboardingUI } from './OnboardingUI';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Onboarding'>;
-
-type GpsCoords = { latitude: number; longitude: number } | null;
 
 export function OnboardingScreen({ navigation }: Props) {
   const setLocation = useLocationStore((state) => state.setLocation);
@@ -94,7 +84,7 @@ export function OnboardingScreen({ navigation }: Props) {
       if (category === 'not_found') {
         setSubmitError("We couldn't find that city. Check the spelling or try a nearby city.");
       } else {
-        setSubmitError("Something went wrong on our end. Please try again.");
+        setSubmitError('Something went wrong on our end. Please try again.');
       }
       return;
     }
@@ -114,50 +104,19 @@ export function OnboardingScreen({ navigation }: Props) {
   const isNextDisabled = city.trim().length === 0 || isSubmitting;
 
   return (
-    <ScreenContainer>
-      <Logo />
-
-      <View style={styles.copyBlock}>
-        <Text style={styles.heading}>Get started</Text>
-        <Text style={styles.body}>
-          Please fill in your home city and country. We only ask this information so that we can
-          better serve you with the content that is relevant for you. Home city is also used as a
-          fallback if GPS location is unavailable.
-        </Text>
-      </View>
-
-      <View style={styles.actions}>
-        <OutlineButton
-          label="Get current location"
-          icon="location"
-          onPress={handleGetCurrentLocation}
-          loading={gpsLoading}
-        />
-        {gpsError ? <InlineMessage>{gpsError}</InlineMessage> : null}
-      </View>
-
-      <View style={styles.fields}>
-        <CountryPicker label="Country" value={country} onChange={handleCountryChange} />
-        <TextField
-          label="City"
-          value={city}
-          onChangeText={handleCityChange}
-          placeholder="Enter your city"
-          autoCapitalize="words"
-          autoCorrect={false}
-        />
-      </View>
-
-      {submitError ? <InlineMessage>{submitError}</InlineMessage> : null}
-
-      <View style={styles.footer}>
-        <PrimaryButton
-          label="Next"
-          onPress={handleSubmit}
-          disabled={isNextDisabled}
-          loading={isSubmitting}
-        />
-      </View>
-    </ScreenContainer>
+    <OnboardingUI
+      country={country}
+      city={city}
+      countryOptions={COUNTRY_NAMES}
+      onCityChange={handleCityChange}
+      onCountryChange={handleCountryChange}
+      onGetCurrentLocation={handleGetCurrentLocation}
+      onSubmit={handleSubmit}
+      gpsLoading={gpsLoading}
+      gpsError={gpsError}
+      submitError={submitError}
+      isSubmitting={isSubmitting}
+      isNextDisabled={isNextDisabled}
+    />
   );
 }

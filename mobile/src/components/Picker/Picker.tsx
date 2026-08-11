@@ -2,28 +2,22 @@ import { Ionicons } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
 import { FlatList, Modal, Pressable, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { COUNTRY_NAMES } from '../../data/countries';
 import { colors } from '../../theme/colors';
-import { styles } from './CountryPicker.styles';
+import type { PickerProps } from '../../types';
+import { styles } from './Picker.styles';
 
-type Props = {
-  label: string;
-  value: string;
-  onChange: (country: string) => void;
-};
-
-export function CountryPicker({ label, value, onChange }: Props) {
+export function Picker({ label, value, options, onChange }: PickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
 
-  const filteredCountries = useMemo(() => {
+  const filteredOptions = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return COUNTRY_NAMES;
-    return COUNTRY_NAMES.filter((country) => country.toLowerCase().includes(query));
-  }, [search]);
+    if (!query) return options;
+    return options.filter((option) => option.toLowerCase().includes(query));
+  }, [search, options]);
 
-  function handleSelect(country: string) {
-    onChange(country);
+  function handleSelect(option: string) {
+    onChange(option);
     setSearch('');
     setIsOpen(false);
   }
@@ -39,7 +33,7 @@ export function CountryPicker({ label, value, onChange }: Props) {
       <Modal visible={isOpen} animationType="slide" onRequestClose={() => setIsOpen(false)}>
         <SafeAreaView style={styles.modal}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Select country</Text>
+            <Text style={styles.modalTitle}>Select {label.toLowerCase()}</Text>
             <Pressable onPress={() => setIsOpen(false)} hitSlop={12}>
               <Ionicons name="close" size={24} color={colors.text} />
             </Pressable>
@@ -53,8 +47,8 @@ export function CountryPicker({ label, value, onChange }: Props) {
             autoFocus
           />
           <FlatList
-            data={filteredCountries}
-            keyExtractor={(country) => country}
+            data={filteredOptions}
+            keyExtractor={(option) => option}
             keyboardShouldPersistTaps="handled"
             renderItem={({ item }) => (
               <Pressable style={styles.option} onPress={() => handleSelect(item)}>

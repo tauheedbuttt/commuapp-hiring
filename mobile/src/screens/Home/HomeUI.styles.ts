@@ -9,4 +9,14 @@ export const styles = StyleSheet.create({
     color: colors.text,
     textAlign: 'center',
   },
+  debug: {
+    marginTop: 24,
+    marginHorizontal: 24,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#EFEBDA',
+    color: colors.textMuted,
+    fontFamily: 'monospace',
+    fontSize: 13,
+  },
 });

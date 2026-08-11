@@ -38,19 +38,25 @@ npm run ios       # iOS simulator
 
 ## Structure
 
-Layer-based, mirroring the backend's organize-by-responsibility convention:
+Layer-based, mirroring the backend's organize-by-responsibility convention.
+See `docs/STANDARDS.md` for the reasoning behind the screens/UI split, the
+components rules, and the types rule below — this section is just the map.
 
-- `screens/` — screen components; own state, validation, Apollo calls, and
-  navigation triggers (`screens/Onboarding/`, `screens/Home/`)
-- `navigation/` — React Navigation (native-stack) setup and route types
+- `screens/<Name>/` — `<Name>Screen.tsx` owns state, validation, Apollo
+  calls, and navigation triggers; `<Name>UI.tsx` is the presentational half,
+  receiving everything via props (`screens/Onboarding/`, `screens/Home/`)
+- `navigation/` — React Navigation (native-stack) setup
 - `api/` — Apollo Client instance, `.graphql` operation documents under
   `api/operations/`, GraphQL Code Generator output under `api/generated/`
   (committed, not gitignored — mirrors the backend's committed Sailor client)
 - `store/` — Zustand store(s)
 - `hooks/` — reusable hooks that read/derive from stores or native APIs
-- `ui/` — presentational-only components (no state/API calls beyond local UI
-  state like a modal's open/closed flag), each with a colocated
-  `*.styles.ts` file
+- `components/` — shared, presentational-only components (no state/API calls
+  beyond local UI-only state like a modal's open/closed flag), each with a
+  colocated `*.styles.ts` file
+- `types/` — every type/interface in the app, one file per module/feature,
+  re-exported from `types/index.ts`; nothing declares its own inline type
+  elsewhere (generated codegen output is exempt)
 - `theme/` — colors, sampled from the reference screenshot
 - `data/` — small static datasets (country name list)
 
@@ -86,10 +92,11 @@ if a location is already saved — onboarding only ever runs once per install.
   City or Country after a GPS fill reverts to the manual (geocoded) path, since
   the edited text is no longer guaranteed to match the GPS coordinates.
 - **Country list**: names come from the `world-countries` npm package (data
-  only); the picker UI itself (`ui/CountryPicker`) is a custom
-  modal + search list, not a bundled picker component, to stay visually
-  consistent with the rest of the screen. Defaults to `Finland` — commu is a
-  Finnish product.
+  only); the picker UI itself (`components/Picker`) is a generic, custom
+  modal + search list — no domain knowledge of countries, just
+  `label`/`value`/`options`/`onChange` — not a bundled picker component, to
+  stay visually consistent with the rest of the screen. Onboarding passes it
+  the country list and defaults to `Finland` — commu is a Finnish product.
 - **Backend URL**: hardcoded per-platform in `src/api/client.ts`, since
   Android emulators resolve `localhost` to the emulator itself rather than the
   host machine (`10.0.2.2` is the documented alias for the host loopback).
@@ -97,6 +104,10 @@ if a location is already saved — onboarding only ever runs once per install.
   `not_found` and `upstream` map to distinct messages; GPS permission denial
   and reverse-geocode failure (no address for the coordinates) each get their
   own message with a nudge back to manual entry.
+- **Home screen** currently dumps the persisted location as raw JSON
+  (`screens/Home/HomeUI.tsx`) — a temporary stand-in so the onboarding →
+  persistence flow is visible end-to-end before the real Home content (post
+  list, area summary) exists. Remove once that lands.
 - No automated tests, per this repo's testing policy. Verification is manual
   (Expo Go / emulator) against the golden paths and error cases listed in the
   originating issue — **not yet run**, since this screen was built in an

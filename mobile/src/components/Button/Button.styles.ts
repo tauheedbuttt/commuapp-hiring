@@ -2,7 +2,24 @@ import { StyleSheet } from 'react-native';
 import { colors } from '../../theme/colors';
 
 export const styles = StyleSheet.create({
-  button: {
+  primary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: colors.primaryGreen,
+    borderRadius: 12,
+    paddingVertical: 16,
+  },
+  primaryPressed: {
+    opacity: 0.85,
+  },
+  primaryLabel: {
+    color: colors.white,
+    fontSize: 17,
+    fontWeight: '700',
+  },
+  outline: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -14,15 +31,15 @@ export const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 18,
   },
-  buttonPressed: {
+  outlinePressed: {
     backgroundColor: colors.white,
   },
-  buttonDisabled: {
-    opacity: 0.5,
-  },
-  label: {
+  outlineLabel: {
     color: colors.text,
     fontSize: 15,
     fontWeight: '600',
+  },
+  disabled: {
+    opacity: 0.4,
   },
 });
