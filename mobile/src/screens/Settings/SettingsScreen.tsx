@@ -1,13 +1,13 @@
-import { useDistanceStore } from '../../store/distanceStore';
+import { useSettingsStore } from '../../store/settingsStore';
 import { SettingsUI } from './SettingsUI';
 
 export function SettingsScreen() {
-  const distanceMeters = useDistanceStore((state) => state.distanceMeters);
-  const setDistanceMeters = useDistanceStore((state) => state.setDistanceMeters);
+  const distance = useSettingsStore((state) => state.distance);
+  const setDistance = useSettingsStore((state) => state.setDistance);
 
   function handleDistanceKmChange(km: number) {
-    setDistanceMeters(Math.round(km * 1000));
+    setDistance(Math.round(km * 1000));
   }
 
-  return <SettingsUI distanceKm={distanceMeters / 1000} onDistanceKmChange={handleDistanceKmChange} />;
+  return <SettingsUI distanceKm={distance / 1000} onDistanceKmChange={handleDistanceKmChange} />;
 }

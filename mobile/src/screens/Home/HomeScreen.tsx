@@ -6,7 +6,7 @@ import {
   AreaSummaryDocument,
   NoticesWhereDistanceDocument,
 } from "../../api/generated/graphql";
-import { useDistanceStore } from "../../store/distanceStore";
+import { useSettingsStore } from "../../store/settingsStore";
 import { useLocationStore } from "../../store/locationStore";
 import type { RootStackParamList } from "../../types";
 import type { NoticeListItem } from "./NoticeCard";
@@ -16,7 +16,7 @@ const PAGE_SIZE = 20;
 
 export function HomeScreen() {
   const location = useLocationStore((state) => state.location);
-  const distanceMeters = useDistanceStore((state) => state.distanceMeters);
+  const distance = useSettingsStore((state) => state.distance);
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const client = useApolloClient();
@@ -37,7 +37,7 @@ export function HomeScreen() {
     variables: {
       lat: location?.latitude ?? 0,
       long: location?.longitude ?? 0,
-      distance: distanceMeters,
+      distance,
       first: PAGE_SIZE,
       page: 1,
     },
@@ -64,7 +64,7 @@ export function HomeScreen() {
       town: location?.city ?? "",
       lat: location?.latitude ?? 0,
       long: location?.longitude ?? 0,
-      distance: distanceMeters,
+      distance,
     },
     skip: !location,
     notifyOnNetworkStatusChange: true,
@@ -82,7 +82,7 @@ export function HomeScreen() {
         variables: {
           lat: location.latitude,
           long: location.longitude,
-          distance: distanceMeters,
+          distance,
           first: PAGE_SIZE,
           page: nextPage,
         },

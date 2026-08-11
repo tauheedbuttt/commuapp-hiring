@@ -1,5 +1,5 @@
-import type { NoticeType } from '../../api/generated/graphql';
-import { colors } from '../../theme/colors';
+import type { NoticeType } from '../api/generated/graphql';
+import { colors } from '../theme/colors';
 
 type TagStyle = {
   label: string;

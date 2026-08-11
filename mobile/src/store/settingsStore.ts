@@ -4,19 +4,19 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 const DEFAULT_DISTANCE_METERS = 15000;
 
-type DistanceStoreState = {
-  distanceMeters: number;
-  setDistanceMeters: (distanceMeters: number) => void;
+type SettingsStoreState = {
+  distance: number;
+  setDistance: (distance: number) => void;
 };
 
-export const useDistanceStore = create<DistanceStoreState>()(
+export const useSettingsStore = create<SettingsStoreState>()(
   persist(
     (set) => ({
-      distanceMeters: DEFAULT_DISTANCE_METERS,
-      setDistanceMeters: (distanceMeters) => set({ distanceMeters }),
+      distance: DEFAULT_DISTANCE_METERS,
+      setDistance: (distance) => set({ distance }),
     }),
     {
-      name: 'commu-distance',
+      name: 'commu-settings',
       storage: createJSONStorage(() => AsyncStorage),
     },
   ),

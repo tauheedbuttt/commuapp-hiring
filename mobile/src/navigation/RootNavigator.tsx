@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ActivityIndicator, View } from 'react-native';
 import { useHasHydrated } from '../hooks/useHasHydrated';
-import { useDistanceStore } from '../store/distanceStore';
+import { useSettingsStore } from '../store/settingsStore';
 import { useLocationStore } from '../store/locationStore';
 import { MainTabNavigator } from './MainTabNavigator';
 import { NoticeDetailScreen } from '../screens/NoticeDetail/NoticeDetailScreen';
@@ -14,10 +14,10 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function RootNavigator() {
   const hasLocationHydrated = useHasHydrated(useLocationStore);
-  const hasDistanceHydrated = useHasHydrated(useDistanceStore);
+  const hasSettingsHydrated = useHasHydrated(useSettingsStore);
   const hasSavedLocation = useLocationStore((state) => state.location !== null);
 
-  if (!hasLocationHydrated || !hasDistanceHydrated) {
+  if (!hasLocationHydrated || !hasSettingsHydrated) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator color={colors.primaryGreen} />

@@ -1,6 +1,6 @@
 import { Image, Pressable, Text, View } from 'react-native';
 import type { NoticesWhereDistanceQuery } from '../../../api/generated/graphql';
-import { formatDistanceAway, noticeTypeTag, titleCase } from '../noticeTypeLabel';
+import { formatDistanceAway, noticeTypeTag, titleCase } from '../../../utils/notice';
 import { styles } from './styles';
 
 export type NoticeListItem = NoticesWhereDistanceQuery['noticesWhereDistance']['data'][number];
