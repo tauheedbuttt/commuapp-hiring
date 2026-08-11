@@ -11,7 +11,7 @@ export function NoticeDetailScreen({ route, navigation }: Props) {
   const { id } = route.params;
   const location = useLocationStore((state) => state.location);
 
-  const { data, loading, error, refetch } = useQuery(NoticeDocument, {
+  const { data, loading, refetch } = useQuery(NoticeDocument, {
     variables: {
       id,
       lat: location?.latitude ?? null,
@@ -24,7 +24,6 @@ export function NoticeDetailScreen({ route, navigation }: Props) {
     <NoticeDetailUI
       notice={data?.notice ?? null}
       loading={loading}
-      error={!!error}
       onRetry={refetch}
       onBack={() => navigation.goBack()}
     />

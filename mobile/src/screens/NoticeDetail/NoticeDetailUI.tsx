@@ -21,7 +21,6 @@ type Notice = NonNullable<NoticeQuery['notice']>;
 type Props = {
   notice: Notice | null;
   loading: boolean;
-  error: boolean;
   onRetry: () => void;
   onBack: () => void;
 };
@@ -35,7 +34,7 @@ function BackRow({ onBack }: { onBack: () => void }) {
   );
 }
 
-export function NoticeDetailUI({ notice, loading, error, onRetry, onBack }: Props) {
+export function NoticeDetailUI({ notice, loading, onRetry, onBack }: Props) {
   const [photoLoadFailed, setPhotoLoadFailed] = useState(false);
 
   useEffect(() => {
@@ -51,7 +50,9 @@ export function NoticeDetailUI({ notice, loading, error, onRetry, onBack }: Prop
     );
   }
 
-  if ((error || !notice) && !loading) {
+  // The notice(...) query is non-nullable on success, so a null notice past the
+  // loading check only happens when the fetch failed.
+  if (!notice) {
     return (
       <ScreenContainer edges={['top']}>
         <BackRow onBack={onBack} />
@@ -61,14 +62,6 @@ export function NoticeDetailUI({ notice, loading, error, onRetry, onBack }: Prop
             <Button label="Retry" variant="outline" onPress={onRetry} />
           </View>
         </View>
-      </ScreenContainer>
-    );
-  }
-
-  if (!notice) {
-    return (
-      <ScreenContainer edges={['top']}>
-        <BackRow onBack={onBack} />
       </ScreenContainer>
     );
   }
