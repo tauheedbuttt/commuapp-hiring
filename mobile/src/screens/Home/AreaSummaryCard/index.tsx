@@ -20,7 +20,7 @@ export function AreaSummaryCard({ loading, error, summary }: Props) {
         onPress={() => setCollapsed((prev) => !prev)}
       >
         <View style={styles.titleRow}>
-          <Ionicons name="sparkles" size={14} color={colors.white} />
+          <Ionicons name="sparkles" size={14} color={colors.primaryGreen} />
           <Text style={styles.title}>Summary</Text>
         </View>
         <Ionicons
