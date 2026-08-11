@@ -20,6 +20,7 @@ export function OnboardingScreen({ navigation }: Props) {
     <OnboardingUI
       country={form.country}
       city={form.city}
+      cityError={form.cityError}
       countryOptions={COUNTRY_NAMES}
       onCityChange={form.handleCityChange}
       onCountryChange={form.handleCountryChange}

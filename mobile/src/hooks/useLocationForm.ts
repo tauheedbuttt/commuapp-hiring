@@ -1,10 +1,12 @@
 import { useLazyQuery } from '@apollo/client/react';
 import * as Location from 'expo-location';
+import { useFormik } from 'formik';
 import { useState } from 'react';
 import { getGraphQLErrorCategory } from '../api/errors';
 import { GeocodeTownDocument } from '../api/generated/graphql';
 import { DEFAULT_COUNTRY } from '../data/countries';
 import { useLocationStore } from '../store/locationStore';
+import { locationFormSchema, type LocationFormValues } from '../validations/location';
 
 type GpsCoords = { latitude: number; longitude: number } | null;
 
@@ -18,8 +20,6 @@ export function useLocationForm() {
   const savedLocation = useLocationStore((state) => state.location);
   const setLocation = useLocationStore((state) => state.setLocation);
 
-  const [country, setCountry] = useState(savedLocation?.country ?? DEFAULT_COUNTRY);
-  const [city, setCity] = useState(savedLocation?.city ?? '');
   const [gpsCoords, setGpsCoords] = useState<GpsCoords>(null);
   const [gpsLoading, setGpsLoading] = useState(false);
   const [gpsError, setGpsError] = useState<string | null>(null);
@@ -27,13 +27,24 @@ export function useLocationForm() {
 
   const [geocodeTown, { loading: geocodeLoading }] = useLazyQuery(GeocodeTownDocument);
 
+  const formik = useFormik<LocationFormValues>({
+    initialValues: {
+      country: savedLocation?.country ?? DEFAULT_COUNTRY,
+      city: savedLocation?.city ?? '',
+    },
+    validationSchema: locationFormSchema,
+    validateOnChange: false,
+    validateOnBlur: false,
+    onSubmit: () => {},
+  });
+
   function handleCityChange(text: string) {
-    setCity(text);
+    formik.setFieldValue('city', text);
     setGpsCoords(null);
   }
 
   function handleCountryChange(next: string) {
-    setCountry(next);
+    formik.setFieldValue('country', next);
     setGpsCoords(null);
   }
 
@@ -60,8 +71,7 @@ export function useLocationForm() {
         return;
       }
 
-      setCity(address.city);
-      setCountry(address.country);
+      formik.setValues({ city: address.city, country: address.country });
       setGpsCoords({
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
@@ -73,9 +83,17 @@ export function useLocationForm() {
     }
   }
 
-  /** Resolves the current fields (GPS coords if set, else geocoding) and persists to the location store. Returns whether it succeeded. */
+  /** Validates, then resolves the current fields (GPS coords if set, else geocoding) and persists to the location store. Returns whether it succeeded. */
   async function handleSave(): Promise<boolean> {
     setSubmitError(null);
+
+    const errors = await formik.validateForm();
+    if (Object.keys(errors).length > 0) {
+      formik.setTouched({ country: true, city: true });
+      return false;
+    }
+
+    const { city, country } = formik.values;
 
     if (gpsCoords) {
       setLocation({ city, country, latitude: gpsCoords.latitude, longitude: gpsCoords.longitude });
@@ -101,13 +119,14 @@ export function useLocationForm() {
   }
 
   return {
-    country,
-    city,
+    country: formik.values.country,
+    city: formik.values.city,
+    cityError: formik.touched.city ? formik.errors.city : undefined,
     gpsLoading,
     gpsError,
     submitError,
     isSaving: geocodeLoading,
-    isSaveDisabled: city.trim().length === 0 || geocodeLoading,
+    isSaveDisabled: geocodeLoading,
     handleCityChange,
     handleCountryChange,
     handleGetCurrentLocation,

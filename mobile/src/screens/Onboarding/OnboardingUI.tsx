@@ -9,6 +9,7 @@ import { styles } from './OnboardingUI.styles';
 type Props = {
   country: string;
   city: string;
+  cityError?: string;
   countryOptions: readonly string[];
   onCityChange: (text: string) => void;
   onCountryChange: (country: string) => void;
@@ -24,6 +25,7 @@ type Props = {
 export function OnboardingUI({
   country,
   city,
+  cityError,
   countryOptions,
   onCityChange,
   onCountryChange,
@@ -52,6 +54,7 @@ export function OnboardingUI({
         <LocationForm
           country={country}
           city={city}
+          cityError={cityError}
           countryOptions={countryOptions}
           onCityChange={onCityChange}
           onCountryChange={onCountryChange}

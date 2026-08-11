@@ -58,6 +58,7 @@ export function SettingsScreen() {
       onDistanceKmChange={handleDistanceKmChange}
       country={locationForm.country}
       city={locationForm.city}
+      cityError={locationForm.cityError}
       countryOptions={COUNTRY_NAMES}
       onCityChange={handleCityChange}
       onCountryChange={handleCountryChange}

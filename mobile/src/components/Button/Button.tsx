@@ -1,7 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { ActivityIndicator, Pressable, StyleProp, Text, ViewStyle } from 'react-native';
-import { colors } from '../../theme/colors';
-import { styles } from './Button.styles';
+import { styles, VARIANT_STYLES } from './Button.styles';
 
 type Props = {
   label: string;
@@ -13,17 +12,6 @@ type Props = {
   /** Escape hatch for layout overrides (e.g. stretching an outline button that defaults to hugging its content). */
   style?: StyleProp<ViewStyle>;
 };
-
-const VARIANT_STYLES = {
-  primary: { container: 'primary', pressed: 'primaryPressed', label: 'primaryLabel', tint: colors.white },
-  outline: { container: 'outline', pressed: 'outlinePressed', label: 'outlineLabel', tint: colors.primaryGreen },
-  'danger-outline': {
-    container: 'dangerOutline',
-    pressed: 'dangerOutlinePressed',
-    label: 'dangerOutlineLabel',
-    tint: colors.errorRed,
-  },
-} as const;
 
 export function Button({ label, onPress, variant = 'primary', icon, disabled, loading, style }: Props) {
   const isDisabled = disabled || loading;

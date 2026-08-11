@@ -16,6 +16,7 @@ type Props = {
   onDistanceKmChange: (km: number) => void;
   country: string;
   city: string;
+  cityError?: string;
   countryOptions: readonly string[];
   onCityChange: (text: string) => void;
   onCountryChange: (country: string) => void;
@@ -38,6 +39,7 @@ export function SettingsUI({
   onDistanceKmChange,
   country,
   city,
+  cityError,
   countryOptions,
   onCityChange,
   onCountryChange,
@@ -94,6 +96,7 @@ export function SettingsUI({
           <LocationForm
             country={country}
             city={city}
+            cityError={cityError}
             countryOptions={countryOptions}
             onCityChange={onCityChange}
             onCountryChange={onCountryChange}

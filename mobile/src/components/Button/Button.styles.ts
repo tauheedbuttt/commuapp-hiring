@@ -1,6 +1,17 @@
 import { StyleSheet } from "react-native";
 import { colors } from "../../theme/colors";
 
+export const VARIANT_STYLES = {
+  primary: { container: "primary", pressed: "primaryPressed", label: "primaryLabel", tint: colors.white },
+  outline: { container: "outline", pressed: "outlinePressed", label: "outlineLabel", tint: colors.primaryGreen },
+  "danger-outline": {
+    container: "dangerOutline",
+    pressed: "dangerOutlinePressed",
+    label: "dangerOutlineLabel",
+    tint: colors.errorRed,
+  },
+} as const;
+
 export const styles = StyleSheet.create({
   primary: {
     flexDirection: "row",

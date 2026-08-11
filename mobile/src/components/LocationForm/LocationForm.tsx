@@ -8,6 +8,7 @@ import { styles } from './LocationForm.styles';
 type Props = {
   country: string;
   city: string;
+  cityError?: string;
   countryOptions: readonly string[];
   onCityChange: (text: string) => void;
   onCountryChange: (country: string) => void;
@@ -20,6 +21,7 @@ type Props = {
 export function LocationForm({
   country,
   city,
+  cityError,
   countryOptions,
   onCityChange,
   onCountryChange,
@@ -45,6 +47,7 @@ export function LocationForm({
         <TextField
           label="City"
           value={city}
+          error={cityError}
           onChangeText={onCityChange}
           placeholder="Enter your city"
           autoCapitalize="words"
