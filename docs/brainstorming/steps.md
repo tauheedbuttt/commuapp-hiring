@@ -14,3 +14,4 @@ This doc covers the step i take to solve the assignment. Agents can add here ste
 8. delete unused files from backend
 9. build newarby notices api
 10. build bedrock integration
+11. build notice by id 

@@ -25,7 +25,19 @@ GraphQL endpoint: `POST http://127.0.0.1:8000/graphql`. See `backend/README.md` 
 
 ### Mobile app (Expo)
 
-_Not built yet._
+```bash
+cd mobile
+npm install
+```
+
+Run (needs the backend running locally, see above):
+
+```bash
+npm start
+```
+
+Then scan the QR code with Expo Go, or `npm run android` / `npm run ios`. See
+`mobile/README.md` for structure, codegen, and the onboarding-screen flow.
 
 ## Decisions
 

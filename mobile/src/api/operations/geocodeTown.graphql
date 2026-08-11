@@ -1,0 +1,7 @@
+query GeocodeTown($town: String!) {
+  geocodeTown(town: $town) {
+    town
+    latitude
+    longitude
+  }
+}

@@ -1,0 +1,8 @@
+overwrite: true
+schema: ../backend/graphql/schema.graphql
+documents: src/api/operations/**/*.graphql
+generates:
+  src/api/generated/:
+    preset: client
+    presetConfig:
+      fragmentMasking: false
