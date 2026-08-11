@@ -1,11 +1,6 @@
 <?php
 
-/*
- * Only the `redis` connections are defined here — this app has no SQL
- * database, so the rest of Laravel's stock `database.php` was stripped.
- * The key must stay `database.php`/`redis` because Laravel's RedisManager
- * reads `config('database.redis')` unconditionally.
- */
+
 return [
 
     'redis' => [
