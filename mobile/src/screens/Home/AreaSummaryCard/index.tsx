@@ -30,7 +30,12 @@ export function AreaSummaryCard({ loading, error, summary }: Props) {
           ) : error ? (
             <Text style={styles.errorText}>Couldn't load the area summary.</Text>
           ) : (
-            <Text style={styles.summaryText}>{summary}</Text>
+            <View style={styles.summaryRow}>
+              <View style={styles.aiIcon}>
+                <Ionicons name="sparkles" size={14} color={colors.white} />
+              </View>
+              <Text style={styles.summaryText}>{summary}</Text>
+            </View>
           )}
         </View>
       )}
