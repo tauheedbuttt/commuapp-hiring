@@ -28,12 +28,12 @@ final class NoticeFieldMapper
             'position' => self::position($notice->position),
             'categories' => self::categories($notice->categories),
             'image' => $notice->image === null ? null : [
-                'url' => $notice->image->url,
+                'url' => self::resolveUrl($notice->image->url),
             ],
             'owner' => $notice->owner === null ? null : [
                 'id' => $notice->owner->id,
                 'name' => $notice->owner->name,
-                'avatar_url' => $notice->owner->avatar_url,
+                'avatar_url' => self::resolveUrl($notice->owner->avatar_url),
             ],
         ];
     }
@@ -52,14 +52,14 @@ final class NoticeFieldMapper
             'distance_to_user' => $notice->distance_to_user,
             'likes' => $notice->likes,
             'image' => $notice->image === null ? null : [
-                'url' => $notice->image->url,
+                'url' => self::resolveUrl($notice->image->url),
             ],
             'position' => self::position($notice->position),
             'categories' => self::categories($notice->categories),
             'owner' => $notice->owner === null ? null : [
                 'id' => $notice->owner->id,
                 'name' => $notice->owner->name,
-                'avatar_url' => $notice->owner->avatar_url,
+                'avatar_url' => self::resolveUrl($notice->owner->avatar_url),
                 'trust_level' => $notice->owner->trust_level,
                 'accountVerifications' => self::nonNullList($notice->owner->accountVerifications, static fn ($verification) => [
                     'type' => $verification->type,
@@ -69,7 +69,7 @@ final class NoticeFieldMapper
             'company' => $notice->company === null ? null : [
                 'id' => $notice->company->id,
                 'name' => $notice->company->name,
-                'logo_url' => $notice->company->logo_url,
+                'logo_url' => self::resolveUrl($notice->company->logo_url),
             ],
             'notice_language_versions' => self::nonNullList($notice->notice_language_versions, static fn ($translation) => [
                 'title' => $translation->title,
@@ -102,6 +102,31 @@ final class NoticeFieldMapper
                 'key' => $category->key,
             ]),
         ];
+    }
+
+    /**
+     * The upstream API returns asset URLs as either absolute (S3) or
+     * relative to its own host (`/storage/uploads/...`) depending on where
+     * the asset was uploaded. A relative path is meaningless to a mobile
+     * client, so resolve it against the Commu origin before it leaves this
+     * app.
+     */
+    private static function resolveUrl(?string $url): ?string
+    {
+        if ($url === null || str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
+            return $url;
+        }
+
+        $graphqlUrl = config('services.commu.graphql_url');
+        $parts = is_string($graphqlUrl) ? parse_url($graphqlUrl) : false;
+
+        if (! is_array($parts) || ! isset($parts['scheme'], $parts['host'])) {
+            return $url;
+        }
+
+        $origin = $parts['scheme'].'://'.$parts['host'].(isset($parts['port']) ? ':'.$parts['port'] : '');
+
+        return $origin.'/'.ltrim($url, '/');
     }
 
     /**
