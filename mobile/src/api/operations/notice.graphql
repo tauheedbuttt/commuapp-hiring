@@ -22,6 +22,10 @@ query Notice($id: ID!, $lat: Float, $long: Float) {
         id
         key
       }
+      sub {
+        id
+        key
+      }
     }
     owner {
       id

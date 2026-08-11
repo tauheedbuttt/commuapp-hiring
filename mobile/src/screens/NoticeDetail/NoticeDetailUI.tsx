@@ -79,6 +79,7 @@ export function NoticeDetailUI({ notice, loading, onRetry, onBack }: Props) {
 
   const typeTag = noticeTypeTag(notice.type);
   const categoryKey = notice.categories.main?.key;
+  const subCategories = notice.categories.sub;
 
   return (
     <ScreenContainer edges={['top']} header={<BackRow onBack={onBack} />}>
@@ -106,6 +107,11 @@ export function NoticeDetailUI({ notice, loading, onRetry, onBack }: Props) {
             <Text style={styles.tagText}>{titleCase(categoryKey)}</Text>
           </View>
         ) : null}
+        {subCategories.map((sub) => (
+          <View style={styles.tag} key={sub.id}>
+            <Text style={styles.tagText}>{titleCase(sub.key)}</Text>
+          </View>
+        ))}
       </View>
 
       <View style={styles.ownerSection}>
