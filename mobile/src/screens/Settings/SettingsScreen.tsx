@@ -1,12 +1,15 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { COUNTRY_NAMES } from '../../data/countries';
+import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 import { useLocationForm } from '../../hooks/useLocationForm';
 import { useLocationStore } from '../../store/locationStore';
 import { useSettingsStore } from '../../store/settingsStore';
 import type { RootStackParamList } from '../../types';
 import { SettingsUI } from './SettingsUI';
+
+const DISTANCE_COMMIT_DELAY_MS = 400;
 
 export function SettingsScreen() {
   const distance = useSettingsStore((state) => state.distance);
@@ -17,9 +20,15 @@ export function SettingsScreen() {
 
   const [justSavedLocation, setJustSavedLocation] = useState(false);
   const [isClearConfirmVisible, setIsClearConfirmVisible] = useState(false);
+  const [distanceKm, setDistanceKm] = useState(distance / 1000);
+  const debouncedDistanceKm = useDebouncedValue(distanceKm, DISTANCE_COMMIT_DELAY_MS);
+
+  useEffect(() => {
+    setDistance(Math.round(debouncedDistanceKm * 1000));
+  }, [debouncedDistanceKm, setDistance]);
 
   function handleDistanceKmChange(km: number) {
-    setDistance(Math.round(km * 1000));
+    setDistanceKm(km);
   }
 
   function handleCityChange(text: string) {
@@ -45,7 +54,7 @@ export function SettingsScreen() {
 
   return (
     <SettingsUI
-      distanceKm={distance / 1000}
+      distanceKm={distanceKm}
       onDistanceKmChange={handleDistanceKmChange}
       country={locationForm.country}
       city={locationForm.city}
