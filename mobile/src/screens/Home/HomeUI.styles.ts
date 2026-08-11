@@ -2,25 +2,39 @@ import { StyleSheet } from 'react-native';
 import { colors } from '../../theme/colors';
 
 export const styles = StyleSheet.create({
-  text: {
-    marginTop: 48,
-    fontSize: 28,
-    fontWeight: '800',
-    color: colors.text,
+  safe: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  listContent: {
+    flexGrow: 1,
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 16,
+  },
+  centeredContent: {
+    flexGrow: 1,
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 16,
+  },
+  footer: {
+    paddingVertical: 20,
+  },
+  emptyState: {
+    marginTop: 32,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 15,
+    color: colors.textMuted,
     textAlign: 'center',
   },
-  debug: {
+  errorState: {
     marginTop: 24,
-    marginHorizontal: 24,
-    padding: 12,
-    borderRadius: 8,
-    backgroundColor: '#EFEBDA',
-    color: colors.textMuted,
-    fontFamily: 'monospace',
-    fontSize: 13,
+    gap: 12,
   },
-  clearButton: {
-    marginTop: 24,
-    marginHorizontal: 24,
+  retryButton: {
+    alignSelf: 'flex-start',
   },
 });

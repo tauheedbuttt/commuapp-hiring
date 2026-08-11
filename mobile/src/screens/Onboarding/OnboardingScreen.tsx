@@ -88,7 +88,7 @@ export function OnboardingScreen({ navigation }: Props) {
         latitude: gpsCoords.latitude,
         longitude: gpsCoords.longitude,
       });
-      navigation.replace("Home");
+      navigation.replace("MainTabs");
       return;
     }
 
@@ -104,7 +104,7 @@ export function OnboardingScreen({ navigation }: Props) {
           latitude: data.geocodeTown.latitude,
           longitude: data.geocodeTown.longitude,
         });
-        navigation.replace("Home");
+        navigation.replace("MainTabs");
       }
     } catch (error) {
       const category = getGraphQLErrorCategory(error);

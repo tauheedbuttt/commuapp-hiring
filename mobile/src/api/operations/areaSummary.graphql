@@ -1,0 +1,5 @@
+query AreaSummary($town: String!, $lat: Float!, $long: Float!, $distance: Int!) {
+  areaSummary(town: $town, lat: $lat, long: $long, distance: $distance) {
+    summary
+  }
+}

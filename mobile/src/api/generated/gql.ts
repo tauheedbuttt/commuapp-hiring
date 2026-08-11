@@ -14,10 +14,14 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
+    "query AreaSummary($town: String!, $lat: Float!, $long: Float!, $distance: Int!) {\n  areaSummary(town: $town, lat: $lat, long: $long, distance: $distance) {\n    summary\n  }\n}": typeof types.AreaSummaryDocument,
     "query GeocodeTown($town: String!) {\n  geocodeTown(town: $town) {\n    town\n    latitude\n    longitude\n  }\n}": typeof types.GeocodeTownDocument,
+    "query NoticesWhereDistance($lat: Float!, $long: Float!, $distance: Int!, $first: Int!, $page: Int) {\n  noticesWhereDistance(\n    lat: $lat\n    long: $long\n    distance: $distance\n    first: $first\n    page: $page\n  ) {\n    paginatorInfo {\n      count\n      currentPage\n      hasMorePages\n    }\n    data {\n      id\n      title\n      description\n      type\n      created_at\n      distance_to_user\n      categories {\n        main {\n          key\n        }\n      }\n      image {\n        url\n      }\n      owner {\n        id\n        name\n        avatar_url\n      }\n    }\n  }\n}": typeof types.NoticesWhereDistanceDocument,
 };
 const documents: Documents = {
+    "query AreaSummary($town: String!, $lat: Float!, $long: Float!, $distance: Int!) {\n  areaSummary(town: $town, lat: $lat, long: $long, distance: $distance) {\n    summary\n  }\n}": types.AreaSummaryDocument,
     "query GeocodeTown($town: String!) {\n  geocodeTown(town: $town) {\n    town\n    latitude\n    longitude\n  }\n}": types.GeocodeTownDocument,
+    "query NoticesWhereDistance($lat: Float!, $long: Float!, $distance: Int!, $first: Int!, $page: Int) {\n  noticesWhereDistance(\n    lat: $lat\n    long: $long\n    distance: $distance\n    first: $first\n    page: $page\n  ) {\n    paginatorInfo {\n      count\n      currentPage\n      hasMorePages\n    }\n    data {\n      id\n      title\n      description\n      type\n      created_at\n      distance_to_user\n      categories {\n        main {\n          key\n        }\n      }\n      image {\n        url\n      }\n      owner {\n        id\n        name\n        avatar_url\n      }\n    }\n  }\n}": types.NoticesWhereDistanceDocument,
 };
 
 /**
@@ -37,7 +41,15 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "query AreaSummary($town: String!, $lat: Float!, $long: Float!, $distance: Int!) {\n  areaSummary(town: $town, lat: $lat, long: $long, distance: $distance) {\n    summary\n  }\n}"): (typeof documents)["query AreaSummary($town: String!, $lat: Float!, $long: Float!, $distance: Int!) {\n  areaSummary(town: $town, lat: $lat, long: $long, distance: $distance) {\n    summary\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "query GeocodeTown($town: String!) {\n  geocodeTown(town: $town) {\n    town\n    latitude\n    longitude\n  }\n}"): (typeof documents)["query GeocodeTown($town: String!) {\n  geocodeTown(town: $town) {\n    town\n    latitude\n    longitude\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "query NoticesWhereDistance($lat: Float!, $long: Float!, $distance: Int!, $first: Int!, $page: Int) {\n  noticesWhereDistance(\n    lat: $lat\n    long: $long\n    distance: $distance\n    first: $first\n    page: $page\n  ) {\n    paginatorInfo {\n      count\n      currentPage\n      hasMorePages\n    }\n    data {\n      id\n      title\n      description\n      type\n      created_at\n      distance_to_user\n      categories {\n        main {\n          key\n        }\n      }\n      image {\n        url\n      }\n      owner {\n        id\n        name\n        avatar_url\n      }\n    }\n  }\n}"): (typeof documents)["query NoticesWhereDistance($lat: Float!, $long: Float!, $distance: Int!, $first: Int!, $page: Int) {\n  noticesWhereDistance(\n    lat: $lat\n    long: $long\n    distance: $distance\n    first: $first\n    page: $page\n  ) {\n    paginatorInfo {\n      count\n      currentPage\n      hasMorePages\n    }\n    data {\n      id\n      title\n      description\n      type\n      created_at\n      distance_to_user\n      categories {\n        main {\n          key\n        }\n      }\n      image {\n        url\n      }\n      owner {\n        id\n        name\n        avatar_url\n      }\n    }\n  }\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

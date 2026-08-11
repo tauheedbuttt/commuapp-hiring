@@ -1,0 +1,30 @@
+query NoticesWhereDistance($lat: Float!, $long: Float!, $distance: Int!, $first: Int!, $page: Int) {
+  noticesWhereDistance(lat: $lat, long: $long, distance: $distance, first: $first, page: $page) {
+    paginatorInfo {
+      count
+      currentPage
+      hasMorePages
+    }
+    data {
+      id
+      title
+      description
+      type
+      created_at
+      distance_to_user
+      categories {
+        main {
+          key
+        }
+      }
+      image {
+        url
+      }
+      owner {
+        id
+        name
+        avatar_url
+      }
+    }
+  }
+}

@@ -9,4 +9,12 @@ export const colors = {
   logoPink: '#F2A6C1',
   white: '#FFFFFF',
   errorRed: '#B3261E',
+  cardBackground: '#F1EDDC',
+  skeletonBase: '#E7E2CE',
+  tagGiveBackground: '#DCF0E3',
+  tagGiveText: '#0C7A49',
+  tagNeedBackground: '#FBEFC9',
+  tagNeedText: '#8A6D1B',
+  tagNeutralBackground: '#E8E4D2',
+  tagNeutralText: '#5B5B54',
 } as const;
