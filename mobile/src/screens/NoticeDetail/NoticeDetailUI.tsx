@@ -43,8 +43,7 @@ export function NoticeDetailUI({ notice, loading, onRetry, onBack }: Props) {
 
   if (loading && !notice) {
     return (
-      <ScreenContainer edges={['top']}>
-        <BackRow onBack={onBack} />
+      <ScreenContainer edges={['top']} header={<BackRow onBack={onBack} />}>
         <NoticeDetailSkeleton />
       </ScreenContainer>
     );
@@ -54,8 +53,7 @@ export function NoticeDetailUI({ notice, loading, onRetry, onBack }: Props) {
   // loading check only happens when the fetch failed.
   if (!notice) {
     return (
-      <ScreenContainer edges={['top']}>
-        <BackRow onBack={onBack} />
+      <ScreenContainer edges={['top']} header={<BackRow onBack={onBack} />}>
         <View style={styles.errorState}>
           <InlineMessage>Couldn't load this help post.</InlineMessage>
           <View style={styles.retryButton}>
@@ -70,9 +68,7 @@ export function NoticeDetailUI({ notice, loading, onRetry, onBack }: Props) {
   const categoryKey = notice.categories.main?.key;
 
   return (
-    <ScreenContainer edges={['top']}>
-      <BackRow onBack={onBack} />
-
+    <ScreenContainer edges={['top']} header={<BackRow onBack={onBack} />}>
       <Text style={styles.title}>{notice.title}</Text>
 
       <View style={styles.imageWrapper}>
@@ -99,14 +95,20 @@ export function NoticeDetailUI({ notice, loading, onRetry, onBack }: Props) {
         ) : null}
       </View>
 
-      <OwnerRow
-        owner={notice.owner}
-        company={notice.company}
-        avatarSize={74}
-        ring
-        style={styles.ownerRow}
-        nameStyle={styles.ownerName}
-      />
+      <View style={styles.ownerSection}>
+        <OwnerRow
+          owner={notice.owner}
+          company={notice.company}
+          avatarSize={74}
+          ring
+          style={styles.ownerRow}
+          nameStyle={styles.ownerName}
+        />
+        <View style={styles.likeBlock}>
+          <Ionicons name="heart" size={28} color={colors.errorRed} />
+          <Text style={styles.likeCount}>{notice.likes ?? 0}</Text>
+        </View>
+      </View>
 
       <View style={styles.metaRow}>
         {notice.distance_to_user != null ? (
@@ -124,11 +126,6 @@ export function NoticeDetailUI({ notice, loading, onRetry, onBack }: Props) {
           Valid <Text style={styles.metaValue}>until: {formatDate(notice.expires_at)}</Text>
         </Text>
       ) : null}
-
-      <View style={styles.likeRow}>
-        <Ionicons name="heart" size={28} color={colors.errorRed} />
-        <Text style={styles.likeCount}>{notice.likes ?? 0}</Text>
-      </View>
 
       {notice.description ? (
         <>

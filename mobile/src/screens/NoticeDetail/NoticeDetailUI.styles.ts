@@ -6,7 +6,6 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
-    marginBottom: 12,
   },
   backLabel: {
     fontSize: 20,
@@ -45,8 +44,13 @@ export const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.tagNeutralText,
   },
-  ownerRow: {
+  ownerSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 16,
+  },
+  ownerRow: {
+    flex: 1,
   },
   ownerName: {
     fontSize: 20,
@@ -68,10 +72,9 @@ export const styles = StyleSheet.create({
     fontWeight: '400',
     color: colors.text,
   },
-  likeRow: {
+  likeBlock: {
     alignItems: 'center',
-    marginTop: 16,
-    marginBottom: 8,
+    marginLeft: 12,
   },
   likeCount: {
     fontSize: 14,
@@ -93,7 +96,7 @@ export const styles = StyleSheet.create({
     marginBottom: 8,
   },
   inReturnCard: {
-    backgroundColor: colors.cardBackground,
+    backgroundColor: colors.tagGiveBackground,
     borderRadius: 16,
     padding: 16,
     marginTop: 16,

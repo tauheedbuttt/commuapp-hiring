@@ -9,6 +9,12 @@ export const styles = StyleSheet.create({
   flex: {
     flex: 1,
   },
+  header: {
+    backgroundColor: colors.background,
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 12,
+  },
   content: {
     flexGrow: 1,
     paddingHorizontal: 24,

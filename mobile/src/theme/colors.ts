@@ -1,6 +1,6 @@
 /** Palette sampled from docs/brainstorming/Location Selection.png and Logo.png. */
 export const colors = {
-  background: '#FBF8EC',
+  background: '#FDFBF5',
   text: '#141414',
   textMuted: '#5B5B54',
   border: '#1F1F1F',
